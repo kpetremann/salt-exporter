@@ -1,4 +1,10 @@
+[![status](https://img.shields.io/badge/status-in%20development-orange)](https://github.com/kpetremann/salt-exporter)
+[![Go](https://img.shields.io/github/go-mod/go-version/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter)
+[![GitHub](https://img.shields.io/github/license/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/blob/main/LICENSE)
+
 # Salt Exporter
+
+This project is ready to use, but is still being battle tested.
 
 ## Quickstart
 
@@ -17,7 +23,6 @@ Be able to configure IPC path and Prometheus listen address/port.
 ## Exposed metrics
 
 ### Example
-<details>
 
 ```
 # HELP salt_expected_responses_total Total number of expected minions responses
@@ -36,8 +41,6 @@ salt_responses_total{function="test.ping",minion="node1",success="true"} 4
 # TYPE salt_scheduled_job_return_total counter
 salt_scheduled_job_return_total{function="saltutil.sync_all",minion="node1",success="true"} 2
 ```
-
-</details>
 
 ### `salt/job/<jid>/new`
 
