@@ -10,15 +10,13 @@ This project is ready to use, but is still being battle tested and metrics are s
 
 Salt Exporter is a Prometheus export for Salt events. It exposes relevant metrics regarding jobs and results.
 
-You just need to run the exporter on the same server than the Salt Master using the same user.
+You just need to run the exporter on the same server than the Salt Master.
 
 ## Features
 
 Supported tags:
 * salt/job/<jid>/new
 * salt/job/<jid>/ret/<*>
-
-Be able to configure IPC path and Prometheus listen address/port.
 
 ## Exposed metrics
 
