@@ -76,6 +76,10 @@ It can be joined on function label to have details per executed module.
 * details per state module when state.single is used
 * metric regarding IPC connectivity
 * support the runners
+* be able to enable/disable metrics
+* webserver: listen address and port configurable
+* webserver: basic auth/TLS
+* salt-api as a backend (yet to be assessed if it is relevant)
 
 ## Estimated performance
 
