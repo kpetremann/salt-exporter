@@ -41,7 +41,12 @@ func main() {
 	mux.Handle("/metrics", promhttp.Handler())
 	httpServer := http.Server{Addr: ":2112", Handler: mux}
 
-	go httpServer.ListenAndServe()
+	go func() {
+		if err := httpServer.ListenAndServe(); err != nil {
+			log.Error().Err(err).Send()
+			stop()
+		}
+	}()
 
 	// exiting
 	<-ctx.Done()
