@@ -24,14 +24,21 @@ func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
 			Name: "salt_responses_total",
 			Help: "Total number of response job processed",
 		},
-		[]string{"function", "minion", "success"},
+		[]string{"minion", "success"},
+	)
+	functionResponsesCounter := promauto.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "salt_function_responses_total",
+			Help: "Total number of response per function processed",
+		},
+		[]string{"function", "success"},
 	)
 	scheduledJobReturnCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_scheduled_job_return_total",
 			Help: "Total number of scheduled job response",
 		},
-		[]string{"function", "minion", "success"},
+		[]string{"function", "success"},
 	)
 	expectedResponsesNumber := promauto.NewCounterVec(
 		prometheus.CounterOpts{
@@ -56,14 +63,17 @@ func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
 				if event.IsScheduleJob {
 					scheduledJobReturnCounter.WithLabelValues(
 						event.Data.Fun,
-						event.Data.Id,
 						strconv.FormatBool(event.Data.Success),
 					).Inc()
 				} else {
+					sucess := strconv.FormatBool(event.Data.Success)
 					responsesCounter.WithLabelValues(
-						event.Data.Fun,
 						event.Data.Id,
-						strconv.FormatBool(event.Data.Success),
+						sucess,
+					).Inc()
+					functionResponsesCounter.WithLabelValues(
+						event.Data.Fun,
+						sucess,
 					).Inc()
 				}
 			}

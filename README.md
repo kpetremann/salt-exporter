@@ -4,7 +4,7 @@
 
 # Salt Exporter
 
-This project is ready to use, but is still being battle tested.
+This project is ready to use, but is still being battle tested and metrics are subject to evolve.
 
 ## Quickstart
 
@@ -27,19 +27,23 @@ Be able to configure IPC path and Prometheus listen address/port.
 ```
 # HELP salt_expected_responses_total Total number of expected minions responses
 # TYPE salt_expected_responses_total counter
-salt_expected_responses_total{function="test.ping"} 4
+salt_expected_responses_total{function="cmd.run"} 6
+salt_expected_responses_total{function="test.ping"} 6
+
+# HELP salt_function_responses_total Total number of response per function processed
+# TYPE salt_function_responses_total counter
+salt_function_responses_total{function="cmd.run",success="true"} 6
+salt_function_responses_total{function="test.ping",success="true"} 6
 
 # HELP salt_new_job_total Total number of new job processed
 # TYPE salt_new_job_total counter
-salt_new_job_total{function="test.ping",success="false"} 4
+salt_new_job_total{function="cmd.run",success="false"} 3
+salt_new_job_total{function="test.ping",success="false"} 3
 
 # HELP salt_responses_total Total number of response job processed
 # TYPE salt_responses_total counter
-salt_responses_total{function="test.ping",minion="node1",success="true"} 4
-
-# HELP salt_scheduled_job_return_total Total number of scheduled job response processed
-# TYPE salt_scheduled_job_return_total counter
-salt_scheduled_job_return_total{function="saltutil.sync_all",minion="node1",success="true"} 2
+salt_responses_total{minion="local",success="true"} 6
+salt_responses_total{minion="node1",success="true"} 6
 ```
 
 ### `salt/job/<jid>/new`
@@ -50,7 +54,7 @@ It increases:
 
 ### `salt/job/<jid>/ret/<*>`
 
-Usually, it will increase the `salt_responses_total` counter.
+Usually, it will increase the `salt_responses_total` (per minion) and `salt_function_responses_total` (per function) counters.
 
 However, if it is a feedback of a scheduled job, it increases `salt_scheduled_job_return_total` instead.
 
