@@ -26,26 +26,42 @@ It extracts and exposes:
 
 ### Example
 
+execution modules:
 ```
 # HELP salt_expected_responses_total Total number of expected minions responses
 # TYPE salt_expected_responses_total counter
-salt_expected_responses_total{function="cmd.run"} 6
-salt_expected_responses_total{function="test.ping"} 6
+salt_expected_responses_total{function="cmd.run", state=""} 6
+salt_expected_responses_total{function="test.ping", state=""} 6
 
 # HELP salt_function_responses_total Total number of response per function processed
 # TYPE salt_function_responses_total counter
-salt_function_responses_total{function="cmd.run",success="true"} 6
-salt_function_responses_total{function="test.ping",success="true"} 6
+salt_function_responses_total{function="cmd.run",state="",success="true"} 6
+salt_function_responses_total{function="test.ping",state="",success="true"} 6
 
 # HELP salt_new_job_total Total number of new job processed
 # TYPE salt_new_job_total counter
-salt_new_job_total{function="cmd.run",success="false"} 3
-salt_new_job_total{function="test.ping",success="false"} 3
+salt_new_job_total{function="cmd.run",state="",success="false"} 3
+salt_new_job_total{function="test.ping",state="",success="false"} 3
 
 # HELP salt_responses_total Total number of response job processed
 # TYPE salt_responses_total counter
 salt_responses_total{minion="local",success="true"} 6
 salt_responses_total{minion="node1",success="true"} 6
+```
+
+states:
+```
+salt_expected_responses_total{function="state.apply",state="highstate"} 1
+salt_expected_responses_total{function="state.highstate",state="highstate"} 2
+salt_expected_responses_total{function="state.sls",state="test"} 1
+
+salt_function_responses_total{function="state.apply",state="highstate",success="true"} 1
+salt_function_responses_total{function="state.highstate",state="highstate",success="true"} 2
+salt_function_responses_total{function="state.sls",state="test",success="true"} 1
+
+salt_new_job_total{function="state.apply",state="highstate",success="false"} 1
+salt_new_job_total{function="state.highstate",state="highstate",success="false"} 2
+salt_new_job_total{function="state.sls",state="test",success="false"} 1
 ```
 
 ### `salt/job/<jid>/new`
