@@ -12,12 +12,12 @@ import (
 )
 
 func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
-	newJobsCounter := promauto.NewCounterVec(
+	newJobCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_new_job_total",
 			Help: "Total number of new job processed",
 		},
-		[]string{"function", "success"},
+		[]string{"function", "state", "success"},
 	)
 	responsesCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
@@ -31,21 +31,22 @@ func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
 			Name: "salt_function_responses_total",
 			Help: "Total number of response per function processed",
 		},
-		[]string{"function", "success"},
+		[]string{"function", "state", "success"},
 	)
+
 	scheduledJobReturnCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_scheduled_job_return_total",
 			Help: "Total number of scheduled job response",
 		},
-		[]string{"function", "success"},
+		[]string{"function", "state", "success"},
 	)
 	expectedResponsesNumber := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_expected_responses_total",
 			Help: "Total number of expected minions responses",
 		},
-		[]string{"function"},
+		[]string{"function", "state"},
 	)
 
 	for {
@@ -55,14 +56,18 @@ func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
 			return
 		case event := <-eventChan:
 			start := time.Now()
+
 			switch event.Type {
 			case "new":
-				newJobsCounter.WithLabelValues(event.Data.Fun, strconv.FormatBool(event.Data.Success)).Inc()
-				expectedResponsesNumber.WithLabelValues(event.Data.Fun).Add(float64(event.TargetNumber))
+				state := event.ExtractState()
+				newJobCounter.WithLabelValues(event.Data.Fun, state, strconv.FormatBool(event.Data.Success)).Inc()
+				expectedResponsesNumber.WithLabelValues(event.Data.Fun, state).Add(float64(event.TargetNumber))
 			case "ret":
+				state := event.ExtractState()
 				if event.IsScheduleJob {
 					scheduledJobReturnCounter.WithLabelValues(
 						event.Data.Fun,
+						state,
 						strconv.FormatBool(event.Data.Success),
 					).Inc()
 				} else {
@@ -73,10 +78,12 @@ func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
 					).Inc()
 					functionResponsesCounter.WithLabelValues(
 						event.Data.Fun,
+						state,
 						sucess,
 					).Inc()
 				}
 			}
+
 			elapsed := time.Since(start)
 			log.Debug().Str("metric conversion took", elapsed.String()).Send()
 		}

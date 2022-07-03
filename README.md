@@ -15,8 +15,12 @@ You just need to run the exporter on the same server than the Salt Master.
 ## Features
 
 Supported tags:
-* salt/job/<jid>/new
-* salt/job/<jid>/ret/<*>
+* `salt/job/<jid>/new`
+* `salt/job/<jid>/ret/<*>`
+
+It extracts and exposes:
+* the execution module, to `function` label
+* the states when using state.sls/state.apply/state.highstate, to `state` label
 
 ## Exposed metrics
 
@@ -70,7 +74,6 @@ It can be joined on function label to have details per executed module.
 
 ## Upcoming features
 
-* details per state when state.sls/state.apply is used
 * details per state module when state.single is used
 * metric regarding IPC connectivity
 * support the runners

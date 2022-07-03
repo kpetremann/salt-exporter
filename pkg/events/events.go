@@ -36,6 +36,38 @@ type SaltEvent struct {
 	IsScheduleJob bool
 }
 
+func extractStateFromArgs(args interface{}) string {
+	// args only
+	if v, ok := args.(string); ok {
+		return v
+	}
+	// kwargs
+	if v, ok := args.(map[string]interface{}); ok {
+		if _, ok := v["mods"]; ok {
+			return v["mods"].(string)
+		}
+	}
+
+	return ""
+}
+
+// Extract state info from event
+func (e *SaltEvent) ExtractState() string {
+	switch e.Data.Fun {
+	case "state.sls", "state.apply":
+		if len(e.Data.Arg) > 0 {
+			return extractStateFromArgs(e.Data.Arg[0])
+		} else if len(e.Data.FunArgs) > 0 {
+			return extractStateFromArgs(e.Data.FunArgs[0])
+		} else if e.Data.Fun == "state.apply" {
+			return "highstate"
+		}
+	case "state.highstate":
+		return "highstate"
+	}
+	return ""
+}
+
 func ParseEvent(message map[string]interface{}, eventChan chan SaltEvent) {
 	body := string(message["body"].([]byte))
 	lines := strings.SplitN(body, "\n\n", 2)
