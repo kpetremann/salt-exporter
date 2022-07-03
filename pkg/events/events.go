@@ -54,13 +54,7 @@ func ParseEvent(message map[string]interface{}, eventChan chan SaltEvent) {
 	byteResult := []byte(lines[1])
 
 	if err := msgpack.Unmarshal(byteResult, &event.Data); err != nil {
-		var debug map[string]interface{}
-		msgpack.Unmarshal(byteResult, &debug)
-		log.Trace().Interface("raw event", debug).Msg("failed to parse event")
-
-		log.Debug().Str("error", err.Error()).Interface("debug", debug).Msg("decoding_failure")
 		log.Warn().Str("error", err.Error()).Str("tag", tag).Msg("decoding_failure")
-
 		return
 	}
 
