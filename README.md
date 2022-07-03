@@ -7,6 +7,10 @@
 
 This project is ready to use, but is still being battle tested and metrics are subject to evolve.
 
+Notes:
+* This has only be tested on Linux
+* If you did not setup the external_auth parameter, you need to run the exporter with the same user running the Salt Master. If it is set, any user will do the trick.
+
 ## Quickstart
 
 Salt Exporter is a Prometheus export for Salt events. It exposes relevant metrics regarding jobs and results.
