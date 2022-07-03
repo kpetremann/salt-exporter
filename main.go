@@ -50,5 +50,7 @@ func main() {
 
 	// exiting
 	<-ctx.Done()
-	httpServer.Shutdown(context.Background())
+	if err := httpServer.Shutdown(context.Background()); err != nil {
+		log.Error().Err(err).Send()
+	}
 }

@@ -1,6 +1,10 @@
 package events
 
-import "github.com/vmihailenco/msgpack/v5"
+import (
+	"log"
+
+	"github.com/vmihailenco/msgpack/v5"
+)
 
 type FakeData struct {
 	Arg       []interface{} `msgpack:"arg"`
@@ -25,7 +29,9 @@ type FakeData struct {
 func fakeEventAsMap(event []byte) map[string]interface{} {
 	var m interface{}
 
-	msgpack.Unmarshal(event, &m)
+	if err := msgpack.Unmarshal(event, &m); err != nil {
+		log.Fatalln(err)
+	}
 
 	return map[string]interface{}{"body": event}
 }
