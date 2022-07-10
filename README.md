@@ -1,9 +1,10 @@
-[![status](https://img.shields.io/badge/status-in%20development-orange)](https://github.com/kpetremann/salt-exporter)
+[![status](https://img.shields.io/badge/status-alpha-orange)](https://github.com/kpetremann/salt-exporter)
 [![Go](https://img.shields.io/github/go-mod/go-version/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter)
 [![CI](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml/badge.svg)](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml)
 [![GitHub](https://img.shields.io/github/license/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/blob/main/LICENSE)
 
 # Salt Exporter
+<img align="right" width="120px" src="https://raw.githubusercontent.com/kpetremann/salt-exporter/main/img/salt-exporter.png" />
 
 This project is ready to use, but is still being battle tested and metrics are subject to evolve.
 
