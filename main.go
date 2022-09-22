@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,6 +22,12 @@ func quit() {
 
 func main() {
 	defer quit()
+
+	listenAddress := flag.String("host", "", "listen address")
+	listenPort := flag.Int("port", 2112, "listen port")
+	flag.Parse()
+	listenSocket := fmt.Sprint(*listenAddress, ":", *listenPort)
+
 	logging.ConfigureLogging()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -35,11 +43,11 @@ func main() {
 	go metrics.ExposeMetrics(ctx, eventChan)
 
 	// start http server
-	log.Info().Msg("exposing metrics on :2112/metrics")
+	log.Info().Msg("exposing metrics on " + listenSocket + "/metrics")
 
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.Handler())
-	httpServer := http.Server{Addr: ":2112", Handler: mux}
+	httpServer := http.Server{Addr: listenSocket, Handler: mux}
 
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil {
