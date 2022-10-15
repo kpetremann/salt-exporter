@@ -20,6 +20,16 @@ Notes:
 
 > If you did not setup the external_auth parameter, you need to run the exporter with the same user running the Salt Master. If it is set, any user will do the trick.
 
+## Usage
+
+```
+./salt-exporter
+  -host string
+        listen address (default 0.0.0.0)
+  -port int
+        listen port (default 2112)
+```
+
 ## Features
 
 Supported tags:
