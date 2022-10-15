@@ -60,7 +60,7 @@ func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
 			switch event.Type {
 			case "new":
 				state := event.ExtractState()
-				newJobCounter.WithLabelValues(event.Data.Fun, state, strconv.FormatBool(event.Data.Success)).Inc()
+				newJobCounter.WithLabelValues(event.Data.Fun, state, "true").Inc()
 				expectedResponsesNumber.WithLabelValues(event.Data.Fun, state).Add(float64(event.TargetNumber))
 			case "ret":
 				state := event.ExtractState()
