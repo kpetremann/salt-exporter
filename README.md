@@ -57,19 +57,22 @@ salt_responses_total{minion="local",success="true"} 6
 salt_responses_total{minion="node1",success="true"} 6
 ```
 
-states:
+states (state.sls/apply/highstate) and states module (state.single):
 ```
 salt_expected_responses_total{function="state.apply",state="highstate"} 1
 salt_expected_responses_total{function="state.highstate",state="highstate"} 2
 salt_expected_responses_total{function="state.sls",state="test"} 1
+salt_expected_responses_total{function="state.single",state="test.nop"} 3
 
 salt_function_responses_total{function="state.apply",state="highstate",success="true"} 1
 salt_function_responses_total{function="state.highstate",state="highstate",success="true"} 2
 salt_function_responses_total{function="state.sls",state="test",success="true"} 1
+salt_function_responses_total{function="state.single",state="test.nop",success="true"} 3
 
 salt_new_job_total{function="state.apply",state="highstate",success="false"} 1
 salt_new_job_total{function="state.highstate",state="highstate",success="false"} 2
 salt_new_job_total{function="state.sls",state="test",success="false"} 1
+salt_new_job_total{function="state.single",state="test.nop",success="true"} 3
 ```
 
 ### `salt/job/<jid>/new`
@@ -98,11 +101,9 @@ It can be joined on function label to have details per executed module.
 
 ## Upcoming features
 
-* details per state module when state.single is used
 * metric regarding IPC connectivity
 * support the runners
 * be able to enable/disable metrics
-* webserver: listen address and port configurable
 * webserver: basic auth/TLS
 
 ## Estimated performance
