@@ -22,13 +22,31 @@ func quit() {
 
 func main() {
 	defer quit()
+	logging.ConfigureLogging()
 
 	listenAddress := flag.String("host", "", "listen address")
 	listenPort := flag.Int("port", 2112, "listen port")
+	tlsEnabled := flag.Bool("tls", false, "enable TLS")
+	tlsCert := flag.String("tls-cert", "", "TLS certificated")
+	tlsKey := flag.String("tls-key", "", "TLS private key")
 	flag.Parse()
-	listenSocket := fmt.Sprint(*listenAddress, ":", *listenPort)
 
-	logging.ConfigureLogging()
+	if *tlsEnabled {
+		missingFlag := false
+		if *tlsCert == "" {
+			missingFlag = true
+			log.Error().Msg("TLS certificate not specified")
+		}
+		if *tlsCert == "" {
+			missingFlag = true
+			log.Error().Msg("TLS private key not specified")
+		}
+		if missingFlag {
+			return
+		}
+	}
+
+	listenSocket := fmt.Sprint(*listenAddress, ":", *listenPort)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -50,7 +68,15 @@ func main() {
 	httpServer := http.Server{Addr: listenSocket, Handler: mux}
 
 	go func() {
-		if err := httpServer.ListenAndServe(); err != nil {
+		var err error
+
+		if !*tlsEnabled {
+			err = httpServer.ListenAndServe()
+		} else {
+			err = httpServer.ListenAndServeTLS(*tlsCert, *tlsKey)
+		}
+
+		if err != nil {
 			log.Error().Err(err).Send()
 			stop()
 		}
