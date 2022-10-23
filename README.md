@@ -114,7 +114,6 @@ It can be joined on function label to have details per executed module.
 * metric regarding IPC connectivity
 * support the runners
 * be able to enable/disable metrics
-* webserver: basic auth/TLS
 
 ## Estimated performance
 
