@@ -22,7 +22,6 @@ func quit() {
 
 func main() {
 	defer quit()
-	logging.ConfigureLogging()
 
 	listenAddress := flag.String("host", "", "listen address")
 	listenPort := flag.Int("port", 2112, "listen port")
@@ -30,6 +29,8 @@ func main() {
 	tlsCert := flag.String("tls-cert", "", "TLS certificated")
 	tlsKey := flag.String("tls-key", "", "TLS private key")
 	flag.Parse()
+
+	logging.ConfigureLogging()
 
 	if *tlsEnabled {
 		missingFlag := false
