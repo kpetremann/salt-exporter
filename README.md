@@ -18,14 +18,28 @@ Notes:
 
 > If you did not setup the external_auth parameter, you need to run the exporter with the same user running the Salt Master. If it is set, any user will do the trick.
 
+## Installation
+
+Just use the binary from [Github releases](https://github.com/kpetremann/salt-exporter/releases) page.
+
+Or, install via source:
+- latest release: `go install github.com/kpetremann/salt-exporter@latest`
+- unstable: `go install github.com/kpetremann/salt-exporter@main`
+
 ## Usage
 
 ```
 ./salt-exporter
   -host string
-        listen address (default 0.0.0.0)
+      listen address (default 0.0.0.0)
   -port int
-        listen port (default 2112)
+      listen port (default 2112)
+  -tls
+      enable TLS
+  -tls-cert string
+      TLS certificated
+  -tls-key string
+      TLS private key
 ```
 
 ## Features
