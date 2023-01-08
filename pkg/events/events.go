@@ -74,9 +74,25 @@ func (e *SaltEvent) ExtractState() string {
 	return ""
 }
 
+func splitTopicFromContent(body string) []string {
+	oldStyleLength := 20
+	if len(body) < oldStyleLength {
+		oldStyleLength = len(body)
+	}
+
+	var lines []string
+	if idx := strings.Index(body[:oldStyleLength], "|"); idx != -1 {
+		lines = []string{body[:idx], body[oldStyleLength:]}
+		log.Print("old style")
+	} else {
+		lines = strings.SplitN(body, "\n\n", 2)
+		log.Print("new style")
+	}
+	return lines
+}
 func ParseEvent(message map[string]interface{}, eventChan chan SaltEvent) {
 	body := string(message["body"].([]byte))
-	lines := strings.SplitN(body, "\n\n", 2)
+	lines := splitTopicFromContent(body)
 
 	tag := lines[0]
 	if !strings.HasPrefix(tag, "salt/job") {

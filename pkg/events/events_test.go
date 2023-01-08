@@ -15,6 +15,11 @@ func TestParseEvent(t *testing.T) {
 		want SaltEvent
 	}{
 		{
+			name: "topic old style",
+			args: fakeEventAsMap(fakeNewJobEventOldStyle()),
+			want: expectedNewJobOldStyle,
+		},
+		{
 			name: "new job",
 			args: fakeEventAsMap(fakeNewJobEvent()),
 			want: expectedNewJob,

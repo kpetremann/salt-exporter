@@ -6,6 +6,45 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+var expectedNewJobOldStyle = SaltEvent{
+	Tag:          "salt/job/old/new",
+	Type:         "new",
+	TargetNumber: 1,
+	Data: EventData{
+		Timestamp: "2022-06-30T00:00:00.000000",
+		Fun:       "test.ping",
+		Jid:       "20220630000000000000",
+		Minions:   []string{"localhost"},
+		Tgt:       "localhost",
+		TgtType:   "glob",
+		User:      "salt_user",
+	},
+	IsScheduleJob: false,
+}
+
+func fakeNewJobEventOldStyle() []byte {
+	// Marshal the data using MsgPack
+	fake := FakeData{
+		Timestamp: "2022-06-30T00:00:00.000000",
+		Fun:       "test.ping",
+		Jid:       "20220630000000000000",
+		Minions:   []string{"localhost"},
+		Tgt:       "localhost",
+		TgtType:   "glob",
+		User:      "salt_user",
+	}
+
+	fakeBody, err := msgpack.Marshal(fake)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fakeMessage := []byte("salt/job/old/new||||")
+	fakeMessage = append(fakeMessage, fakeBody...)
+
+	return fakeMessage
+}
+
 /*
 	Fake new job message of type /new
 
