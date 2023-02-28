@@ -41,10 +41,14 @@ func extractStateFromArgs(args interface{}, key string) string {
 	if v, ok := args.(string); ok {
 		return v
 	}
+
 	// kwargs
 	if v, ok := args.(map[string]interface{}); ok {
-		if _, ok := v[key]; ok {
-			return v[key].(string)
+		if _, keyExists := v[key]; !keyExists {
+			return ""
+		}
+		if ret, isString := v[key].(string); isString {
+			return ret
 		}
 	}
 
