@@ -1,4 +1,4 @@
-[![status](https://img.shields.io/badge/status-alpha-orange)](https://github.com/kpetremann/salt-exporter)
+[![status](https://img.shields.io/badge/status-beta-orange)](https://github.com/kpetremann/salt-exporter)
 [![Go](https://img.shields.io/github/go-mod/go-version/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter)
 [![CI](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml/badge.svg)](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml)
 [![GitHub](https://img.shields.io/github/license/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/blob/main/LICENSE)
@@ -10,13 +10,13 @@
 
 Salt Exporter is a Prometheus export for Salt events. It exposes relevant metrics regarding jobs and results.
 
-You just need to run the exporter on the same server than the Salt Master.
+Working our of the box: you just need to run the exporter on the same server than the Salt Master.
 
 Notes:
 
-> This has only be tested on Linux
-
 > If you did not setup the external_auth parameter, you need to run the exporter with the same user running the Salt Master. If it is set, any user will do the trick.
+
+> This has only be tested on Linux
 
 ## Installation
 
@@ -125,7 +125,6 @@ It can be joined on function label to have details per executed module.
 
 * metric regarding IPC connectivity
 * support the runners
-* be able to enable/disable metrics
 
 ## Estimated performance
 
