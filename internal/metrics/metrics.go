@@ -11,6 +11,13 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func boolToFloat64(b bool) float64 {
+	if b {
+		return 1.0
+	}
+	return 0.0
+}
+
 func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
 	newJobCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
@@ -49,6 +56,14 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
 		[]string{"function", "state"},
 	)
 
+	lastStateHealth := promauto.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "salt_state_health",
+			Help: "Last state success state, 0=Failed, 1=Success",
+		},
+		[]string{"minion", "function", "state"},
+	)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -76,15 +91,20 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
 						strconv.FormatBool(success),
 					).Inc()
 				} else {
-					sucess := strconv.FormatBool(event.Data.Success)
+					success := strconv.FormatBool(event.Data.Success)
+
 					responsesCounter.WithLabelValues(
 						event.Data.Id,
-						sucess,
+						success,
 					).Inc()
+					lastStateHealth.WithLabelValues(
+						event.Data.Id,
+						event.Data.Fun,
+						state).Set(boolToFloat64(event.Data.Success))
 					functionResponsesCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
-						sucess,
+						success,
 					).Inc()
 				}
 			}
