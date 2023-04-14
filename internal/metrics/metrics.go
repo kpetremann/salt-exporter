@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
+func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
 	newJobCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_new_job_total",
@@ -65,10 +65,15 @@ func ExposeMetrics(ctx context.Context, eventChan chan events.SaltEvent) {
 			case "ret":
 				state := event.ExtractState()
 				if event.IsScheduleJob {
+					// for scheduled job, when the states in the job actually failed
+					// - the global "success" value is always true
+					// - the substate success is false, and the global retcode is > 0
+					// using retcode could be enough, but in case there are other corner cases, we combine both values
+					success := event.Data.Success && (event.Data.Retcode == 0)
 					scheduledJobReturnCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
-						strconv.FormatBool(event.Data.Success),
+						strconv.FormatBool(success),
 					).Inc()
 				} else {
 					sucess := strconv.FormatBool(event.Data.Success)
