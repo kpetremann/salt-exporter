@@ -18,7 +18,17 @@ func boolToFloat64(b bool) float64 {
 	return 0.0
 }
 
-func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
+// Function to check if a string exists in a slice of strings
+func contains(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}
+
+func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metricsConfig MetricsConfig) {
 	newJobCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_new_job_total",
@@ -97,15 +107,21 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
 						event.Data.Id,
 						success,
 					).Inc()
-					lastStateHealth.WithLabelValues(
-						event.Data.Id,
-						event.Data.Fun,
-						state).Set(boolToFloat64(event.Data.Success))
 					functionResponsesCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
 						success,
 					).Inc()
+
+					if metricsConfig.HealthMinions {
+						if contains(metricsConfig.HealthFunctionsFilters, event.Data.Fun) &&
+							contains(metricsConfig.HealthStatesFilters, state) {
+							lastStateHealth.WithLabelValues(
+								event.Data.Id,
+								event.Data.Fun,
+								state).Set(boolToFloat64(event.Data.Success))
+						}
+					}
 				}
 			}
 
