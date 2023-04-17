@@ -11,7 +11,24 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
+func boolToFloat64(b bool) float64 {
+	if b {
+		return 1.0
+	}
+	return 0.0
+}
+
+// Function to check if a string exists in a slice of strings
+func contains(slice []string, str string) bool {
+	for _, s := range slice {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}
+
+func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metricsConfig MetricsConfig) {
 	newJobCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_new_job_total",
@@ -49,6 +66,14 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
 		[]string{"function", "state"},
 	)
 
+	lastStateHealth := promauto.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "salt_state_health",
+			Help: "Last state success state, 0=Failed, 1=Success",
+		},
+		[]string{"minion", "function", "state"},
+	)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -76,16 +101,27 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent) {
 						strconv.FormatBool(success),
 					).Inc()
 				} else {
-					sucess := strconv.FormatBool(event.Data.Success)
+					success := strconv.FormatBool(event.Data.Success)
+
 					responsesCounter.WithLabelValues(
 						event.Data.Id,
-						sucess,
+						success,
 					).Inc()
 					functionResponsesCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
-						sucess,
+						success,
 					).Inc()
+
+					if metricsConfig.HealthMinions {
+						if contains(metricsConfig.HealthFunctionsFilters, event.Data.Fun) &&
+							contains(metricsConfig.HealthStatesFilters, state) {
+							lastStateHealth.WithLabelValues(
+								event.Data.Id,
+								event.Data.Fun,
+								state).Set(boolToFloat64(event.Data.Success))
+						}
+					}
 				}
 			}
 

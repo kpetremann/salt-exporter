@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/kpetremann/salt-exporter/internal/logging"
@@ -28,6 +29,11 @@ func main() {
 	tlsEnabled := flag.Bool("tls", false, "enable TLS")
 	tlsCert := flag.String("tls-cert", "", "TLS certificated")
 	tlsKey := flag.String("tls-key", "", "TLS private key")
+	healthMinions := flag.Bool("health-minions", true, "Enable health metric for each minion")
+	healthFunctionsFilters := flag.String("health-functions-filter", "state.highstate",
+		"Apply filter on functions to monitor, separated by a comma")
+	healthStatesFilters := flag.String("health-states-filter", "highstate",
+		"Apply filter on states to monitor, separated by a comma")
 	flag.Parse()
 
 	logging.ConfigureLogging()
@@ -47,6 +53,17 @@ func main() {
 		}
 	}
 
+	var metricsConfig metrics.MetricsConfig
+	metricsConfig.HealthMinions = *healthMinions
+	metricsConfig.HealthFunctionsFilters = strings.Split(*healthFunctionsFilters, ",")
+	metricsConfig.HealthStatesFilters = strings.Split(*healthStatesFilters, ",")
+
+	if metricsConfig.HealthMinions {
+		log.Info().Msg("health-minions: metrics are enabled")
+		log.Info().Msg("health-minions: functions filters: " + *healthFunctionsFilters)
+		log.Info().Msg("health-minions: states filters: " + *healthStatesFilters)
+	}
+
 	listenSocket := fmt.Sprint(*listenAddress, ":", *listenPort)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -59,7 +76,7 @@ func main() {
 	eventListener := events.NewEventListener(ctx, eventChan)
 
 	go eventListener.ListenEvents()
-	go metrics.ExposeMetrics(ctx, eventChan)
+	go metrics.ExposeMetrics(ctx, eventChan, metricsConfig)
 
 	// start http server
 	log.Info().Msg("exposing metrics on " + listenSocket + "/metrics")

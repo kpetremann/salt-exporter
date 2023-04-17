@@ -1,0 +1,20 @@
+groups:
+  - name: saltstack
+    rules:
+      - alert: SaltExporterLastHighstateSuccess
+        expr: sum by(minion) (salt_state_health{function="state.highstate", state="highstate"} == 0)
+        for: 60m
+        labels:
+          severity: critical
+          minion: "{{ $labels.minion }}"
+        annotations:
+          summary: "Salt Last Successful Highstate Failed (minion {{ $labels.minion }})"
+          description: "Salt Last Successful Highstate failed since > 60m"
+      - alert: SaltExporterLastHighstateSuccessInfo
+        expr: sum by(minion) (salt_state_health{function="state.highstate", state="highstate"} == 0)
+        for: 10m
+        labels:
+          severity: info
+          minion: "{{ $labels.minion }}"
+        annotations:
+          summary: "Salt Last Successful Highstate Failed (minion {{ $labels.minion }})"

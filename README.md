@@ -97,6 +97,26 @@ salt_new_job_total{function="state.sls",state="test",success="false"} 1
 salt_new_job_total{function="state.single",state="test.nop",success="true"} 3
 ```
 
+### Health Minions metrics
+By default, the state.highstate will also generate a health metrics:
+```
+salt_state_health{function="state.highstate",minion="node1",state="highstate"} 1
+```
+* `1` mean that the last time this couple of function/state were called, the return was `successful`
+* `0` mean that the last time this couple of function/state were called, the return was `failed`
+
+You will find a example of prometheus alerts that could be used with these default metrics in the prometheus_alerts directory.
+
+The health metrics can be customized by using the -health-functions-filter and -health-states-filter, example of usage:
+```
+./salt-exporter -health-states-filter=test.ping,state.apply -health-functions-filter=""
+```
+This will only generate health minion metrics for the test.ping function call:
+```
+salt_state_health{function="test.ping",minion="node1",state=""} 1
+```
+You can disable all the health metrics with this config switch:
+```./salt-exporter -health-minions=false```
 ### `salt/job/<jid>/new`
 
 It increases:
