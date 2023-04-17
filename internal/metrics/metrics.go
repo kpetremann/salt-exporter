@@ -50,10 +50,10 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 		},
 		[]string{"function", "state", "success"},
 	)
-	lastFunctionHealth := promauto.NewGaugeVec(
+	lastFunctionStatus := promauto.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "salt_function_status",
-			Help: "Last state success function, 0=Failed, 1=Success",
+			Help: "Last function/state success, 0=Failed, 1=Success",
 		},
 		[]string{"minion", "function", "state"},
 	)
@@ -116,7 +116,7 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 				// Expose state/func status
 				if metricsConfig.HealthMinions {
 					if contains(metricsConfig.HealthFunctionsFilters, event.Data.Fun) && contains(metricsConfig.HealthStatesFilters, state) {
-						lastFunctionHealth.WithLabelValues(
+						lastFunctionStatus.WithLabelValues(
 							event.Data.Id,
 							event.Data.Fun,
 							state).Set(boolToFloat64(event.Data.Success))

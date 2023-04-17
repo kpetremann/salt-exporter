@@ -91,6 +91,8 @@ salt_function_responses_total{function="state.highstate",state="highstate",succe
 salt_function_responses_total{function="state.sls",state="test",success="true"} 1
 salt_function_responses_total{function="state.single",state="test.nop",success="true"} 3
 
+salt_function_status{minion="node1",function="state.highstate",state="highstate"} 1
+
 salt_new_job_total{function="state.apply",state="highstate",success="false"} 1
 salt_new_job_total{function="state.highstate",state="highstate",success="false"} 2
 salt_new_job_total{function="state.sls",state="test",success="false"} 1
@@ -133,7 +135,7 @@ It increases:
 
 Usually, it will increase the `salt_responses_total` (per minion) and `salt_function_responses_total` (per function) counters.
 
-However, if it is a feedback of a scheduled job, it increases `salt_scheduled_job_return_total` instead.
+However, if it is of a scheduled job feedback, it increases `salt_scheduled_job_return_total` instead.
 
 #### Why separating `salt_responses_total` and `salt_scheduled_job_return_total`
 
@@ -154,7 +156,7 @@ It can be joined on function label to have details per executed module.
 
 ## Estimated performance
 
-According some simple benchmark, for a simple event, it takes:
+According to some simple benchmark, for a simple event, it takes:
 * ~60us for parsing
 * ~9us for converting to Prometheus metric
 
@@ -164,4 +166,4 @@ Roughly, the exporter should be able to handle about 10kQps.
 
 For a base of 1000 Salt minions, it should be able to sustain 10 jobs per minion per second, which is a quite high for Salt.
 
-If needed, the exporter can easily scale more up by doing the parsing in dedicated coroutines, the limiting factor being the Prometheus metric update (~9us).
+If needed, the exporter can easily scale more up by doing the parsing in dedicated goroutines, the limiting factor being the Prometheus metric update (~9us).
