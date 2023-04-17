@@ -10,7 +10,7 @@
 
 Salt Exporter is a Prometheus export for Salt events. It exposes relevant metrics regarding jobs and results.
 
-Working our of the box: you just need to run the exporter on the same server than the Salt Master.
+Working out of the box: you just need to run the exporter on the same server than the Salt Master.
 
 Notes:
 
