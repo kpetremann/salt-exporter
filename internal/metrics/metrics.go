@@ -50,6 +50,13 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 		},
 		[]string{"function", "state", "success"},
 	)
+	lastFunctionHealth := promauto.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "salt_function_status",
+			Help: "Last state success function, 0=Failed, 1=Success",
+		},
+		[]string{"minion", "function", "state"},
+	)
 
 	scheduledJobReturnCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
@@ -64,14 +71,6 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 			Help: "Total number of expected minions responses",
 		},
 		[]string{"function", "state"},
-	)
-
-	lastStateHealth := promauto.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "salt_job_health",
-			Help: "Last state success state, 0=Failed, 1=Success",
-		},
-		[]string{"minion", "function", "state"},
 	)
 
 	for {
@@ -117,7 +116,7 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 				// Expose state/func status
 				if metricsConfig.HealthMinions {
 					if contains(metricsConfig.HealthFunctionsFilters, event.Data.Fun) && contains(metricsConfig.HealthStatesFilters, state) {
-						lastStateHealth.WithLabelValues(
+						lastFunctionHealth.WithLabelValues(
 							event.Data.Id,
 							event.Data.Fun,
 							state).Set(boolToFloat64(event.Data.Success))
