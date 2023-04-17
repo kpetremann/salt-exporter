@@ -87,39 +87,37 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 				newJobCounter.WithLabelValues(event.Data.Fun, state, "true").Inc()
 				expectedResponsesNumber.WithLabelValues(event.Data.Fun, state).Add(float64(event.TargetNumber))
 			case "ret":
+				var success bool
 				state := event.ExtractState()
 				if event.IsScheduleJob {
 					// for scheduled job, when the states in the job actually failed
 					// - the global "success" value is always true
 					// - the substate success is false, and the global retcode is > 0
 					// using retcode could be enough, but in case there are other corner cases, we combine both values
-					success := event.Data.Success && (event.Data.Retcode == 0)
+					success = event.Data.Success && (event.Data.Retcode == 0)
 					scheduledJobReturnCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
 						strconv.FormatBool(success),
 					).Inc()
 				} else {
-					success := strconv.FormatBool(event.Data.Success)
+					success = event.Data.Success
 
 					responsesCounter.WithLabelValues(
 						event.Data.Id,
-						success,
+						strconv.FormatBool(success),
 					).Inc()
 					functionResponsesCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
-						success,
+						strconv.FormatBool(success),
 					).Inc()
 				}
 
 				// Expose state/func status
 				if metricsConfig.HealthMinions {
 					if contains(metricsConfig.HealthFunctionsFilters, event.Data.Fun) && contains(metricsConfig.HealthStatesFilters, state) {
-						lastFunctionStatus.WithLabelValues(
-							event.Data.Id,
-							event.Data.Fun,
-							state).Set(boolToFloat64(event.Data.Success))
+						lastFunctionStatus.WithLabelValues(event.Data.Id, event.Data.Fun, state).Set(boolToFloat64(success))
 					}
 				}
 			}
