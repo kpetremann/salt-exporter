@@ -91,32 +91,40 @@ salt_function_responses_total{function="state.highstate",state="highstate",succe
 salt_function_responses_total{function="state.sls",state="test",success="true"} 1
 salt_function_responses_total{function="state.single",state="test.nop",success="true"} 3
 
+salt_function_status{minion="node1",function="state.highstate",state="highstate"} 1
+
 salt_new_job_total{function="state.apply",state="highstate",success="false"} 1
 salt_new_job_total{function="state.highstate",state="highstate",success="false"} 2
 salt_new_job_total{function="state.sls",state="test",success="false"} 1
 salt_new_job_total{function="state.single",state="test.nop",success="true"} 3
 ```
 
-### Health Minions metrics
-By default, the state.highstate will also generate a health metrics:
-```
-salt_state_health{function="state.highstate",minion="node1",state="highstate"} 1
-```
-* `1` mean that the last time this couple of function/state were called, the return was `successful`
-* `0` mean that the last time this couple of function/state were called, the return was `failed`
+### Minions job status
 
-You will find a example of prometheus alerts that could be used with these default metrics in the prometheus_alerts directory.
+By default, a Salt highstate will generate a status metric:
+```
+salt_function_status{function="state.highstate",minion="node1",state="highstate"} 1
+```
+* `1` means that the last time this couple of function/state were executed, the return was `successful`
+* `0` means that the last time this couple of function/state were executed, the return was `failed`
 
-The health metrics can be customized by using the -health-functions-filter and -health-states-filter, example of usage:
+You will find an example of Prometheus alerts that could be used with this metric in the `prometheus_alerts` directory.
+
+The health metrics can be customized by using the `-health-functions-filter` and `-health-states-filter`, example of usage:
 ```
 ./salt-exporter -health-states-filter=test.ping,state.apply -health-functions-filter=""
 ```
-This will only generate health minion metrics for the test.ping function call:
+
+This will only generate a metric for the `test.ping` function executed:
 ```
-salt_state_health{function="test.ping",minion="node1",state=""} 1
+salt_function_status{function="test.ping",minion="node1",state=""} 1
 ```
+
 You can disable all the health metrics with this config switch:
 ```./salt-exporter -health-minions=false```
+
+Note: this also works for scheduled jobs.
+
 ### `salt/job/<jid>/new`
 
 It increases:
@@ -127,7 +135,7 @@ It increases:
 
 Usually, it will increase the `salt_responses_total` (per minion) and `salt_function_responses_total` (per function) counters.
 
-However, if it is a feedback of a scheduled job, it increases `salt_scheduled_job_return_total` instead.
+However, if it is of a scheduled job feedback, it increases `salt_scheduled_job_return_total` instead.
 
 #### Why separating `salt_responses_total` and `salt_scheduled_job_return_total`
 
@@ -148,7 +156,7 @@ It can be joined on function label to have details per executed module.
 
 ## Estimated performance
 
-According some simple benchmark, for a simple event, it takes:
+According to some simple benchmark, for a simple event, it takes:
 * ~60us for parsing
 * ~9us for converting to Prometheus metric
 
@@ -158,4 +166,4 @@ Roughly, the exporter should be able to handle about 10kQps.
 
 For a base of 1000 Salt minions, it should be able to sustain 10 jobs per minion per second, which is a quite high for Salt.
 
-If needed, the exporter can easily scale more up by doing the parsing in dedicated coroutines, the limiting factor being the Prometheus metric update (~9us).
+If needed, the exporter can easily scale more up by doing the parsing in dedicated goroutines, the limiting factor being the Prometheus metric update (~9us).
