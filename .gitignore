@@ -20,10 +20,11 @@ vendor/
 # Tagged file
 *.ignore
 
+# Artifacts
+/salt-exporter
+/salt-live
+dist/
+
 # Configuration
 settings.yml
 settings.yaml
-
-# Artifacts
-/salt-exporter
-dist/

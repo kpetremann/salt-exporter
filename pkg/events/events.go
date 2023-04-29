@@ -1,10 +1,13 @@
 package events
 
 import (
+	"encoding/json"
+	"errors"
 	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/vmihailenco/msgpack/v5"
+	"gopkg.in/yaml.v3"
 )
 
 type EventData struct {
@@ -34,6 +37,36 @@ type SaltEvent struct {
 	TargetNumber  int
 	Data          EventData
 	IsScheduleJob bool
+	rawBody       []byte
+}
+
+func (e SaltEvent) RawToJSON(indent bool) ([]byte, error) {
+	if e.rawBody == nil {
+		return nil, errors.New("raw body not registered")
+	}
+
+	var data interface{}
+	if err := msgpack.Unmarshal(e.rawBody, &data); err != nil {
+		return nil, err
+	}
+	if indent {
+		return json.MarshalIndent(data, "", "  ")
+	} else {
+		return json.Marshal(data)
+	}
+}
+
+func (e SaltEvent) RawToYAML() ([]byte, error) {
+	if e.rawBody == nil {
+		return nil, errors.New("raw body not registered")
+	}
+
+	var data interface{}
+	if err := msgpack.Unmarshal(e.rawBody, &data); err != nil {
+		return nil, err
+	}
+
+	return yaml.Marshal(data)
 }
 
 func extractStateFromArgs(args interface{}, key string) string {
@@ -78,7 +111,7 @@ func (e *SaltEvent) ExtractState() string {
 	return ""
 }
 
-func ParseEvent(message map[string]interface{}, eventChan chan SaltEvent) {
+func ParseEvent(message map[string]interface{}, eventChan chan<- SaltEvent) {
 	body := string(message["body"].([]byte))
 	lines := strings.SplitN(body, "\n\n", 2)
 
@@ -92,8 +125,8 @@ func ParseEvent(message map[string]interface{}, eventChan chan SaltEvent) {
 	job_type := strings.Split(tag, "/")[3]
 
 	// Parse message body
-	event := SaltEvent{Tag: tag, Type: job_type}
 	byteResult := []byte(lines[1])
+	event := SaltEvent{Tag: tag, Type: job_type, rawBody: byteResult}
 
 	if err := msgpack.Unmarshal(byteResult, &event.Data); err != nil {
 		log.Warn().Str("error", err.Error()).Str("tag", tag).Msg("decoding_failure")
