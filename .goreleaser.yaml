@@ -26,12 +26,15 @@ changelog:
       - '^docs:'
       - '^test:'
   groups:
+    - title: 'Breaking changes'
+      regexp: '^.*?(\([[:word:]]+\))??!:.+$'
+      order: 0
     - title: 'Enhancements'
       regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
-      order: 0
+      order: 1
     - title: 'Fixes'
       regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
-      order: 1
+      order: 2
     - title: 'Internal'
       regexp: '^.+$'
       order: 999
