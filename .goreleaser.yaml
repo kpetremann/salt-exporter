@@ -25,3 +25,13 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+  groups:
+    - title: 'Enhancements'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Internal'
+      regexp: '^.+$'
+      order: 999
