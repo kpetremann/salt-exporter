@@ -17,6 +17,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var (
+	version = ""
+	commit  = ""
+	date    = "unknown"
+)
+
 func quit() {
 	log.Warn().Msg("Bye.")
 }
@@ -52,6 +58,10 @@ func main() {
 			return
 		}
 	}
+
+	log.Info().Str("Version", version).Send()
+	log.Info().Str("Commit", commit).Send()
+	log.Info().Str("Build time", date).Send()
 
 	var metricsConfig metrics.MetricsConfig
 	metricsConfig.HealthMinions = *healthMinions
