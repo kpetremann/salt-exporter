@@ -21,6 +21,7 @@ snapshot:
 
 changelog:
   sort: asc
+  abbrev: -1
   filters:
     exclude:
       - '^docs:'
