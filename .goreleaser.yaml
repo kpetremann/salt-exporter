@@ -3,7 +3,16 @@ before:
     - go mod tidy
 
 builds:
-  - main: ./cmd/salt-exporter
+  - id: salt-exporter
+    binary: salt-exporter
+    main: ./cmd/salt-exporter
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+  - id: salt-live
+    binary: salt-live
+    main: ./cmd/salt-live
     env:
       - CGO_ENABLED=0
     goos:
