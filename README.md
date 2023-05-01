@@ -3,6 +3,8 @@
 [![CI](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml/badge.svg)](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml)
 [![GitHub](https://img.shields.io/github/license/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/blob/main/LICENSE)
 
+> This exporter comes with a TUI to watch event in real time. See [Salt live](cmd/salt-live/README.md)
+
 # Salt Exporter
 <img align="right" width="120px" src="https://raw.githubusercontent.com/kpetremann/salt-exporter/main/img/salt-exporter.png" />
 
@@ -23,8 +25,8 @@ Notes:
 Just use the binary from [Github releases](https://github.com/kpetremann/salt-exporter/releases) page.
 
 Or, install via source:
-- latest release: `go install github.com/kpetremann/salt-exporter@latest`
-- unstable: `go install github.com/kpetremann/salt-exporter@main`
+- latest release: `go install github.com/kpetremann/cmd/salt-exporter@latest`
+- unstable: `go install github.com/kpetremann/cmd/salt-exporter@main`
 
 ## Usage
 

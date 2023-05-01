@@ -15,9 +15,21 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+var version = "development"
+
+func printVersion() {
+	fmt.Println("Version: ", version)
+}
+
 func main() {
 	maxItems := flag.Int("max-events", 1000, "maximum events to keep in memory")
+	versionCmd := flag.Bool("version", false, "print version")
 	flag.Parse()
+
+	if *versionCmd {
+		printVersion()
+		return
+	}
 
 	log.Logger = log.Output(nil)
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
