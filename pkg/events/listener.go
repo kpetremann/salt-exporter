@@ -65,7 +65,7 @@ func NewEventListener(ctx context.Context, eventChan chan SaltEvent) *EventListe
 	return &e
 }
 
-func (e *EventListener) ListenEvents() {
+func (e *EventListener) ListenEvents(keepRawBody bool) {
 	e.Open()
 
 	for {
@@ -84,7 +84,7 @@ func (e *EventListener) ListenEvents() {
 
 				continue
 			}
-			ParseEvent(message, e.eventChan)
+			ParseEvent(message, e.eventChan, keepRawBody)
 		}
 	}
 }

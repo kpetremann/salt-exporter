@@ -85,7 +85,7 @@ func main() {
 	// listen and expose metric
 	eventListener := events.NewEventListener(ctx, eventChan)
 
-	go eventListener.ListenEvents()
+	go eventListener.ListenEvents(false)
 	go metrics.ExposeMetrics(ctx, eventChan, metricsConfig)
 
 	// start http server

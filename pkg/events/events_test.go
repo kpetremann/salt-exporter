@@ -63,7 +63,7 @@ func TestParseEvent(t *testing.T) {
 
 	for _, test := range tests {
 		var parsed SaltEvent
-		go ParseEvent(test.args, eventChan)
+		go ParseEvent(test.args, eventChan, false)
 
 		select {
 		case parsed = <-eventChan:

@@ -25,7 +25,7 @@ func main() {
 
 	eventChan := make(chan events.SaltEvent, 100)
 	eventListener := events.NewEventListener(ctx, eventChan)
-	go eventListener.ListenEvents()
+	go eventListener.ListenEvents(true)
 
 	p := tea.NewProgram(tui.NewModel(eventChan, *maxItems), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {
