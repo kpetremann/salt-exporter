@@ -18,3 +18,7 @@ Just use the binary from [Github releases](https://github.com/kpetremann/salt-ex
 Or, install via source:
 - latest release: `go install github.com/kpetremann/cmd/salt-live@latest`
 - unstable: `go install github.com/kpetremann/cmd/salt-live@main`
+
+## Credits
+
+This tool uses the amazing [Bubble tea](https://github.com/charmbracelet/bubbletea) TUI framework and [Bubbles](https://github.com/charmbracelet/bubbles) components.
