@@ -228,15 +228,15 @@ func (m model) View() string {
 
 	content = append(content, leftPanelStyle.Render(m.eventList.View()))
 	if m.sideInfos != "" {
-		rawContent := rightPanelTitleStyle.Render("Raw details")
-
-		m.rawView.Width = m.terminalWidth / 2
-		m.rawView.Height = contentHeight - lipgloss.Height(rawContent)
+		rawTitle := rightPanelTitleStyle.Render("Raw details")
 
 		rightPanelStyle.Width(m.terminalWidth / 2)
 		rightPanelStyle.Height(contentHeight)
 
-		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawContent, m.rawView.View()))
+		m.rawView.Width = rightPanelStyle.GetWidth() - rightPanelStyle.GetHorizontalFrameSize()
+		m.rawView.Height = contentHeight - lipgloss.Height(rawTitle)
+
+		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawTitle, m.rawView.View()))
 		content = append(content, sideInfos)
 	}
 
