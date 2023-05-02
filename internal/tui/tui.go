@@ -151,8 +151,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case item:
 		m.itemsBuffer = append([]teaList.Item{msg}, m.itemsBuffer...)
-		if len(m.itemsBuffer) >= m.maxItems {
-			m.eventList.RemoveItem(m.maxItems - 1)
+		if len(m.itemsBuffer) > m.maxItems {
+			m.itemsBuffer = m.itemsBuffer[:len(m.itemsBuffer)-1]
 		}
 
 		// When not in follow mode, we freeze the visible list.
