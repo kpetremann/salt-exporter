@@ -3,8 +3,6 @@ package tui
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	appStyle = lipgloss.NewStyle()
-
 	appTitleStyle = lipgloss.NewStyle().
 			Padding(0, 2).
 			Foreground(lipgloss.Color("#FFFDF5")).

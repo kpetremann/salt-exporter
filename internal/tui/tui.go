@@ -62,11 +62,11 @@ func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
 
 	selColor := lipgloss.Color("#fcc203")
 	list.Styles.SelectedTitle = list.Styles.SelectedTitle.Foreground(selColor).BorderLeftForeground(selColor)
-	list.Styles.SelectedDesc = list.Styles.SelectedTitle.Copy()
+	list.Styles.SelectedDesc = list.Styles.SelectedDesc.Copy()
 
 	eventList := teaList.New([]teaList.Item{}, list, 0, 0)
 	eventList.Title = "Events"
-	eventList.Styles.TitleBar = listTitleStyle
+	eventList.Styles.Title = listTitleStyle
 	eventList.AdditionalFullHelpKeys = func() []key.Binding {
 		return []key.Binding{
 			listKeys.enableFollow,
@@ -158,9 +158,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, watchEvent(m))
 
 	case tea.WindowSizeMsg:
-		h, v := appStyle.GetFrameSize()
-		m.terminalWidth = msg.Width - h*2
-		m.terminalHeight = msg.Height - v*2
+		m.terminalWidth = msg.Width
+		m.terminalHeight = msg.Height
 
 	case tea.KeyMsg:
 		switch {
@@ -212,31 +211,40 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	// Top bar
 	topBarStyle.Width(m.terminalWidth)
 	topBar := topBarStyle.Render(appTitleStyle.Render("Salt live"))
 
 	var content []string
 	contentHeight := m.terminalHeight - lipgloss.Height(topBar)
+	contentWidth := m.terminalWidth / 2
 
-	m.eventList.SetSize(m.terminalWidth, contentHeight)
-	leftPanelStyle.Width(m.terminalWidth / 2)
+	// Left panel
+	leftPanelStyle.Width(contentWidth)
 	leftPanelStyle.Height(contentHeight)
 
+	m.eventList.SetSize(
+		contentWidth-leftPanelStyle.GetHorizontalFrameSize(),
+		contentHeight-leftPanelStyle.GetVerticalFrameSize(),
+	)
+
 	content = append(content, leftPanelStyle.Render(m.eventList.View()))
+
+	// Right panel
+
 	if m.sideInfos != "" {
 		rawTitle := rightPanelTitleStyle.Render("Raw details")
 
-		rightPanelStyle.Width(m.terminalWidth / 2)
+		rightPanelStyle.Width(contentWidth)
 		rightPanelStyle.Height(contentHeight)
 
-		m.rawView.Width = rightPanelStyle.GetWidth() - rightPanelStyle.GetHorizontalFrameSize()
-		m.rawView.Height = contentHeight - lipgloss.Height(rawTitle)
+		m.rawView.Width = contentWidth - rightPanelStyle.GetHorizontalFrameSize()
+		m.rawView.Height = contentHeight - lipgloss.Height(rawTitle) - rightPanelStyle.GetVerticalFrameSize()
 
 		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawTitle, m.rawView.View()))
 		content = append(content, sideInfos)
 	}
 
-	app := lipgloss.JoinVertical(0, topBar, lipgloss.JoinHorizontal(0, content...))
-
-	return appStyle.Render(app)
+	// Final rendering
+	return lipgloss.JoinVertical(0, topBar, lipgloss.JoinHorizontal(0, content...))
 }
