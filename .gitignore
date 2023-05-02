@@ -19,6 +19,7 @@ vendor/
 
 # Tagged file
 *.ignore
+*.patch
 
 # Artifacts
 /salt-exporter
