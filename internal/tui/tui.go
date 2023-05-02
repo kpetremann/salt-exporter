@@ -52,7 +52,7 @@ type model struct {
 	maxItems       int
 	outputFormat   format
 	followMode     bool
-	jsonWordwrap   bool
+	wordWrap       bool
 }
 
 func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
@@ -173,7 +173,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.eventList.ResetSelected()
 			return m, nil
 		case key.Matches(msg, m.keys.toggleWordwrap):
-			m.jsonWordwrap = !m.jsonWordwrap
+			m.wordWrap = !m.wordWrap
 		case key.Matches(msg, m.keys.toggleJSONYAML):
 			m.outputFormat = (m.outputFormat + 1) % nbFormat
 		}
@@ -187,6 +187,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.outputFormat {
 		case YAML:
 			m.sideInfos = sel.(item).eventYAML
+			if m.wordWrap {
+				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
+			}
 			if info, err := Highlight(m.sideInfos, "yaml", theme); err != nil {
 				m.rawView.SetContent(m.sideInfos)
 			} else {
@@ -194,7 +197,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case JSON:
 			m.sideInfos = sel.(item).eventJSON
-			if m.jsonWordwrap {
+			if m.wordWrap {
 				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
 			}
 			if info, err := Highlight(m.sideInfos, "json", theme); err != nil {
