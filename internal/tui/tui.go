@@ -62,7 +62,7 @@ func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
 
 	selColor := lipgloss.Color("#fcc203")
 	list.Styles.SelectedTitle = list.Styles.SelectedTitle.Foreground(selColor).BorderLeftForeground(selColor)
-	list.Styles.SelectedDesc = list.Styles.SelectedDesc.Copy()
+	list.Styles.SelectedDesc = list.Styles.SelectedTitle.Copy()
 
 	eventList := teaList.New([]teaList.Item{}, list, 0, 0)
 	eventList.Title = "Events"
