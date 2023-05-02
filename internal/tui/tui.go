@@ -52,7 +52,7 @@ type model struct {
 	maxItems       int
 	outputFormat   format
 	followMode     bool
-	jsonWordwrap   bool
+	wordWrap       bool
 }
 
 func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
@@ -66,7 +66,7 @@ func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
 
 	eventList := teaList.New([]teaList.Item{}, list, 0, 0)
 	eventList.Title = "Events"
-	eventList.Styles.TitleBar = listTitleStyle
+	eventList.Styles.Title = listTitleStyle
 	eventList.AdditionalFullHelpKeys = func() []key.Binding {
 		return []key.Binding{
 			listKeys.enableFollow,
@@ -138,21 +138,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.followMode = false
 	}
 
-	if m.followMode {
-		m.eventList.Styles.Title = listTitleStyle
-		m.eventList.Styles.TitleBar = lipgloss.NewStyle()
-		cmds = append(cmds, m.eventList.NewStatusMessage(""))
+	if !m.followMode {
+		m.eventList.Title = "Events (frozen)"
 	} else {
-		m.eventList.Styles.TitleBar = listTitleStyle
-		m.eventList.Styles.Title = lipgloss.NewStyle()
-		cmds = append(cmds, m.eventList.NewStatusMessage(lipgloss.NewStyle().Italic(true).Render("frozen")))
+		m.eventList.Title = "Events"
 	}
 
 	switch msg := msg.(type) {
 	case item:
 		m.itemsBuffer = append([]teaList.Item{msg}, m.itemsBuffer...)
-		if len(m.itemsBuffer) >= m.maxItems {
-			m.eventList.RemoveItem(m.maxItems - 1)
+		if len(m.itemsBuffer) > m.maxItems {
+			m.itemsBuffer = m.itemsBuffer[:len(m.itemsBuffer)-1]
 		}
 
 		// When not in follow mode, we freeze the visible list.
@@ -162,23 +158,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, watchEvent(m))
 
 	case tea.WindowSizeMsg:
-		h, v := appStyle.GetFrameSize()
-		m.terminalWidth = msg.Width - h*2
-		m.terminalHeight = msg.Height - v*2
+		m.terminalWidth = msg.Width
+		m.terminalHeight = msg.Height
 
 	case tea.KeyMsg:
-		// Don't match any of the keys below if we're actively filtering.
-		if m.eventList.FilterState() == teaList.Filtering {
-			break
-		}
-
 		switch {
 		case key.Matches(msg, m.keys.enableFollow):
 			m.followMode = true
 			m.eventList.ResetSelected()
 			return m, nil
 		case key.Matches(msg, m.keys.toggleWordwrap):
-			m.jsonWordwrap = !m.jsonWordwrap
+			m.wordWrap = !m.wordWrap
 		case key.Matches(msg, m.keys.toggleJSONYAML):
 			m.outputFormat = (m.outputFormat + 1) % nbFormat
 		}
@@ -192,6 +182,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.outputFormat {
 		case YAML:
 			m.sideInfos = sel.(item).eventYAML
+			if m.wordWrap {
+				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
+			}
 			if info, err := Highlight(m.sideInfos, "yaml", theme); err != nil {
 				m.rawView.SetContent(m.sideInfos)
 			} else {
@@ -199,7 +192,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case JSON:
 			m.sideInfos = sel.(item).eventJSON
-			if m.jsonWordwrap {
+			if m.wordWrap {
 				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
 			}
 			if info, err := Highlight(m.sideInfos, "json", theme); err != nil {
@@ -218,31 +211,40 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	// Top bar
 	topBarStyle.Width(m.terminalWidth)
 	topBar := topBarStyle.Render(appTitleStyle.Render("Salt live"))
 
 	var content []string
 	contentHeight := m.terminalHeight - lipgloss.Height(topBar)
+	contentWidth := m.terminalWidth / 2
 
-	m.eventList.SetSize(m.terminalWidth, contentHeight)
-	leftPanelStyle.Width(m.terminalWidth / 2)
+	// Left panel
+	leftPanelStyle.Width(contentWidth)
 	leftPanelStyle.Height(contentHeight)
 
+	m.eventList.SetSize(
+		contentWidth-leftPanelStyle.GetHorizontalFrameSize(),
+		contentHeight-leftPanelStyle.GetVerticalFrameSize(),
+	)
+
 	content = append(content, leftPanelStyle.Render(m.eventList.View()))
+
+	// Right panel
+
 	if m.sideInfos != "" {
-		rawContent := rightPanelTitleStyle.Render("Raw details")
+		rawTitle := rightPanelTitleStyle.Render("Raw details")
 
-		m.rawView.Width = m.terminalWidth / 2
-		m.rawView.Height = contentHeight - lipgloss.Height(rawContent)
-
-		rightPanelStyle.Width(m.terminalWidth / 2)
+		rightPanelStyle.Width(contentWidth)
 		rightPanelStyle.Height(contentHeight)
 
-		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawContent, m.rawView.View()))
+		m.rawView.Width = contentWidth - rightPanelStyle.GetHorizontalFrameSize()
+		m.rawView.Height = contentHeight - lipgloss.Height(rawTitle) - rightPanelStyle.GetVerticalFrameSize()
+
+		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawTitle, m.rawView.View()))
 		content = append(content, sideInfos)
 	}
 
-	app := lipgloss.JoinVertical(0, topBar, lipgloss.JoinHorizontal(0, content...))
-
-	return appStyle.Render(app)
+	// Final rendering
+	return lipgloss.JoinVertical(0, topBar, lipgloss.JoinHorizontal(0, content...))
 }

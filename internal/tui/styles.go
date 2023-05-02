@@ -3,8 +3,6 @@ package tui
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	appStyle = lipgloss.NewStyle()
-
 	appTitleStyle = lipgloss.NewStyle().
 			Padding(0, 2).
 			Foreground(lipgloss.Color("#FFFDF5")).
@@ -20,7 +18,7 @@ var (
 	listTitleStyle = lipgloss.NewStyle().Padding(0, 1).
 			Border(lipgloss.RoundedBorder())
 
-	leftPanelStyle = lipgloss.NewStyle().Padding(0, 2)
+	leftPanelStyle = lipgloss.NewStyle()
 
 	rightPanelTitleStyle = lipgloss.NewStyle().Padding(0, 1).MarginBottom(1).
 				Border(lipgloss.RoundedBorder())
