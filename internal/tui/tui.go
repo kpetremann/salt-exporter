@@ -138,14 +138,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.followMode = false
 	}
 
-	if m.followMode {
-		m.eventList.Styles.Title = listTitleStyle
-		m.eventList.Styles.TitleBar = lipgloss.NewStyle()
-		cmds = append(cmds, m.eventList.NewStatusMessage(""))
+	if !m.followMode {
+		m.eventList.Title = "Events (frozen)"
 	} else {
-		m.eventList.Styles.TitleBar = listTitleStyle
-		m.eventList.Styles.Title = lipgloss.NewStyle()
-		cmds = append(cmds, m.eventList.NewStatusMessage(lipgloss.NewStyle().Italic(true).Render("frozen")))
+		m.eventList.Title = "Events"
 	}
 
 	switch msg := msg.(type) {
