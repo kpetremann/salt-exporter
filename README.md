@@ -25,8 +25,8 @@ Notes:
 Just use the binary from [Github releases](https://github.com/kpetremann/salt-exporter/releases) page.
 
 Or, install via source:
-- latest release: `go install github.com/kpetremann/cmd/salt-exporter@latest`
-- unstable: `go install github.com/kpetremann/cmd/salt-exporter@main`
+- latest release: `go install github.com/kpetremann/salt-exporter/cmd/salt-exporter@latest`
+- unstable: `go install github.com/kpetremann/salt-exporter/cmd/salt-exporter@main`
 
 ## Usage
 

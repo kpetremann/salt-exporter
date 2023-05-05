@@ -16,8 +16,8 @@ It is similar to `salt-run state.event pretty=True` runner, but with additional 
 Just use the binary from [Github releases](https://github.com/kpetremann/salt-exporter/releases) page.
 
 Or, install via source:
-- latest release: `go install github.com/kpetremann/cmd/salt-live@latest`
-- unstable: `go install github.com/kpetremann/cmd/salt-live@main`
+- latest release: `go install github.com/kpetremann/salt-exporter/cmd/salt-live@latest`
+- unstable: `go install github.com/kpetremann/salt-exporter/cmd/salt-live@main`
 
 ## Credits
 
