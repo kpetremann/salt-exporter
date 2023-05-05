@@ -121,6 +121,7 @@ func watchEvent(m model) tea.Cmd {
 			eventJSON:   string(eventJSON),
 			eventYAML:   string(eventYAML),
 		}
+
 		return item
 	}
 }
@@ -162,6 +163,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.terminalHeight = msg.Height
 
 	case tea.KeyMsg:
+		// Don't match any of the keys below if we're actively filtering.
+		if m.eventList.FilterState() == teaList.Filtering {
+			break
+		}
+
 		switch {
 		case key.Matches(msg, m.keys.enableFollow):
 			m.followMode = true
