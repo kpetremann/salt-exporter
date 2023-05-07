@@ -17,46 +17,30 @@ const theme = "solarized-dark"
 
 type format int
 
-type listKeyMap struct {
-	enableFollow   key.Binding
-	toggleJSONYAML key.Binding
-	toggleWordwrap key.Binding
-}
+type Mode int
 
-func newListKeyMap() *listKeyMap {
-	return &listKeyMap{
-		enableFollow: key.NewBinding(
-			key.WithKeys("f"),
-			key.WithHelp("f", "follow mode"),
-		),
-		toggleWordwrap: key.NewBinding(
-			key.WithKeys("w"),
-			key.WithHelp("w", "toggle JSON word wrap"),
-		),
-		toggleJSONYAML: key.NewBinding(
-			key.WithKeys("m"),
-			key.WithHelp("m", "toggle JSON/YAML"),
-		),
-	}
-}
+const (
+	Following Mode = iota
+	Frozen
+)
 
 type model struct {
 	eventList      teaList.Model
 	itemsBuffer    []teaList.Item
 	rawView        teaViewport.Model
 	eventChan      <-chan events.SaltEvent
-	keys           *listKeyMap
+	keys           *keyMap
 	sideInfos      string
 	terminalWidth  int
 	terminalHeight int
 	maxItems       int
 	outputFormat   format
-	followMode     bool
+	currentMode    Mode
 	wordWrap       bool
 }
 
 func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
-	var listKeys = newListKeyMap()
+	var listKeys = defaultKeyMap()
 
 	list := teaList.NewDefaultDelegate()
 
@@ -81,17 +65,18 @@ func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
 		}
 	}
 	eventList.Filter = WordsFilter
+	eventList.KeyMap = bubblesListKeyMap()
 
 	rawView := teaViewport.New(1, 1)
 	rawView.KeyMap = teaViewport.KeyMap{}
 
 	return model{
-		eventList:  eventList,
-		rawView:    rawView,
-		keys:       listKeys,
-		eventChan:  eventChan,
-		followMode: true,
-		maxItems:   maxItems,
+		eventList:   eventList,
+		rawView:     rawView,
+		keys:        listKeys,
+		eventChan:   eventChan,
+		currentMode: Following,
+		maxItems:    maxItems,
 	}
 }
 
@@ -127,35 +112,39 @@ func watchEvent(m model) tea.Cmd {
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(
-		watchEvent(m),
-	)
+	return watchEvent(m)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
+	// Ensure the mode is Frozen if we are currently navigating
 	if m.eventList.Index() > 0 {
-		m.followMode = false
+		m.currentMode = Frozen
 	}
 
-	if !m.followMode {
-		m.eventList.Title = "Events (frozen)"
-	} else {
-		m.eventList.Title = "Events"
-	}
-
+	/*
+		Manage events
+	*/
 	switch msg := msg.(type) {
 	case item:
-		m.itemsBuffer = append([]teaList.Item{msg}, m.itemsBuffer...)
-		if len(m.itemsBuffer) > m.maxItems {
-			m.itemsBuffer = m.itemsBuffer[:len(m.itemsBuffer)-1]
+		switch m.currentMode {
+		case Following:
+			// In follow mode (default), we update both the list and the buffer
+			currentList := m.eventList.Items()
+			if len(currentList) >= m.maxItems {
+				m.eventList.RemoveItem(len(currentList) - 1)
+			}
+			cmds = append(cmds, m.eventList.InsertItem(0, msg))
+			m.itemsBuffer = m.eventList.Items()
+		case Frozen:
+			// In Frozen mode, we only update the buffer and keep the item list as is
+			m.itemsBuffer = append([]teaList.Item{msg}, m.itemsBuffer...)
+			if len(m.itemsBuffer) > m.maxItems {
+				m.itemsBuffer = m.itemsBuffer[:len(m.itemsBuffer)-1]
+			}
 		}
 
-		// When not in follow mode, we freeze the visible list.
-		if m.followMode {
-			cmds = append(cmds, m.eventList.SetItems(m.itemsBuffer))
-		}
 		cmds = append(cmds, watchEvent(m))
 
 	case tea.WindowSizeMsg:
@@ -170,9 +159,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch {
 		case key.Matches(msg, m.keys.enableFollow):
-			m.followMode = true
+			m.currentMode = Following
 			m.eventList.ResetSelected()
-			return m, nil
+			cmds = append(cmds, m.eventList.SetItems(m.itemsBuffer))
 		case key.Matches(msg, m.keys.toggleWordwrap):
 			m.wordWrap = !m.wordWrap
 		case key.Matches(msg, m.keys.toggleJSONYAML):
@@ -180,10 +169,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
+	/*
+		Update embedded components
+	*/
 	var cmd tea.Cmd
 	m.eventList, cmd = m.eventList.Update(msg)
 	cmds = append(cmds, cmd)
 
+	m.updateSideInfos()
+	m.rawView, cmd = m.rawView.Update(msg)
+	cmds = append(cmds, cmd)
+
+	if m.eventList.Index() > 0 {
+		m.currentMode = Frozen
+	}
+
+	m.updateTitle()
+	return m, tea.Batch(cmds...)
+
+}
+
+func (m *model) updateSideInfos() {
 	if sel := m.eventList.SelectedItem(); sel != nil {
 		switch m.outputFormat {
 		case YAML:
@@ -208,16 +214,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	}
+}
 
-	m.rawView, cmd = m.rawView.Update(msg)
-	cmds = append(cmds, cmd)
-
-	return m, tea.Batch(cmds...)
-
+func (m *model) updateTitle() {
+	switch m.currentMode {
+	case Following:
+		m.eventList.Title = "Events"
+	case Frozen:
+		m.eventList.Title = "Events (frozen)"
+	}
 }
 
 func (m model) View() string {
-	// Top bar
+	/*
+		Top bar
+	*/
 	topBarStyle.Width(m.terminalWidth)
 	topBar := topBarStyle.Render(appTitleStyle.Render("Salt live"))
 
@@ -225,7 +236,10 @@ func (m model) View() string {
 	contentHeight := m.terminalHeight - lipgloss.Height(topBar)
 	contentWidth := m.terminalWidth / 2
 
-	// Left panel
+	/*
+		Left panel
+	*/
+
 	leftPanelStyle.Width(contentWidth)
 	leftPanelStyle.Height(contentHeight)
 
@@ -236,7 +250,9 @@ func (m model) View() string {
 
 	content = append(content, leftPanelStyle.Render(m.eventList.View()))
 
-	// Right panel
+	/*
+		Right panel
+	*/
 
 	if m.sideInfos != "" {
 		rawTitle := rightPanelTitleStyle.Render("Raw details")
@@ -251,6 +267,8 @@ func (m model) View() string {
 		content = append(content, sideInfos)
 	}
 
-	// Final rendering
+	/*
+		Final rendering
+	*/
 	return lipgloss.JoinVertical(0, topBar, lipgloss.JoinHorizontal(0, content...))
 }
