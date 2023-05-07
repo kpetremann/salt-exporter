@@ -22,6 +22,13 @@ func printVersion() {
 }
 
 func main() {
+	f, err := tea.LogToFile("debug.log", "debug")
+	if err != nil {
+		fmt.Println("fatal:", err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
 	maxItems := flag.Int("max-events", 1000, "maximum events to keep in memory")
 	versionCmd := flag.Bool("version", false, "print version")
 	flag.Parse()
