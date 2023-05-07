@@ -116,7 +116,7 @@ func ParseEvent(message map[string]interface{}, eventChan chan<- SaltEvent, keep
 	lines := strings.SplitN(body, "\n\n", 2)
 
 	tag := lines[0]
-	if !strings.HasPrefix(tag, "salt/job") {
+	if !(strings.HasPrefix(tag, "salt/job") || strings.HasPrefix(tag, "salt/run")) {
 		return
 	}
 	log.Debug().Str("tag", tag).Msg("new event")
@@ -139,6 +139,11 @@ func ParseEvent(message map[string]interface{}, eventChan chan<- SaltEvent, keep
 
 	event.TargetNumber = len(event.Data.Minions)
 	event.IsScheduleJob = event.Data.Schedule != ""
+
+	// A runner are executed on the master but they do not provide their ID in the event
+	if strings.HasPrefix(tag, "salt/run") && event.Data.Id == "" {
+		event.Data.Id = "master"
+	}
 
 	eventChan <- event
 }
