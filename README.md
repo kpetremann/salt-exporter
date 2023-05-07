@@ -49,10 +49,13 @@ Or, install via source:
 Supported tags:
 * `salt/job/<jid>/new`
 * `salt/job/<jid>/ret/<*>`
+* `salt/run/<jid>/new`
+* `salt/run/<jid>/ret/<*>`
 
 It extracts and exposes:
 * the execution module, to `function` label
 * the states when using state.sls/state.apply/state.highstate, to `state` label
+* same info for the runners
 
 ## Exposed metrics
 
@@ -154,7 +157,6 @@ It can be joined on function label to have details per executed module.
 ## Upcoming features
 
 * metric regarding IPC connectivity
-* support the runners
 
 ## Estimated performance
 
