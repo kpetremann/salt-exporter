@@ -31,6 +31,7 @@ func main() {
 
 	maxItems := flag.Int("max-events", 1000, "maximum events to keep in memory")
 	bufferSize := flag.Int("buffer-size", 1000, "buffer size in number of events")
+	filter := flag.String("hard-filter", "", "filter when received (filtered out events are discarded forever)")
 	versionCmd := flag.Bool("version", false, "print version")
 	flag.Parse()
 
@@ -47,7 +48,7 @@ func main() {
 	eventListener := events.NewEventListener(ctx, eventChan)
 	go eventListener.ListenEvents(true)
 
-	p := tea.NewProgram(tui.NewModel(eventChan, *maxItems), tea.WithMouseCellMotion())
+	p := tea.NewProgram(tui.NewModel(eventChan, *maxItems, *filter), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

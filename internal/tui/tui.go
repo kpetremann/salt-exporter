@@ -29,6 +29,7 @@ type model struct {
 	itemsBuffer    []teaList.Item
 	rawView        teaViewport.Model
 	eventChan      <-chan events.SaltEvent
+	hardFilter     string
 	keys           *keyMap
 	sideInfos      string
 	terminalWidth  int
@@ -39,7 +40,7 @@ type model struct {
 	wordWrap       bool
 }
 
-func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
+func NewModel(eventChan <-chan events.SaltEvent, maxItems int, filter string) model {
 	var listKeys = defaultKeyMap()
 
 	list := teaList.NewDefaultDelegate()
@@ -75,6 +76,7 @@ func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
 		rawView:     rawView,
 		keys:        listKeys,
 		eventChan:   eventChan,
+		hardFilter:  filter,
 		currentMode: Following,
 		maxItems:    maxItems,
 	}
@@ -82,32 +84,42 @@ func NewModel(eventChan <-chan events.SaltEvent, maxItems int) model {
 
 func watchEvent(m model) tea.Cmd {
 	return func() tea.Msg {
-		e := <-m.eventChan
-		var sender string = "master"
-		if e.Data.Id != "" {
-			sender = e.Data.Id
-		}
-		eventJSON, err := e.RawToJSON(true)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		eventYAML, err := e.RawToYAML()
-		if err != nil {
-			log.Fatalln(err)
-		}
-		datetime, _ := time.Parse("2006-01-02T15:04:05.999999", e.Data.Timestamp)
-		item := item{
-			title:       e.Tag,
-			description: e.Type,
-			datetime:    datetime.Format("2006-01-02 15:04"),
-			event:       e,
-			sender:      sender,
-			state:       e.ExtractState(),
-			eventJSON:   string(eventJSON),
-			eventYAML:   string(eventYAML),
-		}
+		for {
+			e := <-m.eventChan
+			var sender string = "master"
+			if e.Data.Id != "" {
+				sender = e.Data.Id
+			}
+			eventJSON, err := e.RawToJSON(true)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			eventYAML, err := e.RawToYAML()
+			if err != nil {
+				log.Fatalln(err)
+			}
+			datetime, _ := time.Parse("2006-01-02T15:04:05.999999", e.Data.Timestamp)
+			item := item{
+				title:       e.Tag,
+				description: e.Type,
+				datetime:    datetime.Format("2006-01-02 15:04"),
+				event:       e,
+				sender:      sender,
+				state:       e.ExtractState(),
+				eventJSON:   string(eventJSON),
+				eventYAML:   string(eventYAML),
+			}
 
-		return item
+			// No hard filter set
+			if m.hardFilter == "" {
+				return item
+			}
+
+			// Hard filter set
+			if rank := m.eventList.Filter(m.hardFilter, []string{item.FilterValue()}); len(rank) > 0 {
+				return item
+			}
+		}
 	}
 }
 

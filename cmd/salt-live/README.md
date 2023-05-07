@@ -6,7 +6,8 @@ Salt live is a Terminal UI tool to watch event in real time.
 
 It is similar to `salt-run state.event pretty=True` runner, but with additional features:
 
-- live filter
+- hard filter: filtered out events are discarded forever
+- soft filter: filtered out events are still kept in the buffer
 - display some info from the salt-exporter parser
 - event details in YAML or JSON
 - freeze the refresh list to navigate the events, while still receiving new ones
