@@ -30,6 +30,7 @@ func main() {
 	defer f.Close()
 
 	maxItems := flag.Int("max-events", 1000, "maximum events to keep in memory")
+	bufferSize := flag.Int("buffer-size", 1000, "buffer size in number of events")
 	versionCmd := flag.Bool("version", false, "print version")
 	flag.Parse()
 
@@ -42,7 +43,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	eventChan := make(chan events.SaltEvent, 100)
+	eventChan := make(chan events.SaltEvent, *bufferSize)
 	eventListener := events.NewEventListener(ctx, eventChan)
 	go eventListener.ListenEvents(true)
 
