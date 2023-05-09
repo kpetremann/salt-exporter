@@ -21,6 +21,9 @@ vendor/
 *.ignore
 *.patch
 
+# Logs
+debug.log
+
 # Artifacts
 /salt-exporter
 /salt-live
