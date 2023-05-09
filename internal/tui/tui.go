@@ -279,6 +279,8 @@ func (m model) View() string {
 		content = append(content, sideInfos)
 	}
 
+	log.Println("width total:", m.terminalWidth, "- left:", m.eventList.Width(), "- right:", m.rawView.Width)
+
 	/*
 		Final rendering
 	*/

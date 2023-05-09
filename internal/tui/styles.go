@@ -15,10 +15,10 @@ var (
 			BorderStyle(lipgloss.InnerHalfBlockBorder()).
 			BorderBottom(true).BorderForeground(lipgloss.Color("#255aa0"))
 
-	listTitleStyle = lipgloss.NewStyle().Padding(0, 1).
+	listTitleStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder())
 
-	leftPanelStyle = lipgloss.NewStyle()
+	leftPanelStyle = lipgloss.NewStyle().Copy()
 
 	rightPanelTitleStyle = lipgloss.NewStyle().Padding(0, 1).MarginBottom(1).
 				Border(lipgloss.RoundedBorder())
