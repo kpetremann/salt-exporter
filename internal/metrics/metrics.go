@@ -103,10 +103,13 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 				} else {
 					success = event.Data.Success
 
-					responsesCounter.WithLabelValues(
-						event.Data.Id,
-						strconv.FormatBool(success),
-					).Inc()
+					if metricsConfig.HealthMinions {
+						responsesCounter.WithLabelValues(
+							event.Data.Id,
+							strconv.FormatBool(success),
+						).Inc()
+					}
+
 					functionResponsesCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
