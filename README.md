@@ -117,7 +117,7 @@ You will find an example of Prometheus alerts that could be used with this metri
 
 The health metrics can be customized by using the `-health-functions-filter` and `-health-states-filter`, example of usage:
 ```
-./salt-exporter -health-states-filter=test.ping,state.apply -health-functions-filter=""
+./salt-exporter -health-functions-filter=test.ping,state.apply -health-states-filter=""
 ```
 
 This will only generate a metric for the `test.ping` function executed:
