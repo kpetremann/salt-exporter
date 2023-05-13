@@ -152,6 +152,11 @@ func TestMetrics(t *testing.T) {
 	if err != nil {
 		healthcheckValueFalse = 0
 	}
+	healthcheckFindJobLabels := map[string]string{"function": "saltutil.find_job", "state": "", "success": "true"}
+	healthcheckFindJob, err := getValueForMetric(parsed, "salt_function_responses_total", healthcheckFindJobLabels)
+	if err != nil {
+		healthcheckFindJob = 0
+	}
 
 	// Check if the expected metrics are present
 	for testName, metrics := range expected {
@@ -161,7 +166,7 @@ func TestMetrics(t *testing.T) {
 			// Remove events coming from docker healthcheck
 			if testName == "total responses" {
 				if e.Labels["success"] == "true" {
-					value -= healthcheckValueTrue
+					value -= healthcheckValueTrue + healthcheckFindJob
 				} else if e.Labels["success"] == "false" {
 					value -= healthcheckValueFalse
 				}
