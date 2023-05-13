@@ -17,26 +17,25 @@ type EventListener struct {
 	decoder      *msgpack.Decoder
 }
 
-func (e *EventListener) Open() net.Conn {
+func (e *EventListener) Open() {
 	log.Info().Msg("connecting to salt-master event bus")
-	var eventBus net.Conn
 	var err error
 
 	for {
 		select {
 		case <-e.ctx.Done():
-			return nil
+			return
 		default:
 		}
 
-		eventBus, err = net.Dial("unix", "/var/run/salt/master/master_event_pub.ipc")
+		e.saltEventBus, err = net.Dial("unix", "/var/run/salt/master/master_event_pub.ipc")
 		if err != nil {
 			log.Error().Msg("failed to connect to event bus, retrying in 5 seconds")
 			time.Sleep(time.Second * 5)
 		} else {
 			log.Info().Msg("successfully connected to event bus")
-			e.decoder = msgpack.NewDecoder(eventBus)
-			return eventBus
+			e.decoder = msgpack.NewDecoder(e.saltEventBus)
+			return
 		}
 	}
 }
