@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  salt_master:
+    image: saltstack/salt:3005.1
+    environment:
+      SALT_MASTER_CONFIG: '{"interface": "0.0.0.0", "auto_accept": true}'
+    volumes:
+      - ../e2e_test/:/test/:ro
+      - ./states:/srv/salt/:ro
+      - ipc:/var/run/salt/master/
+    networks:
+      - e2e
+
+  minion:
+    image: saltstack/salt:3005.1
+    environment:
+      SALT_MINION_CONFIG: '{"id": "foo", "master": "salt_master"}'
+    healthcheck:
+      test: ["CMD-SHELL", "salt-call status.ping_master salt_master"]
+      interval: 1s
+      start_period: 1s
+    networks:
+      - e2e
+
+  exporter:
+    image: golang:1.20-bullseye
+    command: "go run ./cmd/salt-exporter"
+    working_dir: "/app"
+    environment:
+      CGO_ENABLED: 0
+    volumes:
+      - ../:/app/:ro
+      - ipc:/var/run/salt/master/:ro
+    ports:
+      - 127.0.0.1:2112:2112
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://127.0.0.1:2112/metrics"]
+      interval: 1s
+      retries: 60
+      start_period: 1s
+    depends_on:
+      minion:
+        condition: service_healthy
+
+volumes:
+  ipc:
+
+networks:
+  e2e:
