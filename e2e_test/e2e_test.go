@@ -141,10 +141,32 @@ func TestMetrics(t *testing.T) {
 		},
 	}
 
+	// Get values from healthcheck
+	healthcheckLabelsSuccess := map[string]string{"function": "status.ping_master", "state": "", "success": "true"}
+	healthcheckValueTrue, err := getValueForMetric(parsed, "salt_function_responses_total", healthcheckLabelsSuccess)
+	if err != nil {
+		healthcheckValueTrue = 0
+	}
+	healthcheckLabelsFailed := map[string]string{"function": "status.ping_master", "state": "", "success": "false"}
+	healthcheckValueFalse, err := getValueForMetric(parsed, "salt_function_responses_total", healthcheckLabelsFailed)
+	if err != nil {
+		healthcheckValueFalse = 0
+	}
+
 	// Check if the expected metrics are present
 	for testName, metrics := range expected {
 		for _, e := range metrics {
 			value, err := getValueForMetric(parsed, e.Name, e.Labels)
+
+			// Remove events coming from docker healthcheck
+			if testName == "total responses" {
+				if e.Labels["success"] == "true" {
+					value -= healthcheckValueTrue
+				} else if e.Labels["success"] == "false" {
+					value -= healthcheckValueFalse
+				}
+			}
+
 			if err != nil {
 				t.Error(err)
 			} else if value != e.Value {

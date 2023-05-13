@@ -16,6 +16,10 @@ services:
     image: saltstack/salt:3005.1
     environment:
       SALT_MINION_CONFIG: '{"id": "foo", "master": "salt_master"}'
+    healthcheck:
+      test: ["CMD-SHELL", "salt-call status.ping_master salt_master"]
+      interval: 1s
+      start_period: 1s
     networks:
       - e2e
 
@@ -30,6 +34,14 @@ services:
       - ipc:/var/run/salt/master/:ro
     ports:
       - 127.0.0.1:2112:2112
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://127.0.0.1:2112/metrics"]
+      interval: 1s
+      retries: 60
+      start_period: 1s
+    depends_on:
+      minion:
+        condition: service_healthy
 
 volumes:
   ipc:

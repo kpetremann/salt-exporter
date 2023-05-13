@@ -45,10 +45,7 @@ jobs:
           go-version: "1.20"
 
       - name: Set up environment
-        run: docker compose -f $COMPOSE_FILE up -d
-
-      - name: Give some time to Salt
-        run: sleep 30
+        run: docker compose -f $COMPOSE_FILE up -d --wait --wait-timeout 60
 
       - name: Run some Salt commands
         run: docker compose -f $COMPOSE_FILE exec salt_master sh /test/exec_commands.sh
