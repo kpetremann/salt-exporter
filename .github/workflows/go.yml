@@ -56,6 +56,10 @@ jobs:
       - name: Test
         run: go test -v -tags=e2e ./e2e_test/...
 
+      - name: Print metrics if failed
+        if: failure()
+        run: curl 127.0.0.1:2112/metrics | grep salt_
+
       - name: "Clean up environment"
         if: always()
         run: docker compose -f $COMPOSE_FILE down
