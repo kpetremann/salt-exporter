@@ -8,7 +8,6 @@ require (
 	github.com/charmbracelet/bubbletea v0.24.0
 	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/google/go-cmp v0.5.9
-	github.com/k0kubun/pp/v3 v3.2.0
 	github.com/prometheus/client_golang v1.15.1
 	github.com/prometheus/client_model v0.3.0
 	github.com/prometheus/common v0.42.0
