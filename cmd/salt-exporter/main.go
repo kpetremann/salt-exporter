@@ -40,9 +40,10 @@ func main() {
 		"Apply filter on functions to monitor, separated by a comma")
 	healthStatesFilters := flag.String("health-states-filter", "highstate",
 		"Apply filter on states to monitor, separated by a comma")
+	logLevel := flag.String("log-level", "info", "log level (debug, info, warn, error, fatal, panic, disabled)")
 	flag.Parse()
 
-	logging.ConfigureLogging()
+	logging.ConfigureLogging(*logLevel)
 
 	if *tlsEnabled {
 		missingFlag := false
