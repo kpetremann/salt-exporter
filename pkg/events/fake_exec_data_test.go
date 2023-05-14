@@ -1,8 +1,9 @@
-package events
+package events_test
 
 import (
 	"log"
 
+	"github.com/kpetremann/salt-exporter/pkg/events"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
@@ -24,11 +25,11 @@ import (
 	}
 */
 
-var expectedNewJob = SaltEvent{
+var expectedNewJob = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "test.ping",
 		Jid:       "20220630000000000000",
@@ -80,11 +81,11 @@ func fakeNewJobEvent() []byte {
 
 */
 
-var expectedReturnJob = SaltEvent{
+var expectedReturnJob = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "test.ping",
@@ -140,11 +141,11 @@ func fakeRetJobEvent() []byte {
 	}
 */
 
-var expectedNewScheduleJob = SaltEvent{
+var expectedNewScheduleJob = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		FunArgs:   []interface{}{"sync_all"},
 		Fun:       "schedule.run_job",
@@ -202,11 +203,11 @@ func fakeNewScheduleJobEvent() []byte {
 	}
 */
 
-var expectedAckScheduleJob = SaltEvent{
+var expectedAckScheduleJob = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "schedule.run_job",
@@ -290,11 +291,11 @@ func fakeAckScheduleJobEvent() []byte {
 	}
 */
 
-var expectedScheduleJobReturn = SaltEvent{
+var expectedScheduleJobReturn = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "saltutil.sync_all",

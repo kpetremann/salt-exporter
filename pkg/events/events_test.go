@@ -1,18 +1,19 @@
-package events
+package events_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/kpetremann/salt-exporter/pkg/events"
 )
 
 func TestParseEvent(t *testing.T) {
-	eventChan := make(chan SaltEvent)
+	eventChan := make(chan events.SaltEvent)
 	tests := []struct {
 		name string
 		args map[string]interface{}
-		want SaltEvent
+		want events.SaltEvent
 	}{
 		{
 			name: "new job",
@@ -62,8 +63,8 @@ func TestParseEvent(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		var parsed SaltEvent
-		go ParseEvent(test.args, eventChan, false)
+		var parsed events.SaltEvent
+		go events.ParseEvent(test.args, eventChan, false)
 
 		select {
 		case parsed = <-eventChan:
@@ -100,7 +101,7 @@ func TestExtractState(t *testing.T) {
 
 	tests := []struct {
 		name  string
-		event SaltEvent
+		event events.SaltEvent
 		want  string
 	}{
 		{
