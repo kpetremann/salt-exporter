@@ -1,17 +1,18 @@
-package events
+package events_test
 
 import (
 	"log"
 
+	"github.com/kpetremann/salt-exporter/pkg/events"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
-func getNewStateEvent() SaltEvent {
-	return SaltEvent{
+func getNewStateEvent() events.SaltEvent {
+	return events.SaltEvent{
 		Tag:          "salt/job/20220630000000000000/new",
 		Type:         "new",
 		TargetNumber: 1,
-		Data: EventData{
+		Data: events.EventData{
 			Timestamp: "2022-06-30T00:00:00.000000",
 			Fun:       "state.sls",
 			Arg:       []interface{}{"test"},
@@ -46,11 +47,11 @@ func getNewStateEvent() SaltEvent {
 	}
 */
 
-var expectedNewStateSlsJob = SaltEvent{
+var expectedNewStateSlsJob = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
 		Arg:       []interface{}{"test"},
@@ -121,11 +122,11 @@ func fakeNewStateSlsJobEvent() []byte {
 
 */
 
-var expectedStateSlsReturn = SaltEvent{
+var expectedStateSlsReturn = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/node1",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
@@ -216,11 +217,11 @@ func fakeStateSlsReturnEvent() []byte {
 
 */
 
-var expectedNewStateSingle = SaltEvent{
+var expectedNewStateSingle = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Arg: []interface{}{
 			map[string]interface{}{
@@ -307,11 +308,11 @@ func fakeNewStateSingleEvent() []byte {
 
 */
 
-var expectedStateSingleReturn = SaltEvent{
+var expectedStateSingleReturn = events.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/node1",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: EventData{
+	Data: events.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.single",

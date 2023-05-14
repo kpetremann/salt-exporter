@@ -1,22 +1,20 @@
 package logging
 
 import (
-	"flag"
+	"fmt"
 	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
-func ConfigureLogging() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-
-	debug := flag.Bool("debug", false, "sets log level to debug")
-	flag.Parse()
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	if *debug {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+func ConfigureLogging(logLevel string) {
+	level, err := zerolog.ParseLevel(logLevel)
+	if err != nil {
+		fmt.Println("Failed to parse log level")
+		os.Exit(1)
 	}
-
+	zerolog.SetGlobalLevel(level)
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 }
