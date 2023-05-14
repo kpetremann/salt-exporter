@@ -35,7 +35,7 @@ func main() {
 	tlsEnabled := flag.Bool("tls", false, "enable TLS")
 	tlsCert := flag.String("tls-cert", "", "TLS certificated")
 	tlsKey := flag.String("tls-key", "", "TLS private key")
-	healthMinions := flag.Bool("health-minions", true, "Enable health metric for each minion")
+	healthMinions := flag.Bool("health-minions", true, "Enable minion metrics")
 	healthFunctionsFilters := flag.String("health-functions-filter", "state.highstate",
 		"Apply filter on functions to monitor, separated by a comma")
 	healthStatesFilters := flag.String("health-states-filter", "highstate",

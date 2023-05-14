@@ -32,16 +32,24 @@ Or, install via source:
 
 ```
 ./salt-exporter
+  -health-functions-filter string
+        Apply filter on functions to monitor, separated by a comma (default "state.highstate")
+  -health-minions
+        Enable minion metrics (default true)
+  -health-states-filter string
+        Apply filter on states to monitor, separated by a comma (default "highstate")
   -host string
-      listen address (default 0.0.0.0)
+        listen address
+  -log-level string
+        log level (debug, info, warn, error, fatal, panic, disabled) (default "info")
   -port int
-      listen port (default 2112)
+        listen port (default 2112)
   -tls
-      enable TLS
+        enable TLS
   -tls-cert string
-      TLS certificated
+        TLS certificated
   -tls-key string
-      TLS private key
+        TLS private key
 ```
 
 ## Features
@@ -103,6 +111,8 @@ salt_new_job_total{function="state.highstate",state="highstate",success="false"}
 salt_new_job_total{function="state.sls",state="test",success="false"} 1
 salt_new_job_total{function="state.single",state="test.nop",success="true"} 3
 ```
+
+> Note: `salt_responses_total{minion="local",success="true"}` metrics can be disabled using `-health-minions` flag.
 
 ### Minions job status
 
