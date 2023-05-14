@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/kpetremann/salt-exporter/internal/filters"
 	"github.com/kpetremann/salt-exporter/pkg/events"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -16,16 +17,6 @@ func boolToFloat64(b bool) float64 {
 		return 1.0
 	}
 	return 0.0
-}
-
-// Function to check if a string exists in a slice of strings
-func contains(slice []string, str string) bool {
-	for _, s := range slice {
-		if s == str {
-			return true
-		}
-	}
-	return false
 }
 
 func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metricsConfig MetricsConfig) {
@@ -103,10 +94,13 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 				} else {
 					success = event.Data.Success
 
-					responsesCounter.WithLabelValues(
-						event.Data.Id,
-						strconv.FormatBool(success),
-					).Inc()
+					if metricsConfig.HealthMinions {
+						responsesCounter.WithLabelValues(
+							event.Data.Id,
+							strconv.FormatBool(success),
+						).Inc()
+					}
+
 					functionResponsesCounter.WithLabelValues(
 						event.Data.Fun,
 						state,
@@ -114,12 +108,18 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metri
 					).Inc()
 				}
 
-				// Expose state/func status
-				if metricsConfig.HealthMinions {
-					if contains(metricsConfig.HealthFunctionsFilters, event.Data.Fun) && contains(metricsConfig.HealthStatesFilters, state) {
-						lastFunctionStatus.WithLabelValues(event.Data.Id, event.Data.Fun, state).Set(boolToFloat64(success))
-					}
+				// Expose state/func status if feature enabled and matching filters
+				if !metricsConfig.HealthMinions {
+					continue
 				}
+				if !filters.Match(event.Data.Fun, metricsConfig.HealthFunctionsFilters) {
+					continue
+				}
+				log.Debug().Msg("function matches")
+				if !filters.Match(state, metricsConfig.HealthStatesFilters) {
+					continue
+				}
+				lastFunctionStatus.WithLabelValues(event.Data.Id, event.Data.Fun, state).Set(boolToFloat64(success))
 			}
 
 			elapsed := time.Since(start)
