@@ -8,6 +8,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// ConfigureLogging configures the logger
+//
+// logLevel: The log level to use, in zerolog format
 func ConfigureLogging(logLevel string) {
 	level, err := zerolog.ParseLevel(logLevel)
 	if err != nil {

@@ -1,7 +1,12 @@
 package metrics
 
 type MetricsConfig struct {
-	HealthMinions          bool
+	// HealtMinions enable/disable the health functions/states metrics
+	HealthMinions bool
+
+	// HealthFunctionsFilter permits to limit the number of function exposed
 	HealthFunctionsFilters []string
-	HealthStatesFilters    []string
+
+	// HealthFunctionsFilter permits to limit the number of state exposed
+	HealthStatesFilters []string
 }
