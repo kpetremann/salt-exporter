@@ -10,9 +10,12 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+const defaultIPCFilepath = "/var/run/salt/master/master_event_pub.ipc"
+
 type EventListener struct {
 	ctx          context.Context
 	eventChan    chan SaltEvent
+	iPCFilepath  string
 	saltEventBus net.Conn
 	decoder      *msgpack.Decoder
 }
@@ -28,7 +31,7 @@ func (e *EventListener) Open() {
 		default:
 		}
 
-		e.saltEventBus, err = net.Dial("unix", "/var/run/salt/master/master_event_pub.ipc")
+		e.saltEventBus, err = net.Dial("unix", e.iPCFilepath)
 		if err != nil {
 			log.Error().Msg("failed to connect to event bus, retrying in 5 seconds")
 			time.Sleep(time.Second * 5)
@@ -60,8 +63,16 @@ func (e *EventListener) Reconnect() {
 }
 
 func NewEventListener(ctx context.Context, eventChan chan SaltEvent) *EventListener {
-	e := EventListener{ctx: ctx, eventChan: eventChan}
+	e := EventListener{ctx: ctx, eventChan: eventChan, iPCFilepath: defaultIPCFilepath}
 	return &e
+}
+
+// SetIPCFilepath sets the filepath to the salt-master event bus
+//
+// The IPC file must be readable by the user running the exporter
+// Default: /var/run/salt/master/master_event_pub.ipc
+func (e *EventListener) SetIPCFilepath(filepath string) {
+	e.iPCFilepath = filepath
 }
 
 func (e *EventListener) ListenEvents(keepRawBody bool) {
