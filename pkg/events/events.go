@@ -40,6 +40,9 @@ type SaltEvent struct {
 	RawBody       []byte
 }
 
+// RawToJSON converts raw body to JSON
+//
+// If indent is true, the JSON will be indented
 func (e SaltEvent) RawToJSON(indent bool) ([]byte, error) {
 	if e.RawBody == nil {
 		return nil, errors.New("raw body not registered")
@@ -56,6 +59,7 @@ func (e SaltEvent) RawToJSON(indent bool) ([]byte, error) {
 	}
 }
 
+// RawToYAML converts raw body to YAML
 func (e SaltEvent) RawToYAML() ([]byte, error) {
 	if e.RawBody == nil {
 		return nil, errors.New("raw body not registered")
@@ -69,6 +73,7 @@ func (e SaltEvent) RawToYAML() ([]byte, error) {
 	return yaml.Marshal(data)
 }
 
+// extractStateFromArgs extracts embedded state info
 func extractStateFromArgs(args interface{}, key string) string {
 	// args only
 	if v, ok := args.(string); ok {
@@ -111,6 +116,10 @@ func (e *SaltEvent) ExtractState() string {
 	return ""
 }
 
+// ParseEvent parses a salt event
+//
+// Once parsed, the message is sent to the eventChan channel.
+// KeepRawBody is used to keep the raw body of the event.
 func ParseEvent(message map[string]interface{}, eventChan chan<- SaltEvent, keepRawBody bool) {
 	body := string(message["body"].([]byte))
 	lines := strings.SplitN(body, "\n\n", 2)
