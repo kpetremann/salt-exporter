@@ -69,6 +69,10 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metric
 			log.Info().Msg("stopping event listener")
 			return
 		case event := <-eventChan:
+			if metricsConfig.IgnoreTest && event.IsTest || metricsConfig.IgnoreMock && event.IsMock {
+				return
+			}
+
 			switch event.Type {
 			case "new":
 				state := event.ExtractState()
