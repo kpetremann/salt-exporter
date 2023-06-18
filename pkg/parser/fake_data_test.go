@@ -1,4 +1,4 @@
-package events_test
+package parser_test
 
 import (
 	"log"

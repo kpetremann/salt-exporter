@@ -1,11 +1,9 @@
-package events
+package event
 
 import (
 	"encoding/json"
 	"errors"
-	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/vmihailenco/msgpack/v5"
 	"gopkg.in/yaml.v3"
 )
@@ -114,44 +112,4 @@ func (e *SaltEvent) ExtractState() string {
 		return "highstate"
 	}
 	return ""
-}
-
-// ParseEvent parses a salt event
-//
-// KeepRawBody is used to keep the raw body of the event.
-func ParseEvent(message map[string]interface{}, keepRawBody bool) (SaltEvent, error) {
-	body := string(message["body"].([]byte))
-	lines := strings.SplitN(body, "\n\n", 2)
-
-	tag := lines[0]
-	if !(strings.HasPrefix(tag, "salt/job") || strings.HasPrefix(tag, "salt/run")) {
-		return SaltEvent{}, errors.New("tag not supported")
-	}
-	log.Debug().Str("tag", tag).Msg("new event")
-
-	// Extract job type from the tag
-	job_type := strings.Split(tag, "/")[3]
-
-	// Parse message body
-	byteResult := []byte(lines[1])
-	event := SaltEvent{Tag: tag, Type: job_type}
-
-	if keepRawBody {
-		event.RawBody = byteResult
-	}
-
-	if err := msgpack.Unmarshal(byteResult, &event.Data); err != nil {
-		log.Warn().Str("error", err.Error()).Str("tag", tag).Msg("decoding_failure")
-		return SaltEvent{}, err
-	}
-
-	event.TargetNumber = len(event.Data.Minions)
-	event.IsScheduleJob = event.Data.Schedule != ""
-
-	// A runner are executed on the master but they do not provide their ID in the event
-	if strings.HasPrefix(tag, "salt/run") && event.Data.Id == "" {
-		event.Data.Id = "master"
-	}
-
-	return event, nil
 }

@@ -9,7 +9,9 @@ import (
 	"syscall"
 
 	"github.com/kpetremann/salt-exporter/internal/tui"
-	"github.com/kpetremann/salt-exporter/pkg/events"
+	"github.com/kpetremann/salt-exporter/pkg/event"
+	"github.com/kpetremann/salt-exporter/pkg/listener"
+	"github.com/kpetremann/salt-exporter/pkg/parser"
 	"github.com/rs/zerolog/log"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -47,9 +49,10 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	eventChan := make(chan events.SaltEvent, *bufferSize)
-	eventListener := events.NewEventListener(ctx, eventChan)
-	go eventListener.ListenEvents(true)
+	eventChan := make(chan event.SaltEvent, *bufferSize)
+	parser := parser.NewEventParser(true)
+	eventListener := listener.NewEventListener(ctx, parser, eventChan)
+	go eventListener.ListenEvents()
 
 	p := tea.NewProgram(tui.NewModel(eventChan, *maxItems, *filter), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {

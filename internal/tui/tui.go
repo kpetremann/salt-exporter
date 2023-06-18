@@ -10,7 +10,7 @@ import (
 	teaViewport "github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/kpetremann/salt-exporter/pkg/events"
+	"github.com/kpetremann/salt-exporter/pkg/event"
 )
 
 const theme = "solarized-dark"
@@ -28,7 +28,7 @@ type model struct {
 	eventList      teaList.Model
 	itemsBuffer    []teaList.Item
 	rawView        teaViewport.Model
-	eventChan      <-chan events.SaltEvent
+	eventChan      <-chan event.SaltEvent
 	hardFilter     string
 	keys           *keyMap
 	sideInfos      string
@@ -40,7 +40,7 @@ type model struct {
 	wordWrap       bool
 }
 
-func NewModel(eventChan <-chan events.SaltEvent, maxItems int, filter string) model {
+func NewModel(eventChan <-chan event.SaltEvent, maxItems int, filter string) model {
 	var listKeys = defaultKeyMap()
 
 	list := teaList.NewDefaultDelegate()

@@ -1,9 +1,9 @@
-package events_test
+package parser_test
 
 import (
 	"log"
 
-	"github.com/kpetremann/salt-exporter/pkg/events"
+	"github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
@@ -25,11 +25,11 @@ import (
 	}
 */
 
-var expectedNewJob = events.SaltEvent{
+var expectedNewJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "test.ping",
 		Jid:       "20220630000000000000",
@@ -81,11 +81,11 @@ func fakeNewJobEvent() []byte {
 
 */
 
-var expectedReturnJob = events.SaltEvent{
+var expectedReturnJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "test.ping",
@@ -141,11 +141,11 @@ func fakeRetJobEvent() []byte {
 	}
 */
 
-var expectedNewScheduleJob = events.SaltEvent{
+var expectedNewScheduleJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		FunArgs:   []interface{}{"sync_all"},
 		Fun:       "schedule.run_job",
@@ -203,11 +203,11 @@ func fakeNewScheduleJobEvent() []byte {
 	}
 */
 
-var expectedAckScheduleJob = events.SaltEvent{
+var expectedAckScheduleJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "schedule.run_job",
@@ -291,11 +291,11 @@ func fakeAckScheduleJobEvent() []byte {
 	}
 */
 
-var expectedScheduleJobReturn = events.SaltEvent{
+var expectedScheduleJobReturn = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "saltutil.sync_all",
