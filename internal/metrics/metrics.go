@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/kpetremann/salt-exporter/internal/filters"
-	events "github.com/kpetremann/salt-exporter/pkg/event"
+	"github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog/log"
@@ -19,7 +19,7 @@ func boolToFloat64(b bool) float64 {
 	return 0.0
 }
 
-func ExposeMetrics(ctx context.Context, eventChan <-chan events.SaltEvent, metricsConfig MetricsConfig) {
+func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metricsConfig MetricsConfig) {
 	newJobCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_new_job_total",

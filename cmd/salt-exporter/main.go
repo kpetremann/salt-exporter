@@ -12,7 +12,7 @@ import (
 
 	"github.com/kpetremann/salt-exporter/internal/logging"
 	"github.com/kpetremann/salt-exporter/internal/metrics"
-	events "github.com/kpetremann/salt-exporter/pkg/event"
+	"github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/kpetremann/salt-exporter/pkg/listener"
 	"github.com/kpetremann/salt-exporter/pkg/parser"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -83,7 +83,7 @@ func main() {
 	defer stop()
 
 	log.Info().Msg("listening for events...")
-	eventChan := make(chan events.SaltEvent)
+	eventChan := make(chan event.SaltEvent)
 
 	// listen and expose metric
 	parser := parser.NewEventParser(false)
