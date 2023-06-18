@@ -10,6 +10,7 @@ import (
 	teaViewport "github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/k0kubun/pp/v3"
 	"github.com/kpetremann/salt-exporter/pkg/event"
 )
 
@@ -27,11 +28,12 @@ const (
 type model struct {
 	eventList      teaList.Model
 	itemsBuffer    []teaList.Item
-	rawView        teaViewport.Model
+	sideView       teaViewport.Model
 	eventChan      <-chan event.SaltEvent
 	hardFilter     string
 	keys           *keyMap
 	sideInfos      string
+	sideTitle      string
 	terminalWidth  int
 	terminalHeight int
 	maxItems       int
@@ -73,7 +75,7 @@ func NewModel(eventChan <-chan event.SaltEvent, maxItems int, filter string) mod
 
 	return model{
 		eventList:   eventList,
-		rawView:     rawView,
+		sideView:    rawView,
 		keys:        listKeys,
 		eventChan:   eventChan,
 		hardFilter:  filter,
@@ -189,7 +191,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	m.updateSideInfos()
-	m.rawView, cmd = m.rawView.Update(msg)
+	m.sideView, cmd = m.sideView.Update(msg)
 	cmds = append(cmds, cmd)
 
 	if m.eventList.Index() > 0 {
@@ -205,25 +207,33 @@ func (m *model) updateSideInfos() {
 	if sel := m.eventList.SelectedItem(); sel != nil {
 		switch m.outputFormat {
 		case YAML:
+			m.sideTitle = "Raw event (YAML)"
 			m.sideInfos = sel.(item).eventYAML
 			if m.wordWrap {
 				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
 			}
 			if info, err := Highlight(m.sideInfos, "yaml", theme); err != nil {
-				m.rawView.SetContent(m.sideInfos)
+				m.sideView.SetContent(m.sideInfos)
 			} else {
-				m.rawView.SetContent(info)
+				m.sideView.SetContent(info)
 			}
 		case JSON:
+			m.sideTitle = "Raw event (JSON)"
 			m.sideInfos = sel.(item).eventJSON
 			if m.wordWrap {
 				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
 			}
 			if info, err := Highlight(m.sideInfos, "json", theme); err != nil {
-				m.rawView.SetContent(m.sideInfos)
+				m.sideView.SetContent(m.sideInfos)
 			} else {
-				m.rawView.SetContent(info)
+				m.sideView.SetContent(info)
 			}
+		case PARSED:
+			m.sideTitle = "Parsed event (Golang)"
+			eventLite := sel.(item).event
+			eventLite.RawBody = nil
+			m.sideInfos = pp.Sprint(eventLite)
+			m.sideView.SetContent(m.sideInfos)
 		}
 	}
 }
@@ -267,15 +277,15 @@ func (m model) View() string {
 	*/
 
 	if m.sideInfos != "" {
-		rawTitle := rightPanelTitleStyle.Render("Raw details")
+		rawTitle := rightPanelTitleStyle.Render(m.sideTitle)
 
 		rightPanelStyle.Width(contentWidth)
 		rightPanelStyle.Height(contentHeight)
 
-		m.rawView.Width = contentWidth - rightPanelStyle.GetHorizontalFrameSize()
-		m.rawView.Height = contentHeight - lipgloss.Height(rawTitle) - rightPanelStyle.GetVerticalFrameSize()
+		m.sideView.Width = contentWidth - rightPanelStyle.GetHorizontalFrameSize()
+		m.sideView.Height = contentHeight - lipgloss.Height(rawTitle) - rightPanelStyle.GetVerticalFrameSize()
 
-		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawTitle, m.rawView.View()))
+		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawTitle, m.sideView.View()))
 		content = append(content, sideInfos)
 	}
 

@@ -23,7 +23,7 @@ func defaultKeyMap() *keyMap {
 		),
 		toggleJSONYAML: key.NewBinding(
 			key.WithKeys("m"),
-			key.WithHelp("m", "toggle JSON/YAML"),
+			key.WithHelp("m", "toggle JSON/YAML/parsed"),
 		),
 	}
 }
