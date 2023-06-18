@@ -3,13 +3,13 @@ package tui
 import (
 	"fmt"
 
-	"github.com/kpetremann/salt-exporter/pkg/events"
+	"github.com/kpetremann/salt-exporter/pkg/event"
 )
 
 type item struct {
 	title       string
 	description string
-	event       events.SaltEvent
+	event       event.SaltEvent
 	datetime    string
 	sender      string
 	state       string

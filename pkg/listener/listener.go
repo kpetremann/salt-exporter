@@ -1,4 +1,4 @@
-package events
+package listener
 
 import (
 	"context"
@@ -6,9 +6,14 @@ import (
 	"net"
 	"time"
 
+	events "github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/rs/zerolog/log"
 	"github.com/vmihailenco/msgpack/v5"
 )
+
+type eventParser interface {
+	Parse(message map[string]interface{}) (events.SaltEvent, error)
+}
 
 const defaultIPCFilepath = "/var/run/salt/master/master_event_pub.ipc"
 
@@ -18,7 +23,7 @@ type EventListener struct {
 	ctx context.Context
 
 	// eventChan is the channel to send events to
-	eventChan chan SaltEvent
+	eventChan chan events.SaltEvent
 
 	// iPCFilepath is filepath to the salt-master event bus
 	iPCFilepath string
@@ -28,6 +33,8 @@ type EventListener struct {
 
 	// decoder is msgpack decoder for parsing the event bus messages
 	decoder *msgpack.Decoder
+
+	eventParser eventParser
 }
 
 // Open opens the salt-master event bus
@@ -78,8 +85,13 @@ func (e *EventListener) Reconnect() {
 // NewEventListener creates a new EventListener
 //
 // The events will be sent to eventChan.
-func NewEventListener(ctx context.Context, eventChan chan SaltEvent) *EventListener {
-	e := EventListener{ctx: ctx, eventChan: eventChan, iPCFilepath: defaultIPCFilepath}
+func NewEventListener(ctx context.Context, eventParser eventParser, eventChan chan events.SaltEvent) *EventListener {
+	e := EventListener{
+		ctx:         ctx,
+		eventChan:   eventChan,
+		eventParser: eventParser,
+		iPCFilepath: defaultIPCFilepath,
+	}
 	return &e
 }
 
@@ -93,10 +105,7 @@ func (e *EventListener) SetIPCFilepath(filepath string) {
 }
 
 // ListenEvents listens to the salt-master event bus and sends events to the event channel
-//
-// if keepRawBody is true, the raw event body will be kept in the event struct.
-// It can be useful for debugging or post-processing.
-func (e *EventListener) ListenEvents(keepRawBody bool) {
+func (e *EventListener) ListenEvents() {
 	e.Open()
 
 	for {
@@ -115,7 +124,9 @@ func (e *EventListener) ListenEvents(keepRawBody bool) {
 
 				continue
 			}
-			ParseEvent(message, e.eventChan, keepRawBody)
+			if event, err := e.eventParser.Parse(message); err == nil {
+				e.eventChan <- event
+			}
 		}
 	}
 }

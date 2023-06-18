@@ -12,7 +12,9 @@ import (
 
 	"github.com/kpetremann/salt-exporter/internal/logging"
 	"github.com/kpetremann/salt-exporter/internal/metrics"
-	"github.com/kpetremann/salt-exporter/pkg/events"
+	events "github.com/kpetremann/salt-exporter/pkg/event"
+	"github.com/kpetremann/salt-exporter/pkg/listener"
+	"github.com/kpetremann/salt-exporter/pkg/parser"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 )
@@ -84,9 +86,10 @@ func main() {
 	eventChan := make(chan events.SaltEvent)
 
 	// listen and expose metric
-	eventListener := events.NewEventListener(ctx, eventChan)
+	parser := parser.NewEventParser(false)
+	eventListener := listener.NewEventListener(ctx, parser, eventChan)
 
-	go eventListener.ListenEvents(false)
+	go eventListener.ListenEvents()
 	go metrics.ExposeMetrics(ctx, eventChan, metricsConfig)
 
 	// start http server

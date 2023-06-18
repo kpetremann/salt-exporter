@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/kpetremann/salt-exporter/internal/filters"
-	"github.com/kpetremann/salt-exporter/pkg/events"
+	events "github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/rs/zerolog/log"

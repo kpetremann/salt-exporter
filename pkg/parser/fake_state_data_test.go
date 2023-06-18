@@ -1,31 +1,11 @@
-package events_test
+package parser_test
 
 import (
 	"log"
 
-	"github.com/kpetremann/salt-exporter/pkg/events"
+	"github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/vmihailenco/msgpack/v5"
 )
-
-func getNewStateEvent() events.SaltEvent {
-	return events.SaltEvent{
-		Tag:          "salt/job/20220630000000000000/new",
-		Type:         "new",
-		TargetNumber: 1,
-		Data: events.EventData{
-			Timestamp: "2022-06-30T00:00:00.000000",
-			Fun:       "state.sls",
-			Arg:       []interface{}{"test"},
-			Jid:       "20220630000000000000",
-			Minions:   []string{"node1"},
-			Missing:   []string{},
-			Tgt:       "node1",
-			TgtType:   "glob",
-			User:      "salt_user",
-		},
-		IsScheduleJob: false,
-	}
-}
 
 /*
 	Fake state.sls job
@@ -47,11 +27,11 @@ func getNewStateEvent() events.SaltEvent {
 	}
 */
 
-var expectedNewStateSlsJob = events.SaltEvent{
+var expectedNewStateSlsJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
 		Arg:       []interface{}{"test"},
@@ -122,11 +102,11 @@ func fakeNewStateSlsJobEvent() []byte {
 
 */
 
-var expectedStateSlsReturn = events.SaltEvent{
+var expectedStateSlsReturn = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/node1",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
@@ -217,11 +197,11 @@ func fakeStateSlsReturnEvent() []byte {
 
 */
 
-var expectedNewStateSingle = events.SaltEvent{
+var expectedNewStateSingle = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
 	TargetNumber: 1,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Arg: []interface{}{
 			map[string]interface{}{
@@ -308,11 +288,11 @@ func fakeNewStateSingleEvent() []byte {
 
 */
 
-var expectedStateSingleReturn = events.SaltEvent{
+var expectedStateSingleReturn = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/node1",
 	Type:         "ret",
 	TargetNumber: 0,
-	Data: events.EventData{
+	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.single",
