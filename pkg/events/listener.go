@@ -115,7 +115,9 @@ func (e *EventListener) ListenEvents(keepRawBody bool) {
 
 				continue
 			}
-			ParseEvent(message, e.eventChan, keepRawBody)
+			if event, err := ParseEvent(message, keepRawBody); err == nil {
+				e.eventChan <- event
+			}
 		}
 	}
 }

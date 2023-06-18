@@ -2,14 +2,12 @@ package events_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/kpetremann/salt-exporter/pkg/events"
 )
 
 func TestParseEvent(t *testing.T) {
-	eventChan := make(chan events.SaltEvent)
 	tests := []struct {
 		name string
 		args map[string]interface{}
@@ -60,15 +58,22 @@ func TestParseEvent(t *testing.T) {
 			args: fakeEventAsMap(fakeStateSingleReturnEvent()),
 			want: expectedStateSingleReturn,
 		},
+		{
+			name: "dry-run",
+			args: fakeEventAsMap(fakeStateSingleReturnEvent()),
+			want: expectedStateSingleReturn,
+		},
+		{
+			name: "mock",
+			args: fakeEventAsMap(fakeStateSingleReturnEvent()),
+			want: expectedStateSingleReturn,
+		},
 	}
 
 	for _, test := range tests {
-		var parsed events.SaltEvent
-		go events.ParseEvent(test.args, eventChan, false)
-
-		select {
-		case parsed = <-eventChan:
-		case <-time.After(1 * time.Millisecond):
+		parsed, err := events.ParseEvent(test.args, false)
+		if err != nil {
+			t.Errorf("Unexpected error %s", err.Error())
 		}
 
 		if diff := cmp.Diff(parsed, test.want); diff != "" {

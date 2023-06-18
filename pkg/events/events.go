@@ -118,15 +118,14 @@ func (e *SaltEvent) ExtractState() string {
 
 // ParseEvent parses a salt event
 //
-// Once parsed, the message is sent to the eventChan channel.
 // KeepRawBody is used to keep the raw body of the event.
-func ParseEvent(message map[string]interface{}, eventChan chan<- SaltEvent, keepRawBody bool) {
+func ParseEvent(message map[string]interface{}, keepRawBody bool) (SaltEvent, error) {
 	body := string(message["body"].([]byte))
 	lines := strings.SplitN(body, "\n\n", 2)
 
 	tag := lines[0]
 	if !(strings.HasPrefix(tag, "salt/job") || strings.HasPrefix(tag, "salt/run")) {
-		return
+		return SaltEvent{}, errors.New("tag not supported")
 	}
 	log.Debug().Str("tag", tag).Msg("new event")
 
@@ -143,7 +142,7 @@ func ParseEvent(message map[string]interface{}, eventChan chan<- SaltEvent, keep
 
 	if err := msgpack.Unmarshal(byteResult, &event.Data); err != nil {
 		log.Warn().Str("error", err.Error()).Str("tag", tag).Msg("decoding_failure")
-		return
+		return SaltEvent{}, err
 	}
 
 	event.TargetNumber = len(event.Data.Minions)
@@ -154,5 +153,5 @@ func ParseEvent(message map[string]interface{}, eventChan chan<- SaltEvent, keep
 		event.Data.Id = "master"
 	}
 
-	eventChan <- event
+	return event, nil
 }
