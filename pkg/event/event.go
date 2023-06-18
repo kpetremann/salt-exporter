@@ -36,6 +36,8 @@ type SaltEvent struct {
 	Data          EventData
 	IsScheduleJob bool
 	RawBody       []byte
+	IsTest        bool
+	IsMock        bool
 }
 
 // RawToJSON converts raw body to JSON

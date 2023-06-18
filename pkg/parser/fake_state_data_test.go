@@ -43,6 +43,8 @@ var expectedNewStateSlsJob = event.SaltEvent{
 		User:      "salt_user",
 	},
 	IsScheduleJob: false,
+	IsTest:        false,
+	IsMock:        false,
 }
 
 func fakeNewStateSlsJobEvent() []byte {
@@ -131,6 +133,8 @@ var expectedStateSlsReturn = event.SaltEvent{
 		Success: true,
 	},
 	IsScheduleJob: false,
+	IsTest:        false,
+	IsMock:        false,
 }
 
 func fakeStateSlsReturnEvent() []byte {
@@ -219,6 +223,8 @@ var expectedNewStateSingle = event.SaltEvent{
 		User:    "salt_user",
 	},
 	IsScheduleJob: false,
+	IsTest:        false,
+	IsMock:        false,
 }
 
 func fakeNewStateSingleEvent() []byte {
@@ -322,6 +328,8 @@ var expectedStateSingleReturn = event.SaltEvent{
 		Success: true,
 	},
 	IsScheduleJob: false,
+	IsTest:        false,
+	IsMock:        false,
 }
 
 func fakeStateSingleReturnEvent() []byte {
@@ -351,6 +359,207 @@ func fakeStateSingleReturnEvent() []byte {
 				"name":        "toto",
 				"result":      true,
 				"start_time":  "09:20:38.462572",
+			},
+		},
+		Success: true,
+	}
+
+	fakeBody, err := msgpack.Marshal(fake)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fakeMessage := []byte("salt/job/20220630000000000000/ret/node1\n\n")
+	fakeMessage = append(fakeMessage, fakeBody...)
+
+	return fakeMessage
+}
+
+/*
+	Fake state.sls job test=True mock=True
+
+	salt/job/20220630000000000000/new	{
+		"_stamp": "2022-06-30T00:00:00.000000",
+		"fun": "state.sls",
+		"arg": [
+			"somestate",
+			{
+				"__kwarg__": true,
+				"test": true,
+				"mock": true
+			}
+		],
+		"jid": "20220630000000000000",
+		"minions": [
+			"node1"
+		],
+		"missing": [],
+		"tgt": "node1",
+		"tgt_type": "glob",
+		"user": "salt_user"
+	}
+*/
+
+var expectedNewTestMockStateSlsJob = event.SaltEvent{
+	Tag:          "salt/job/20220630000000000000/new",
+	Type:         "new",
+	TargetNumber: 1,
+	Data: event.EventData{
+		Timestamp: "2022-06-30T00:00:00.000000",
+		Fun:       "state.sls",
+		Arg: []interface{}{
+			"somestate",
+			map[string]interface{}{
+				"test": true,
+				"mock": true,
+			},
+		},
+		Jid:     "20220630000000000000",
+		Minions: []string{"node1"},
+		Missing: []string{},
+		Tgt:     "node1",
+		TgtType: "glob",
+		User:    "salt_user",
+	},
+	IsScheduleJob: false,
+	IsTest:        true,
+	IsMock:        true,
+}
+
+func fakeNewTestMockStateSlsJobEvent() []byte {
+	// Marshal the data using MsgPack
+	fake := FakeData{
+		Timestamp: "2022-06-30T00:00:00.000000",
+		Fun:       "state.sls",
+		Arg: []interface{}{
+			"somestate",
+			map[string]interface{}{
+				"test": true,
+				"mock": true,
+			},
+		},
+		Jid:     "20220630000000000000",
+		Minions: []string{"node1"},
+		Missing: []string{},
+		Tgt:     "node1",
+		TgtType: "glob",
+		User:    "salt_user",
+	}
+
+	fakeBody, err := msgpack.Marshal(fake)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fakeMessage := []byte("salt/job/20220630000000000000/new\n\n")
+	fakeMessage = append(fakeMessage, fakeBody...)
+
+	return fakeMessage
+}
+
+/*
+	Fake state.sls ret
+
+	salt/job/20220630000000000000/ret/node1	{
+		"_stamp": "2022-06-30T00:00:00.000000",
+		"cmd": "_return",
+		"fun": "state.sls",
+		"fun_args": [
+			"somestate",
+			{
+				"test": true,
+				"mock": true
+			}
+		],
+		"id": "node1",
+		"jid": "20220630000000000000",
+		"out": "highstate",
+		"retcode": 0,
+		"return": {
+			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": {
+				"__id__": "dummy somestate",
+				"__run_num__": 0,
+				"__sls__": "somestate",
+				"changes": {},
+				"comment": "Success!",
+				"duration": 0.481,
+				"name": "Dummy somestate",
+				"result": true,
+				"start_time": "09:17:08.822722"
+			}
+		},
+		"success": true
+	}
+
+*/
+
+var expectedTestMockStateSlsReturn = event.SaltEvent{
+	Tag:          "salt/job/20220630000000000000/ret/node1",
+	Type:         "ret",
+	TargetNumber: 0,
+	Data: event.EventData{
+		Timestamp: "2022-06-30T00:00:00.000000",
+		Cmd:       "_return",
+		Fun:       "state.sls",
+		FunArgs: []interface{}{
+			"somestate",
+			map[string]interface{}{
+				"test": true,
+				"mock": true,
+			},
+		},
+		Id:      "node1",
+		Jid:     "20220630000000000000",
+		Out:     "highstate",
+		Retcode: 0,
+		Return: map[string]interface{}{
+			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
+				"__id__":      "dummy somestate",
+				"__run_num__": int8(0),
+				"__sls__":     "somestate",
+				"changes":     map[string]interface{}{},
+				"comment":     "Success!",
+				"duration":    0.481,
+				"name":        "Dummy somestate",
+				"result":      true,
+				"start_time":  "09:17:08.822722",
+			},
+		},
+		Success: true,
+	},
+	IsScheduleJob: false,
+	IsTest:        true,
+	IsMock:        true,
+}
+
+func fakeTestMockStateSlsReturnEvent() []byte {
+	// Marshal the data using MsgPack
+	fake := FakeData{
+		Timestamp: "2022-06-30T00:00:00.000000",
+		Cmd:       "_return",
+		Fun:       "state.sls",
+		FunArgs: []interface{}{
+			"somestate",
+			map[string]interface{}{
+				"test": true,
+				"mock": true,
+			},
+		},
+		Id:      "node1",
+		Out:     "highstate",
+		Jid:     "20220630000000000000",
+		Retcode: 0,
+		Return: map[string]interface{}{
+			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
+				"__id__":      "dummy somestate",
+				"__run_num__": 0,
+				"__sls__":     "somestate",
+				"changes":     map[string]interface{}{},
+				"comment":     "Success!",
+				"duration":    0.481,
+				"name":        "Dummy somestate",
+				"result":      true,
+				"start_time":  "09:17:08.822722",
 			},
 		},
 		Success: true,
