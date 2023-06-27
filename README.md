@@ -33,23 +33,27 @@ Or, install via source:
 ```
 ./salt-exporter
   -health-functions-filter string
-        Apply filter on functions to monitor, separated by a comma (default "state.highstate")
+    	Apply filter on functions to monitor, separated by a comma (default "state.highstate")
   -health-minions
-        Enable minion metrics (default true)
+    	Enable minion metrics (default true)
   -health-states-filter string
-        Apply filter on states to monitor, separated by a comma (default "highstate")
+    	Apply filter on states to monitor, separated by a comma (default "highstate")
   -host string
-        listen address
+    	listen address
+  -ignore-mock
+    	ignore mock=True events
+  -ignore-test
+    	ignore test=True events
   -log-level string
-        log level (debug, info, warn, error, fatal, panic, disabled) (default "info")
+    	log level (debug, info, warn, error, fatal, panic, disabled) (default "info")
   -port int
-        listen port (default 2112)
+    	listen port (default 2112)
   -tls
-        enable TLS
+    	enable TLS
   -tls-cert string
-        TLS certificated
+    	TLS certificated
   -tls-key string
-        TLS private key
+    	TLS private key
 ```
 
 ## Features
