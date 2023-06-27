@@ -22,6 +22,16 @@ type Registry struct {
 }
 
 func NewRegistry(config Config) Registry {
+	functionResponsesTotalLabels := []string{"function", "state", "success"}
+	if config.SaltFunctionResponsesTotal.AddMinionLabel {
+		functionResponsesTotalLabels = append([]string{"minion"}, functionResponsesTotalLabels...)
+	}
+
+	scheduledJobReturnTotalLabels := []string{"function", "state", "success"}
+	if config.SaltScheduledJobReturnTotal.AddMinionLabel {
+		scheduledJobReturnTotalLabels = append([]string{"minion"}, scheduledJobReturnTotalLabels...)
+	}
+
 	return Registry{
 		config: config,
 
@@ -46,7 +56,7 @@ func NewRegistry(config Config) Registry {
 				Name: "salt_function_responses_total",
 				Help: "Total number of response per function processed",
 			},
-			[]string{"function", "state", "success"},
+			functionResponsesTotalLabels,
 		),
 
 		scheduledJobReturnTotal: promauto.NewCounterVec(
@@ -54,7 +64,7 @@ func NewRegistry(config Config) Registry {
 				Name: "salt_scheduled_job_return_total",
 				Help: "Total number of scheduled job response",
 			},
-			[]string{"function", "state", "success"},
+			scheduledJobReturnTotalLabels,
 		),
 
 		responseTotal: promauto.NewCounterVec(
@@ -87,15 +97,25 @@ func (r Registry) IncreaseExpectedResponsesTotal(function, state string, value f
 	}
 }
 
-func (r Registry) IncreaseFunctionResponsesTotal(function, state string, success bool) {
+func (r Registry) IncreaseFunctionResponsesTotal(function, state, minion string, success bool) {
+	labels := []string{function, state, strconv.FormatBool(success)}
+	if r.config.SaltFunctionResponsesTotal.AddMinionLabel {
+		labels = append([]string{minion}, labels...)
+	}
+
 	if r.config.SaltFunctionResponsesTotal.Enabled {
-		r.functionResponsesTotal.WithLabelValues(function, state, strconv.FormatBool(success)).Inc()
+		r.functionResponsesTotal.WithLabelValues(labels...).Inc()
 	}
 }
 
-func (r Registry) IncreaseScheduledJobReturnTotal(function, state string, success bool) {
+func (r Registry) IncreaseScheduledJobReturnTotal(function, state, minion string, success bool) {
+	labels := []string{function, state, strconv.FormatBool(success)}
+	if r.config.SaltScheduledJobReturnTotal.AddMinionLabel {
+		labels = append([]string{minion}, labels...)
+	}
+
 	if r.config.SaltScheduledJobReturnTotal.Enabled {
-		r.scheduledJobReturnTotal.WithLabelValues(function, state, strconv.FormatBool(success)).Inc()
+		r.scheduledJobReturnTotal.WithLabelValues(labels...).Inc()
 	}
 }
 

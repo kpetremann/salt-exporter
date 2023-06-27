@@ -31,10 +31,10 @@ func eventToMetrics(event event.SaltEvent, r Registry) {
 			// - the substate success is false, and the global retcode is > 0
 			// using retcode could be enough, but in case there are other corner cases, we combine both values
 			success = event.Data.Success && (event.Data.Retcode == 0)
-			r.IncreaseScheduledJobReturnTotal(event.Data.Fun, state, success)
+			r.IncreaseScheduledJobReturnTotal(event.Data.Fun, state, event.Data.Id, success)
 		} else {
 			r.IncreaseResponseTotal(event.Data.Id, success) // TODO: move outside the if?
-			r.IncreaseFunctionResponsesTotal(event.Data.Fun, state, success)
+			r.IncreaseFunctionResponsesTotal(event.Data.Fun, state, event.Data.Id, success)
 		}
 
 		r.SetFunctionStatus(event.Data.Id, event.Data.Fun, state, success)
