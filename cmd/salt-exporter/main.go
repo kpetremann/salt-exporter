@@ -92,8 +92,6 @@ func start(config Config) {
 
 func main() {
 	defer quit()
-
-	// TODO: refacto > configure()
 	logging.Configure()
 
 	config, err := ReadConfig()

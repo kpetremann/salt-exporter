@@ -9,12 +9,23 @@ import (
 	"github.com/spf13/viper"
 )
 
+const defaultLogLevel = "info"
+const defaultPort = 2112
+const defaultHealthMinion = true
+const defaultHealthFunctionsFilter = "state.highstate"
+const defaultHealthStatesFilter = "highstate"
+
 var flagConfigMapping = map[string]string{
-	"host":     "listen-address",
-	"port":     "listen-port",
-	"tls":      "tls.enabled",
-	"tls-cert": "tls.certificate",
-	"tls-key":  "tls.key",
+	"host":                    "listen-address",
+	"port":                    "listen-port",
+	"tls":                     "tls.enabled",
+	"tls-cert":                "tls.certificate",
+	"tls-key":                 "tls.key",
+	"ignore-test":             "metrics.global.filters.ignore-test",
+	"ignore-mock":             "metrics.global.filters.ignore-mock",
+	"health-minions":          "metrics.health-minions",
+	"health-functions-filter": "metrics.salt_function_status.filters.functions",
+	"health-states-filter":    "metrics.salt_function_status.filters.states",
 }
 
 type Config struct {
@@ -33,10 +44,10 @@ type Config struct {
 
 func parseFlags() {
 	// flags
-	flag.String("log-level", "info", "log level (debug, info, warn, error, fatal, panic, disabled)")
+	flag.String("log-level", defaultLogLevel, "log level (debug, info, warn, error, fatal, panic, disabled)")
 
 	flag.String("host", "", "listen address")
-	flag.Int("port", 2112, "listen port")
+	flag.Int("port", defaultPort, "listen port")
 	flag.Bool("tls", false, "enable TLS")
 	flag.String("tls-cert", "", "TLS certificated")
 	flag.String("tls-key", "", "TLS private key")
@@ -44,15 +55,25 @@ func parseFlags() {
 	flag.Bool("ignore-test", false, "ignore test=True events")
 	flag.Bool("ignore-mock", false, "ignore mock=True events")
 
-	flag.Bool("health-minions", true, "enable minion metrics")
-	flag.String("health-functions-filter", "state.highstate",
+	flag.Bool("health-minions", defaultHealthMinion, "enable minion metrics")
+	flag.String("health-functions-filter", defaultHealthStatesFilter,
 		"apply filter on functions to monitor, separated by a comma")
-	flag.String("health-states-filter", "highstate",
+	flag.String("health-states-filter", defaultHealthStatesFilter,
 		"apply filter on states to monitor, separated by a comma")
 	flag.Parse()
 }
 
+func setDefaults() {
+	viper.SetDefault("log-level", defaultLogLevel)
+	viper.SetDefault("listen-port", defaultPort)
+	viper.SetDefault("metrics.health-minions", defaultHealthMinion)
+	viper.SetDefault("metrics.salt_function_status.filters.functions", []string{defaultHealthFunctionsFilter})
+	viper.SetDefault("metrics.salt_function_status.filters.states", []string{defaultHealthStatesFilter})
+}
+
 func getConfig() (Config, error) {
+	setDefaults()
+
 	// bind flags
 	var allFlags []viperFlag
 	flag.Visit(func(f *flag.Flag) {

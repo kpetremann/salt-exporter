@@ -19,6 +19,7 @@ func Configure() {
 // logLevel: The log level to use, in zerolog format
 func SetLevel(logLevel string) {
 	level, err := zerolog.ParseLevel(logLevel)
+	fmt.Println(logLevel)
 	if err != nil {
 		fmt.Println("Failed to parse log level")
 		os.Exit(1)
