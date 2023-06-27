@@ -38,6 +38,13 @@ type Config struct {
 				IgnoreMock bool `mapstructure:"ignore-mock"`
 			}
 		}
+
+		SaltFunctionStatus struct {
+			Filters struct {
+				Functions []string
+				States    []string
+			}
+		} `mapstructure:"salt_function_status"`
 	}
 }
 

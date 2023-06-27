@@ -59,8 +59,8 @@ func main() {
 
 	metricsConfig := metrics.MetricsConfig{
 		HealthMinions:          config.HealthMinions,
-		HealthFunctionsFilters: config.HealthFunctionsFilter,
-		HealthStatesFilters:    config.HealthStatesFilter,
+		HealthFunctionsFilters: config.Metrics.SaltFunctionStatus.Filters.Functions,
+		HealthStatesFilters:    config.Metrics.SaltFunctionStatus.Filters.States,
 		IgnoreTest:             config.Metrics.Global.Filters.IgnoreTest,
 		IgnoreMock:             config.Metrics.Global.Filters.IgnoreMock,
 	}
