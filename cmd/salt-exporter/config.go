@@ -55,14 +55,15 @@ func parseFlags() {
 	flag.Bool("ignore-test", false, "ignore test=True events")
 	flag.Bool("ignore-mock", false, "ignore mock=True events")
 
-	healthMinions := flag.Bool("health-minions", defaultHealthMinion, "enable minion metrics")
-	flag.String("health-functions-filter", defaultHealthStatesFilter,
+	// deprecated flag
+	healthMinions := flag.Bool("health-minions", defaultHealthMinion, "[DEPRECATED] enable minion metrics")
+	flag.String("[DEPRECATED] health-functions-filter", defaultHealthStatesFilter,
 		"apply filter on functions to monitor, separated by a comma")
-	flag.String("health-states-filter", defaultHealthStatesFilter,
+	flag.String("[DEPRECATED] health-states-filter", defaultHealthStatesFilter,
 		"apply filter on states to monitor, separated by a comma")
 	flag.Parse()
 
-	// ensure compatibility with health-minions flag
+	// ensure compatibility with deprecated health-minions flag
 	if !*healthMinions {
 		viper.SetDefault("metrics.salt_function_status.enabled", false)
 		viper.SetDefault("metrics.salt_responses_total.enabled", false)
