@@ -31,6 +31,7 @@ func quit() {
 
 func main() {
 	defer quit()
+	logging.Configure()
 
 	listenAddress := flag.String("host", "", "listen address")
 	listenPort := flag.Int("port", 2112, "listen port")
@@ -47,7 +48,7 @@ func main() {
 	logLevel := flag.String("log-level", "info", "log level (debug, info, warn, error, fatal, panic, disabled)")
 	flag.Parse()
 
-	logging.ConfigureLogging(*logLevel)
+	logging.SetLevel(*logLevel)
 
 	if *tlsEnabled {
 		missingFlag := false
