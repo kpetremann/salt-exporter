@@ -2,12 +2,10 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/kpetremann/salt-exporter/internal/logging"
@@ -33,30 +31,20 @@ func main() {
 	defer quit()
 	logging.Configure()
 
-	listenAddress := flag.String("host", "", "listen address")
-	listenPort := flag.Int("port", 2112, "listen port")
-	tlsEnabled := flag.Bool("tls", false, "enable TLS")
-	tlsCert := flag.String("tls-cert", "", "TLS certificated")
-	tlsKey := flag.String("tls-key", "", "TLS private key")
-	healthMinions := flag.Bool("health-minions", true, "Enable minion metrics")
-	healthFunctionsFilters := flag.String("health-functions-filter", "state.highstate",
-		"Apply filter on functions to monitor, separated by a comma")
-	healthStatesFilters := flag.String("health-states-filter", "highstate",
-		"Apply filter on states to monitor, separated by a comma")
-	ignoreTest := flag.Bool("ignore-test", false, "ignore test=True events")
-	ignoreMock := flag.Bool("ignore-mock", false, "ignore mock=True events")
-	logLevel := flag.String("log-level", "info", "log level (debug, info, warn, error, fatal, panic, disabled)")
-	flag.Parse()
+	config, err := ReadConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load settings during initialization")
+	}
+	log.Fatal().Msg("DEBUG")
+	logging.SetLevel(config.LogLevel)
 
-	logging.SetLevel(*logLevel)
-
-	if *tlsEnabled {
+	if config.TLS.Enabled {
 		missingFlag := false
-		if *tlsCert == "" {
+		if config.TLS.Key == "" {
 			missingFlag = true
 			log.Error().Msg("TLS certificate not specified")
 		}
-		if *tlsCert == "" {
+		if config.TLS.Certificate == "" {
 			missingFlag = true
 			log.Error().Msg("TLS private key not specified")
 		}
@@ -70,17 +58,17 @@ func main() {
 	log.Info().Str("Build time", date).Send()
 
 	metricsConfig := metrics.MetricsConfig{
-		HealthMinions:          *healthMinions,
-		HealthFunctionsFilters: strings.Split(*healthFunctionsFilters, ","),
-		HealthStatesFilters:    strings.Split(*healthStatesFilters, ","),
-		IgnoreTest:             *ignoreTest,
-		IgnoreMock:             *ignoreMock,
+		HealthMinions:          config.HealthMinions,
+		HealthFunctionsFilters: config.HealthFunctionsFilter,
+		HealthStatesFilters:    config.HealthStatesFilter,
+		IgnoreTest:             config.IgnoreTest,
+		IgnoreMock:             config.IgnoreMock,
 	}
 
 	if metricsConfig.HealthMinions {
 		log.Info().Msg("health-minions: metrics are enabled")
-		log.Info().Msgf("health-minions: functions filters: %s", *healthFunctionsFilters)
-		log.Info().Msgf("health-minions: states filters: %s", *healthStatesFilters)
+		log.Info().Msgf("health-minions: functions filters: %s", config.HealthFunctionsFilter)
+		log.Info().Msgf("health-minions: states filters: %s", config.HealthStatesFilter)
 	}
 
 	if metricsConfig.IgnoreTest {
@@ -88,7 +76,7 @@ func main() {
 		log.Info().Msg("mock=True events will be ignored")
 	}
 
-	listenSocket := fmt.Sprint(*listenAddress, ":", *listenPort)
+	listenSocket := fmt.Sprint(config.ListenAddress, ":", config.ListenPort)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -113,10 +101,10 @@ func main() {
 	go func() {
 		var err error
 
-		if !*tlsEnabled {
+		if !config.TLS.Enabled {
 			err = httpServer.ListenAndServe()
 		} else {
-			err = httpServer.ListenAndServeTLS(*tlsCert, *tlsKey)
+			err = httpServer.ListenAndServeTLS(config.TLS.Certificate, config.TLS.Key)
 		}
 
 		if err != nil {
