@@ -27,12 +27,18 @@ type Config struct {
 		Certificate string
 	}
 
-	IgnoreTest bool `mapstructure:"ignore-test"`
-	IgnoreMock bool `mapstructure:"ignore-mock"`
-
 	HealthMinions         bool     `mapstructure:"health-minions"`
 	HealthFunctionsFilter []string `mapstructure:"health-functions-filter"`
 	HealthStatesFilter    []string `mapstructure:"health-states-filter"`
+
+	Metrics struct {
+		Global struct {
+			Filters struct {
+				IgnoreTest bool `mapstructure:"ignore-test"`
+				IgnoreMock bool `mapstructure:"ignore-mock"`
+			}
+		}
+	}
 }
 
 func parseFlags() {

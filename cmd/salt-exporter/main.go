@@ -61,8 +61,8 @@ func main() {
 		HealthMinions:          config.HealthMinions,
 		HealthFunctionsFilters: config.HealthFunctionsFilter,
 		HealthStatesFilters:    config.HealthStatesFilter,
-		IgnoreTest:             config.IgnoreTest,
-		IgnoreMock:             config.IgnoreMock,
+		IgnoreTest:             config.Metrics.Global.Filters.IgnoreTest,
+		IgnoreMock:             config.Metrics.Global.Filters.IgnoreMock,
 	}
 
 	if metricsConfig.HealthMinions {
