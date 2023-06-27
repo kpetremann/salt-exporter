@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/kpetremann/salt-exporter/internal/metrics"
 	"github.com/spf13/viper"
 )
 
@@ -27,25 +28,7 @@ type Config struct {
 		Certificate string
 	}
 
-	HealthMinions         bool     `mapstructure:"health-minions"`
-	HealthFunctionsFilter []string `mapstructure:"health-functions-filter"`
-	HealthStatesFilter    []string `mapstructure:"health-states-filter"`
-
-	Metrics struct {
-		Global struct {
-			Filters struct {
-				IgnoreTest bool `mapstructure:"ignore-test"`
-				IgnoreMock bool `mapstructure:"ignore-mock"`
-			}
-		}
-
-		SaltFunctionStatus struct {
-			Filters struct {
-				Functions []string
-				States    []string
-			}
-		} `mapstructure:"salt_function_status"`
-	}
+	Metrics metrics.Config
 }
 
 func parseFlags() {

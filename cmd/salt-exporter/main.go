@@ -57,22 +57,16 @@ func main() {
 	log.Info().Str("Commit", commit).Send()
 	log.Info().Str("Build time", date).Send()
 
-	metricsConfig := metrics.MetricsConfig{
-		HealthMinions:          config.HealthMinions,
-		HealthFunctionsFilters: config.Metrics.SaltFunctionStatus.Filters.Functions,
-		HealthStatesFilters:    config.Metrics.SaltFunctionStatus.Filters.States,
-		IgnoreTest:             config.Metrics.Global.Filters.IgnoreTest,
-		IgnoreMock:             config.Metrics.Global.Filters.IgnoreMock,
-	}
-
-	if metricsConfig.HealthMinions {
+	if config.Metrics.HealthMinions {
 		log.Info().Msg("health-minions: metrics are enabled")
-		log.Info().Msgf("health-minions: functions filters: %s", config.HealthFunctionsFilter)
-		log.Info().Msgf("health-minions: states filters: %s", config.HealthStatesFilter)
+		log.Info().Msgf("health-minions: functions filters: %s", config.Metrics.SaltFunctionStatus.Filters.Functions)
+		log.Info().Msgf("health-minions: states filters: %s", config.Metrics.SaltFunctionStatus.Filters.States)
 	}
 
-	if metricsConfig.IgnoreTest {
+	if config.Metrics.Global.Filters.IgnoreTest {
 		log.Info().Msg("test=True events will be ignored")
+	}
+	if config.Metrics.Global.Filters.IgnoreMock {
 		log.Info().Msg("mock=True events will be ignored")
 	}
 
@@ -89,7 +83,7 @@ func main() {
 	eventListener := listener.NewEventListener(ctx, parser, eventChan)
 
 	go eventListener.ListenEvents()
-	go metrics.ExposeMetrics(ctx, eventChan, metricsConfig)
+	go metrics.ExposeMetrics(ctx, eventChan, config.Metrics)
 
 	// start http server
 	log.Info().Msg("exposing metrics on " + listenSocket + "/metrics")

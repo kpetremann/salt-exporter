@@ -1,15 +1,20 @@
 package metrics
 
-type MetricsConfig struct {
+type Config struct {
 	// HealtMinions enable/disable the health functions/states metrics
-	HealthMinions bool
+	HealthMinions bool `mapstructure:"health-minions"`
 
-	// HealthFunctionsFilter permits to limit the number of function exposed
-	HealthFunctionsFilters []string
+	Global struct {
+		Filters struct {
+			IgnoreTest bool `mapstructure:"ignore-test"`
+			IgnoreMock bool `mapstructure:"ignore-mock"`
+		}
+	}
 
-	// HealthFunctionsFilter permits to limit the number of state exposed
-	HealthStatesFilters []string
-
-	// Ignore test=True / mock=True events
-	IgnoreTest, IgnoreMock bool
+	SaltFunctionStatus struct {
+		Filters struct {
+			Functions []string
+			States    []string
+		}
+	} `mapstructure:"salt_function_status"`
 }
