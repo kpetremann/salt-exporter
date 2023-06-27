@@ -27,38 +27,12 @@ func quit() {
 	log.Warn().Msg("Bye.")
 }
 
-func main() {
-	defer quit()
-	logging.Configure()
-
-	config, err := ReadConfig()
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load settings during initialization")
-	}
-	log.Fatal().Msg("DEBUG")
-	logging.SetLevel(config.LogLevel)
-
-	if config.TLS.Enabled {
-		missingFlag := false
-		if config.TLS.Key == "" {
-			missingFlag = true
-			log.Error().Msg("TLS certificate not specified")
-		}
-		if config.TLS.Certificate == "" {
-			missingFlag = true
-			log.Error().Msg("TLS private key not specified")
-		}
-		if missingFlag {
-			return
-		}
-	}
-
+func printInfo(config Config) {
 	log.Info().Str("Version", version).Send()
 	log.Info().Str("Commit", commit).Send()
 	log.Info().Str("Build time", date).Send()
 
 	if config.Metrics.HealthMinions {
-		log.Info().Msg("health-minions: metrics are enabled")
 		log.Info().Msgf("health-minions: functions filters: %s", config.Metrics.SaltFunctionStatus.Filters.Functions)
 		log.Info().Msgf("health-minions: states filters: %s", config.Metrics.SaltFunctionStatus.Filters.States)
 	}
@@ -69,7 +43,9 @@ func main() {
 	if config.Metrics.Global.Filters.IgnoreMock {
 		log.Info().Msg("mock=True events will be ignored")
 	}
+}
 
+func start(config Config) {
 	listenSocket := fmt.Sprint(config.ListenAddress, ":", config.ListenPort)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -112,4 +88,20 @@ func main() {
 	if err := httpServer.Shutdown(context.Background()); err != nil {
 		log.Error().Err(err).Send()
 	}
+}
+
+func main() {
+	defer quit()
+
+	// TODO: refacto > configure()
+	logging.Configure()
+
+	config, err := ReadConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load settings during initialization")
+	}
+
+	logging.SetLevel(config.LogLevel)
+	printInfo(config)
+	start(config)
 }
