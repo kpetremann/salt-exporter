@@ -59,6 +59,16 @@ func TestParseEvent(t *testing.T) {
 			args: fakeEventAsMap(fakeStateSingleReturnEvent()),
 			want: expectedStateSingleReturn,
 		},
+		{
+			name: "new state.sls test=True mock=True",
+			args: fakeEventAsMap(fakeNewTestMockStateSlsJobEvent()),
+			want: expectedNewTestMockStateSlsJob,
+		},
+		{
+			name: "return state.sls test=True mock=True",
+			args: fakeEventAsMap(fakeTestMockStateSlsReturnEvent()),
+			want: expectedTestMockStateSlsReturn,
+		},
 	}
 
 	p := parser.NewEventParser(false)

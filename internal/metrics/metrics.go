@@ -3,7 +3,6 @@ package metrics
 import (
 	"context"
 	"strconv"
-	"time"
 
 	"github.com/kpetremann/salt-exporter/internal/filters"
 	"github.com/kpetremann/salt-exporter/pkg/event"
@@ -70,7 +69,9 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metric
 			log.Info().Msg("stopping event listener")
 			return
 		case event := <-eventChan:
-			start := time.Now()
+			if metricsConfig.IgnoreTest && event.IsTest || metricsConfig.IgnoreMock && event.IsMock {
+				return
+			}
 
 			switch event.Type {
 			case "new":
@@ -121,9 +122,6 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metric
 				}
 				lastFunctionStatus.WithLabelValues(event.Data.Id, event.Data.Fun, state).Set(boolToFloat64(success))
 			}
-
-			elapsed := time.Since(start)
-			log.Debug().Str("metric conversion took", elapsed.String()).Send()
 		}
 	}
 }

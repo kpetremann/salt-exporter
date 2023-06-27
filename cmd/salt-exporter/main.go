@@ -42,6 +42,8 @@ func main() {
 		"Apply filter on functions to monitor, separated by a comma")
 	healthStatesFilters := flag.String("health-states-filter", "highstate",
 		"Apply filter on states to monitor, separated by a comma")
+	ignoreTest := flag.Bool("ignore-test", false, "ignore test=True events")
+	ignoreMock := flag.Bool("ignore-mock", false, "ignore mock=True events")
 	logLevel := flag.String("log-level", "info", "log level (debug, info, warn, error, fatal, panic, disabled)")
 	flag.Parse()
 
@@ -66,15 +68,23 @@ func main() {
 	log.Info().Str("Commit", commit).Send()
 	log.Info().Str("Build time", date).Send()
 
-	var metricsConfig metrics.MetricsConfig
-	metricsConfig.HealthMinions = *healthMinions
-	metricsConfig.HealthFunctionsFilters = strings.Split(*healthFunctionsFilters, ",")
-	metricsConfig.HealthStatesFilters = strings.Split(*healthStatesFilters, ",")
+	metricsConfig := metrics.MetricsConfig{
+		HealthMinions:          *healthMinions,
+		HealthFunctionsFilters: strings.Split(*healthFunctionsFilters, ","),
+		HealthStatesFilters:    strings.Split(*healthStatesFilters, ","),
+		IgnoreTest:             *ignoreTest,
+		IgnoreMock:             *ignoreMock,
+	}
 
 	if metricsConfig.HealthMinions {
 		log.Info().Msg("health-minions: metrics are enabled")
-		log.Info().Msg("health-minions: functions filters: " + *healthFunctionsFilters)
-		log.Info().Msg("health-minions: states filters: " + *healthStatesFilters)
+		log.Info().Msgf("health-minions: functions filters: %s", *healthFunctionsFilters)
+		log.Info().Msgf("health-minions: states filters: %s", *healthStatesFilters)
+	}
+
+	if metricsConfig.IgnoreTest {
+		log.Info().Msg("test=True events will be ignored")
+		log.Info().Msg("mock=True events will be ignored")
 	}
 
 	listenSocket := fmt.Sprint(*listenAddress, ":", *listenPort)

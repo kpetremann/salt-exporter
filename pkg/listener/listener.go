@@ -6,13 +6,13 @@ import (
 	"net"
 	"time"
 
-	events "github.com/kpetremann/salt-exporter/pkg/event"
+	"github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/rs/zerolog/log"
 	"github.com/vmihailenco/msgpack/v5"
 )
 
 type eventParser interface {
-	Parse(message map[string]interface{}) (events.SaltEvent, error)
+	Parse(message map[string]interface{}) (event.SaltEvent, error)
 }
 
 const defaultIPCFilepath = "/var/run/salt/master/master_event_pub.ipc"
@@ -23,7 +23,7 @@ type EventListener struct {
 	ctx context.Context
 
 	// eventChan is the channel to send events to
-	eventChan chan events.SaltEvent
+	eventChan chan event.SaltEvent
 
 	// iPCFilepath is filepath to the salt-master event bus
 	iPCFilepath string
@@ -85,7 +85,7 @@ func (e *EventListener) Reconnect() {
 // NewEventListener creates a new EventListener
 //
 // The events will be sent to eventChan.
-func NewEventListener(ctx context.Context, eventParser eventParser, eventChan chan events.SaltEvent) *EventListener {
+func NewEventListener(ctx context.Context, eventParser eventParser, eventChan chan event.SaltEvent) *EventListener {
 	e := EventListener{
 		ctx:         ctx,
 		eventChan:   eventChan,

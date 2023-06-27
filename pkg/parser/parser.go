@@ -9,6 +9,9 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+const testArg = "test"
+const mockArg = "mock"
+
 type Event struct {
 	KeepRawBody bool
 }
@@ -17,9 +20,49 @@ func NewEventParser(KeepRawBody bool) Event {
 	return Event{KeepRawBody: KeepRawBody}
 }
 
-// ParseEvent parses a salt event
+// isDryRun checks if an event is run with test=True
 //
-// KeepRawBody is used to keep the raw body of the event.
+// Salt stores can store this info at two locations:
+//
+// in args:
+//
+//	"arg": [
+//		"somestate",
+//		{
+//			"__kwarg__": true,
+//			"test": true
+//		}
+//	]
+//
+// or in fun_args:
+//
+//	"fun_args": [
+//		"somestate",
+//		{
+//			"test": true
+//		}
+//	]
+func getBoolKwarg(event event.SaltEvent, field string) bool {
+	for _, arg := range event.Data.Arg {
+		if fields, ok := arg.(map[string]interface{}); ok {
+			if val, ok := fields[field].(bool); ok {
+				return val
+			}
+		}
+	}
+
+	for _, funArg := range event.Data.FunArgs {
+		if fields, ok := funArg.(map[string]interface{}); ok {
+			if val, ok := fields[field].(bool); ok {
+				return val
+			}
+		}
+	}
+
+	return false
+}
+
+// ParseEvent parses a salt event
 func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 	body := string(message["body"].([]byte))
 	lines := strings.SplitN(body, "\n\n", 2)
@@ -46,8 +89,11 @@ func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 		return event.SaltEvent{}, err
 	}
 
+	// Extract other info
 	ev.TargetNumber = len(ev.Data.Minions)
 	ev.IsScheduleJob = ev.Data.Schedule != ""
+	ev.IsTest = getBoolKwarg(ev, testArg)
+	ev.IsMock = getBoolKwarg(ev, mockArg)
 
 	// A runner are executed on the master but they do not provide their ID in the event
 	if strings.HasPrefix(tag, "salt/run") && ev.Data.Id == "" {

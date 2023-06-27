@@ -9,4 +9,7 @@ type MetricsConfig struct {
 
 	// HealthFunctionsFilter permits to limit the number of state exposed
 	HealthStatesFilters []string
+
+	// Ignore test=True / mock=True events
+	IgnoreTest, IgnoreMock bool
 }
