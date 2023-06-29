@@ -4,9 +4,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/kpetremann/salt-exporter/internal/metrics"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 const defaultLogLevel = "info"
@@ -74,8 +76,17 @@ func setDefaults() {
 	viper.SetDefault("log-level", defaultLogLevel)
 	viper.SetDefault("listen-port", defaultPort)
 	viper.SetDefault("metrics.health-minions", defaultHealthMinion)
+
+	viper.SetDefault("metrics.salt_new_job_total.enabled", true)
+	viper.SetDefault("metrics.salt_expected_responses_total.enabled", true)
+	viper.SetDefault("metrics.salt_function_responses_total.enabled", true)
+	viper.SetDefault("metrics.salt_scheduled_job_return_total.enabled", true)
+	viper.SetDefault("metrics.salt_responses_total.enabled", true)
+	viper.SetDefault("metrics.salt_function_status.enabled", true)
+
 	viper.SetDefault("metrics.salt_function_status.filters.functions", []string{defaultHealthFunctionsFilter})
 	viper.SetDefault("metrics.salt_function_status.filters.states", []string{defaultHealthStatesFilter})
+
 }
 
 func getConfig() (Config, error) {
@@ -110,6 +121,9 @@ func getConfig() (Config, error) {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return Config{}, fmt.Errorf("failed to load configuration: %w", err)
 	}
+
+	out, _ := yaml.Marshal(cfg)
+	ioutil.WriteFile("config.yml", out, 0644)
 
 	return cfg, nil
 }
