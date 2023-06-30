@@ -4,11 +4,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 
 	"github.com/kpetremann/salt-exporter/internal/metrics"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 )
 
 const defaultLogLevel = "info"
@@ -121,9 +119,6 @@ func getConfig() (Config, error) {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return Config{}, fmt.Errorf("failed to load configuration: %w", err)
 	}
-
-	out, _ := yaml.Marshal(cfg)
-	ioutil.WriteFile("config.yml", out, 0644)
 
 	return cfg, nil
 }
