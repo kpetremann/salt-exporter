@@ -34,8 +34,8 @@ type Config struct {
 
 	SaltScheduledJobReturnTotal struct {
 		Enabled        bool
-		AddMinionLabel bool `mapstructure:"salt_responses_total"`
-	} `mapstructure:"add-minion-label"`
+		AddMinionLabel bool `mapstructure:"add-minion-label"`
+	} `mapstructure:"salt_scheduled_job_return_total"`
 
 	SaltResponsesTotal struct {
 		Enabled bool
