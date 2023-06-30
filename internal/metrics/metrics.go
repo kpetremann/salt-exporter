@@ -18,7 +18,7 @@ func boolToFloat64(b bool) float64 {
 	return 0.0
 }
 
-func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metricsConfig MetricsConfig) {
+func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metricsConfig Config) {
 	newJobCounter := promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "salt_new_job_total",
@@ -69,7 +69,7 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metric
 			log.Info().Msg("stopping event listener")
 			return
 		case event := <-eventChan:
-			if metricsConfig.IgnoreTest && event.IsTest || metricsConfig.IgnoreMock && event.IsMock {
+			if metricsConfig.Global.Filters.IgnoreTest && event.IsTest || metricsConfig.Global.Filters.IgnoreMock && event.IsMock {
 				return
 			}
 
@@ -113,11 +113,11 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, metric
 				if !metricsConfig.HealthMinions {
 					continue
 				}
-				if !filters.Match(event.Data.Fun, metricsConfig.HealthFunctionsFilters) {
+				if !filters.Match(event.Data.Fun, metricsConfig.SaltFunctionStatus.Filters.Functions) {
 					continue
 				}
 				log.Debug().Msg("function matches")
-				if !filters.Match(state, metricsConfig.HealthStatesFilters) {
+				if !filters.Match(state, metricsConfig.SaltFunctionStatus.Filters.States) {
 					continue
 				}
 				lastFunctionStatus.WithLabelValues(event.Data.Id, event.Data.Fun, state).Set(boolToFloat64(success))

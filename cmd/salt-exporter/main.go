@@ -2,12 +2,10 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/kpetremann/salt-exporter/internal/logging"
@@ -29,65 +27,26 @@ func quit() {
 	log.Warn().Msg("Bye.")
 }
 
-func main() {
-	defer quit()
-
-	listenAddress := flag.String("host", "", "listen address")
-	listenPort := flag.Int("port", 2112, "listen port")
-	tlsEnabled := flag.Bool("tls", false, "enable TLS")
-	tlsCert := flag.String("tls-cert", "", "TLS certificated")
-	tlsKey := flag.String("tls-key", "", "TLS private key")
-	healthMinions := flag.Bool("health-minions", true, "Enable minion metrics")
-	healthFunctionsFilters := flag.String("health-functions-filter", "state.highstate",
-		"Apply filter on functions to monitor, separated by a comma")
-	healthStatesFilters := flag.String("health-states-filter", "highstate",
-		"Apply filter on states to monitor, separated by a comma")
-	ignoreTest := flag.Bool("ignore-test", false, "ignore test=True events")
-	ignoreMock := flag.Bool("ignore-mock", false, "ignore mock=True events")
-	logLevel := flag.String("log-level", "info", "log level (debug, info, warn, error, fatal, panic, disabled)")
-	flag.Parse()
-
-	logging.ConfigureLogging(*logLevel)
-
-	if *tlsEnabled {
-		missingFlag := false
-		if *tlsCert == "" {
-			missingFlag = true
-			log.Error().Msg("TLS certificate not specified")
-		}
-		if *tlsCert == "" {
-			missingFlag = true
-			log.Error().Msg("TLS private key not specified")
-		}
-		if missingFlag {
-			return
-		}
-	}
-
+func printInfo(config Config) {
 	log.Info().Str("Version", version).Send()
 	log.Info().Str("Commit", commit).Send()
 	log.Info().Str("Build time", date).Send()
 
-	metricsConfig := metrics.MetricsConfig{
-		HealthMinions:          *healthMinions,
-		HealthFunctionsFilters: strings.Split(*healthFunctionsFilters, ","),
-		HealthStatesFilters:    strings.Split(*healthStatesFilters, ","),
-		IgnoreTest:             *ignoreTest,
-		IgnoreMock:             *ignoreMock,
+	if config.Metrics.HealthMinions {
+		log.Info().Msgf("health-minions: functions filters: %s", config.Metrics.SaltFunctionStatus.Filters.Functions)
+		log.Info().Msgf("health-minions: states filters: %s", config.Metrics.SaltFunctionStatus.Filters.States)
 	}
 
-	if metricsConfig.HealthMinions {
-		log.Info().Msg("health-minions: metrics are enabled")
-		log.Info().Msgf("health-minions: functions filters: %s", *healthFunctionsFilters)
-		log.Info().Msgf("health-minions: states filters: %s", *healthStatesFilters)
-	}
-
-	if metricsConfig.IgnoreTest {
+	if config.Metrics.Global.Filters.IgnoreTest {
 		log.Info().Msg("test=True events will be ignored")
+	}
+	if config.Metrics.Global.Filters.IgnoreMock {
 		log.Info().Msg("mock=True events will be ignored")
 	}
+}
 
-	listenSocket := fmt.Sprint(*listenAddress, ":", *listenPort)
+func start(config Config) {
+	listenSocket := fmt.Sprint(config.ListenAddress, ":", config.ListenPort)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -100,7 +59,7 @@ func main() {
 	eventListener := listener.NewEventListener(ctx, parser, eventChan)
 
 	go eventListener.ListenEvents()
-	go metrics.ExposeMetrics(ctx, eventChan, metricsConfig)
+	go metrics.ExposeMetrics(ctx, eventChan, config.Metrics)
 
 	// start http server
 	log.Info().Msg("exposing metrics on " + listenSocket + "/metrics")
@@ -112,10 +71,10 @@ func main() {
 	go func() {
 		var err error
 
-		if !*tlsEnabled {
+		if !config.TLS.Enabled {
 			err = httpServer.ListenAndServe()
 		} else {
-			err = httpServer.ListenAndServeTLS(*tlsCert, *tlsKey)
+			err = httpServer.ListenAndServeTLS(config.TLS.Certificate, config.TLS.Key)
 		}
 
 		if err != nil {
@@ -129,4 +88,18 @@ func main() {
 	if err := httpServer.Shutdown(context.Background()); err != nil {
 		log.Error().Err(err).Send()
 	}
+}
+
+func main() {
+	defer quit()
+	logging.Configure()
+
+	config, err := ReadConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to load settings during initialization")
+	}
+
+	logging.SetLevel(config.LogLevel)
+	printInfo(config)
+	start(config)
 }
