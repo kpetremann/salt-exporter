@@ -28,32 +28,105 @@ Or, install via source:
 - latest release: `go install github.com/kpetremann/salt-exporter/cmd/salt-exporter@latest`
 - unstable: `go install github.com/kpetremann/salt-exporter/cmd/salt-exporter@main`
 
+## Deprecation notice
+
+`-health-minions`, `health-functions-filter` and `health-states-filter` are deprecated.
+They should be replaced by configuring metrics in the `config.yml` file.
+
+The equivalent of `./salt-exporter -health-minions -health-functions-filter "func1,func2" -health-states-filter "state1,state2"` is:
+
+```yaml
+metrics:
+  salt_responses_total:
+    enabled: true
+
+  salt_function_status:
+    enabled: true
+    filters:
+      functions:
+        - "func1"
+        - "func2"
+      states:
+        - "state1"
+        - "state2"
+```
+
 ## Usage
 
+Simply run:
+```./salt-exporter```
+
+The exporter can be configured using flags:
 ```
-./salt-exporter
+./salt-exporter -help
   -health-functions-filter string
-    	Apply filter on functions to monitor, separated by a comma (default "state.highstate")
-  -health-minions
-    	Enable minion metrics (default true)
+        [DEPRECATED] apply filter on functions to monitor, separated by a comma (default "highstate")
   -health-states-filter string
-    	Apply filter on states to monitor, separated by a comma (default "highstate")
+        [DEPRECATED] apply filter on states to monitor, separated by a comma (default "highstate")
+  -health-minions
+        [DEPRECATED] enable minion metrics (default true)
   -host string
-    	listen address
+        listen address
   -ignore-mock
-    	ignore mock=True events
+        ignore mock=True events
   -ignore-test
-    	ignore test=True events
+        ignore test=True events
   -log-level string
-    	log level (debug, info, warn, error, fatal, panic, disabled) (default "info")
+        log level (debug, info, warn, error, fatal, panic, disabled) (default "info")
   -port int
-    	listen port (default 2112)
+        listen port (default 2112)
   -tls
-    	enable TLS
+        enable TLS
   -tls-cert string
-    	TLS certificated
+        TLS certificated
   -tls-key string
-    	TLS private key
+        TLS private key
+```
+
+It can also be configured via a `config.yml` file, which provides more customization.
+
+The default settings are:
+```yaml
+listen-address: ""
+listen-port: 2112
+
+log-level: "info"
+tls:
+  enabled: true
+  key: "/path/to/key"
+  certificate: "/path/to/certificate"
+
+
+metrics:
+  global:
+    filters:
+      ignore-test: false
+      ignore-mock: false
+
+  salt_new_job_total:
+    enabled: true
+
+  salt_expected_responses_total:
+    enabled: true
+
+  salt_function_responses_total:
+    enabled: true
+    add-minion-label: false  # not recommended in production
+
+  salt_scheduled_job_return_total:
+    enabled: true
+    add-minion-label: false  # not recommended in production
+
+  salt_responses_total:
+    enabled: true
+
+  salt_function_status:
+    enabled: true
+    filters:
+      functions:
+        - "state.highstate"
+      states:
+        - "highstate"
 ```
 
 ## Features
@@ -68,6 +141,12 @@ It extracts and exposes:
 * the execution module, to `function` label
 * the states when using state.sls/state.apply/state.highstate, to `state` label
 * same info for the runners
+
+Each metrics can enabled or disabled via the configuration file.
+
+You can also add the minion label on some metrics. But be careful, this is not recommended on large environment as it could lead to cardinality issues!
+
+You can also filter out event run with `test=True` and/or `mock=True`.
 
 ## Exposed metrics
 

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/k0kubun/pp/v3"
 	"github.com/kpetremann/salt-exporter/internal/metrics"
 	"github.com/spf13/viper"
 )
@@ -55,20 +56,36 @@ func parseFlags() {
 	flag.Bool("ignore-test", false, "ignore test=True events")
 	flag.Bool("ignore-mock", false, "ignore mock=True events")
 
-	flag.Bool("health-minions", defaultHealthMinion, "enable minion metrics")
+	// deprecated flag
+	healthMinions := flag.Bool("health-minions", defaultHealthMinion, "[DEPRECATED] enable minion metrics")
 	flag.String("health-functions-filter", defaultHealthStatesFilter,
-		"apply filter on functions to monitor, separated by a comma")
+		"[DEPRECATED] apply filter on functions to monitor, separated by a comma")
 	flag.String("health-states-filter", defaultHealthStatesFilter,
-		"apply filter on states to monitor, separated by a comma")
+		"[DEPRECATED] apply filter on states to monitor, separated by a comma")
 	flag.Parse()
+
+	// ensure compatibility with deprecated health-minions flag
+	if !*healthMinions {
+		viper.SetDefault("metrics.salt_function_status.enabled", false)
+		viper.SetDefault("metrics.salt_responses_total.enabled", false)
+	}
 }
 
 func setDefaults() {
 	viper.SetDefault("log-level", defaultLogLevel)
 	viper.SetDefault("listen-port", defaultPort)
 	viper.SetDefault("metrics.health-minions", defaultHealthMinion)
+
+	viper.SetDefault("metrics.salt_new_job_total.enabled", true)
+	viper.SetDefault("metrics.salt_expected_responses_total.enabled", true)
+	viper.SetDefault("metrics.salt_function_responses_total.enabled", true)
+	viper.SetDefault("metrics.salt_scheduled_job_return_total.enabled", true)
+	viper.SetDefault("metrics.salt_responses_total.enabled", true)
+	viper.SetDefault("metrics.salt_function_status.enabled", true)
+
 	viper.SetDefault("metrics.salt_function_status.filters.functions", []string{defaultHealthFunctionsFilter})
 	viper.SetDefault("metrics.salt_function_status.filters.states", []string{defaultHealthStatesFilter})
+
 }
 
 func getConfig() (Config, error) {
@@ -94,8 +111,10 @@ func getConfig() (Config, error) {
 	viper.AddConfigPath(".")
 
 	err := viper.ReadInConfig()
-	if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-		return Config{}, fmt.Errorf("invalid config file: %w", err)
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return Config{}, fmt.Errorf("invalid config file: %w", err)
+		}
 	}
 
 	// extract configuration
@@ -103,6 +122,8 @@ func getConfig() (Config, error) {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return Config{}, fmt.Errorf("failed to load configuration: %w", err)
 	}
+
+	pp.Println(cfg)
 
 	return cfg, nil
 }
