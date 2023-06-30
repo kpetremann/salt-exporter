@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/k0kubun/pp/v3"
 	"github.com/kpetremann/salt-exporter/internal/metrics"
 	"github.com/spf13/viper"
 )
@@ -110,8 +111,10 @@ func getConfig() (Config, error) {
 	viper.AddConfigPath(".")
 
 	err := viper.ReadInConfig()
-	if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-		return Config{}, fmt.Errorf("invalid config file: %w", err)
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return Config{}, fmt.Errorf("invalid config file: %w", err)
+		}
 	}
 
 	// extract configuration
@@ -119,6 +122,8 @@ func getConfig() (Config, error) {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return Config{}, fmt.Errorf("failed to load configuration: %w", err)
 	}
+
+	pp.Println(cfg)
 
 	return cfg, nil
 }
