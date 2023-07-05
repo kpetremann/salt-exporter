@@ -4,8 +4,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"path/filepath"
-	"strings"
 
 	"github.com/kpetremann/salt-exporter/internal/metrics"
 	"github.com/spf13/viper"
@@ -44,7 +42,7 @@ type Config struct {
 	Metrics metrics.Config
 }
 
-func parseFlags() bool {
+func parseFlags() {
 	// flags
 	flag.String("log-level", defaultLogLevel, "log level (debug, info, warn, error, fatal, panic, disabled)")
 
@@ -65,26 +63,32 @@ func parseFlags() bool {
 		"[DEPRECATED] apply filter on states to monitor, separated by a comma")
 	flag.Parse()
 
-	return *healthMinions
+	// ensure compatibility with deprecated health-minions flag
+	if !*healthMinions {
+		viper.SetDefault("metrics.salt_function_status.enabled", false)
+		viper.SetDefault("metrics.salt_responses_total.enabled", false)
+	}
 }
 
-func setDefaults(healthMinions bool) {
+func setDefaults() {
 	viper.SetDefault("log-level", defaultLogLevel)
 	viper.SetDefault("listen-port", defaultPort)
 	viper.SetDefault("metrics.health-minions", defaultHealthMinion)
+
 	viper.SetDefault("metrics.salt_new_job_total.enabled", true)
 	viper.SetDefault("metrics.salt_expected_responses_total.enabled", true)
 	viper.SetDefault("metrics.salt_function_responses_total.enabled", true)
 	viper.SetDefault("metrics.salt_scheduled_job_return_total.enabled", true)
-	viper.SetDefault("metrics.salt_function_status.enabled", healthMinions) // TODO: true once health-minions will be removed
-	viper.SetDefault("metrics.salt_responses_total.enabled", healthMinions) // TODO: true once health-minions will be removed
+	viper.SetDefault("metrics.salt_responses_total.enabled", true)
+	viper.SetDefault("metrics.salt_function_status.enabled", true)
+
 	viper.SetDefault("metrics.salt_function_status.filters.functions", []string{defaultHealthFunctionsFilter})
 	viper.SetDefault("metrics.salt_function_status.filters.states", []string{defaultHealthStatesFilter})
 
 }
 
-func getConfig(configFileName string, healthMinions bool) (Config, error) {
-	setDefaults(healthMinions)
+func getConfig() (Config, error) {
+	setDefaults()
 
 	// bind flags
 	var allFlags []viperFlag
@@ -101,9 +105,8 @@ func getConfig(configFileName string, healthMinions bool) (Config, error) {
 	}
 
 	// bind configuration file
-	ext := filepath.Ext(configFileName)
-	viper.SetConfigName(strings.TrimSuffix(configFileName, ext))
-	viper.SetConfigType(strings.TrimPrefix(ext, "."))
+	viper.SetConfigName("config")
+	viper.SetConfigType("yml")
 	viper.AddConfigPath(".")
 
 	err := viper.ReadInConfig()
@@ -135,12 +138,12 @@ func checkRequirements(cfg Config) error {
 	return nil
 }
 
-func ReadConfig(configFileName string) (Config, error) {
+func ReadConfig() (Config, error) {
 	var err error
 
-	healthMinions := parseFlags()
+	parseFlags()
 
-	cfg, err := getConfig(configFileName, healthMinions)
+	cfg, err := getConfig()
 	if err != nil {
 		return Config{}, err
 	}
