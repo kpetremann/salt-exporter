@@ -129,6 +129,8 @@ metrics:
         - "highstate"
 ```
 
+**Note: Except for -health-minions, all flag have the priority over the configuration file.**
+
 ## Features
 
 Supported tags:

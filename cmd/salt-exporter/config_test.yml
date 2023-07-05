@@ -1,0 +1,40 @@
+listen-address: "127.0.0.1"
+listen-port: 2113
+
+log-level: "info"
+tls:
+  enabled: true
+  key: "/path/to/key"
+  certificate: "/path/to/certificate"
+
+
+metrics:
+  global:
+    filters:
+      ignore-test: true
+      ignore-mock: false
+
+  salt_new_job_total:
+    enabled: true
+
+  salt_expected_responses_total:
+    enabled: true
+
+  salt_function_responses_total:
+    enabled: true
+    add-minion-label: true  # not recommended in production
+
+  salt_scheduled_job_return_total:
+    enabled: true
+    add-minion-label: true  # not recommended in production
+
+  salt_responses_total:
+    enabled: true
+
+  salt_function_status:
+    enabled: true
+    filters:
+      functions:
+        - "state.sls"
+      states:
+        - "test"
