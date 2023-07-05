@@ -4,6 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"path/filepath"
+	"strings"
 
 	"github.com/kpetremann/salt-exporter/internal/metrics"
 	"github.com/spf13/viper"
@@ -81,7 +83,7 @@ func setDefaults(healthMinions bool) {
 
 }
 
-func getConfig(healthMinions bool) (Config, error) {
+func getConfig(configFileName string, healthMinions bool) (Config, error) {
 	setDefaults(healthMinions)
 
 	// bind flags
@@ -99,8 +101,9 @@ func getConfig(healthMinions bool) (Config, error) {
 	}
 
 	// bind configuration file
-	viper.SetConfigName("config")
-	viper.SetConfigType("yml")
+	ext := filepath.Ext(configFileName)
+	viper.SetConfigName(strings.TrimSuffix(configFileName, ext))
+	viper.SetConfigType(strings.TrimPrefix(ext, "."))
 	viper.AddConfigPath(".")
 
 	err := viper.ReadInConfig()
@@ -137,7 +140,7 @@ func ReadConfig(configFileName string) (Config, error) {
 
 	healthMinions := parseFlags()
 
-	cfg, err := getConfig(healthMinions)
+	cfg, err := getConfig(configFileName, healthMinions)
 	if err != nil {
 		return Config{}, err
 	}
