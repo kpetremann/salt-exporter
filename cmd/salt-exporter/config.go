@@ -42,7 +42,7 @@ type Config struct {
 	Metrics metrics.Config
 }
 
-func parseFlags() {
+func parseFlags() bool {
 	// flags
 	flag.String("log-level", defaultLogLevel, "log level (debug, info, warn, error, fatal, panic, disabled)")
 
@@ -63,32 +63,26 @@ func parseFlags() {
 		"[DEPRECATED] apply filter on states to monitor, separated by a comma")
 	flag.Parse()
 
-	// ensure compatibility with deprecated health-minions flag
-	if !*healthMinions {
-		viper.SetDefault("metrics.salt_function_status.enabled", false)
-		viper.SetDefault("metrics.salt_responses_total.enabled", false)
-	}
+	return *healthMinions
 }
 
-func setDefaults() {
+func setDefaults(healthMinions bool) {
 	viper.SetDefault("log-level", defaultLogLevel)
 	viper.SetDefault("listen-port", defaultPort)
 	viper.SetDefault("metrics.health-minions", defaultHealthMinion)
-
 	viper.SetDefault("metrics.salt_new_job_total.enabled", true)
 	viper.SetDefault("metrics.salt_expected_responses_total.enabled", true)
 	viper.SetDefault("metrics.salt_function_responses_total.enabled", true)
 	viper.SetDefault("metrics.salt_scheduled_job_return_total.enabled", true)
-	viper.SetDefault("metrics.salt_responses_total.enabled", true)
-	viper.SetDefault("metrics.salt_function_status.enabled", true)
-
+	viper.SetDefault("metrics.salt_function_status.enabled", healthMinions) // TODO: true once health-minions will be removed
+	viper.SetDefault("metrics.salt_responses_total.enabled", healthMinions) // TODO: true once health-minions will be removed
 	viper.SetDefault("metrics.salt_function_status.filters.functions", []string{defaultHealthFunctionsFilter})
 	viper.SetDefault("metrics.salt_function_status.filters.states", []string{defaultHealthStatesFilter})
 
 }
 
-func getConfig() (Config, error) {
-	setDefaults()
+func getConfig(healthMinions bool) (Config, error) {
+	setDefaults(healthMinions)
 
 	// bind flags
 	var allFlags []viperFlag
@@ -138,12 +132,12 @@ func checkRequirements(cfg Config) error {
 	return nil
 }
 
-func ReadConfig() (Config, error) {
+func ReadConfig(configFileName string) (Config, error) {
 	var err error
 
-	parseFlags()
+	healthMinions := parseFlags()
 
-	cfg, err := getConfig()
+	cfg, err := getConfig(healthMinions)
 	if err != nil {
 		return Config{}, err
 	}
