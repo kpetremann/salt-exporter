@@ -80,7 +80,6 @@ func setDefaults(healthMinions bool) {
 	viper.SetDefault("metrics.salt_responses_total.enabled", healthMinions) // TODO: true once health-minions will be removed
 	viper.SetDefault("metrics.salt_function_status.filters.functions", []string{defaultHealthFunctionsFilter})
 	viper.SetDefault("metrics.salt_function_status.filters.states", []string{defaultHealthStatesFilter})
-
 }
 
 func getConfig(configFileName string, healthMinions bool) (Config, error) {
