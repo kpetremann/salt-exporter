@@ -129,7 +129,7 @@ metrics:
         - "highstate"
 ```
 
-**Note: Except for -health-minions, all flag have the priority over the configuration file.**
+**Note: Except for -health-minions, all flags have the priority over the configuration file.**
 
 ## Features
 
