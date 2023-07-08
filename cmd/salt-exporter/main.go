@@ -59,6 +59,7 @@ func start(config Config) {
 	// listen and expose metric
 	parser := parser.NewEventParser(false)
 	eventListener := listener.NewEventListener(ctx, parser, eventChan)
+	eventListener.SetIPCFilepath(config.IPCFile)
 
 	go eventListener.ListenEvents()
 	go metrics.ExposeMetrics(ctx, eventChan, config.Metrics)

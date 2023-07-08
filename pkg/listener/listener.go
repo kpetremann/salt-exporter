@@ -15,7 +15,7 @@ type eventParser interface {
 	Parse(message map[string]interface{}) (event.SaltEvent, error)
 }
 
-const defaultIPCFilepath = "/var/run/salt/master/master_event_pub.ipc"
+const DefaultIPCFilepath = "/var/run/salt/master/master_event_pub.ipc"
 
 // EventListener listens to the salt-master event bus and sends events to the event channel
 type EventListener struct {
@@ -90,7 +90,7 @@ func NewEventListener(ctx context.Context, eventParser eventParser, eventChan ch
 		ctx:         ctx,
 		eventChan:   eventChan,
 		eventParser: eventParser,
-		iPCFilepath: defaultIPCFilepath,
+		iPCFilepath: DefaultIPCFilepath,
 	}
 	return &e
 }
