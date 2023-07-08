@@ -36,7 +36,7 @@ type Config struct {
 
 	ListenAddress string `mapstructure:"listen-address"`
 	ListenPort    int    `mapstructure:"listen-port"`
-	IPCFile       string `mapstructure:"file-path"`
+	IPCFile       string `mapstructure:"ipc-file"`
 	TLS           struct {
 		Enabled     bool
 		Key         string
