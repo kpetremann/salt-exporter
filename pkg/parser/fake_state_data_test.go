@@ -8,6 +8,7 @@ import (
 )
 
 var False = false
+var True = true
 
 /*
 	Fake state.sls job
@@ -134,9 +135,10 @@ var expectedStateSlsReturn = event.SaltEvent{
 		},
 		Success: true,
 	},
-	IsScheduleJob: false,
-	IsTest:        false,
-	IsMock:        false,
+	IsScheduleJob:      false,
+	IsTest:             false,
+	IsMock:             false,
+	StateModuleSuccess: &True,
 }
 
 func fakeStateSlsReturnEvent() []byte {
@@ -329,9 +331,10 @@ var expectedStateSingleReturn = event.SaltEvent{
 		},
 		Success: true,
 	},
-	IsScheduleJob: false,
-	IsTest:        false,
-	IsMock:        false,
+	IsScheduleJob:      false,
+	IsTest:             false,
+	IsMock:             false,
+	StateModuleSuccess: &True,
 }
 
 func fakeStateSingleReturnEvent() []byte {

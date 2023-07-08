@@ -14,56 +14,56 @@ func TestParseEvent(t *testing.T) {
 		args map[string]interface{}
 		want event.SaltEvent
 	}{
-		// {
-		// 	name: "new job",
-		// 	args: fakeEventAsMap(fakeNewJobEvent()),
-		// 	want: expectedNewJob,
-		// },
-		// {
-		// 	name: "return job",
-		// 	args: fakeEventAsMap(fakeRetJobEvent()),
-		// 	want: expectedReturnJob,
-		// },
-		// {
-		// 	name: "new schedule job",
-		// 	args: fakeEventAsMap(fakeNewScheduleJobEvent()),
-		// 	want: expectedNewScheduleJob,
-		// },
-		// {
-		// 	name: "return ack schedule job",
-		// 	args: fakeEventAsMap(fakeAckScheduleJobEvent()),
-		// 	want: expectedAckScheduleJob,
-		// },
-		// {
-		// 	name: "return schedule job",
-		// 	args: fakeEventAsMap(fakeScheduleJobReturnEvent()),
-		// 	want: expectedScheduleJobReturn,
-		// },
-		// {
-		// 	name: "new state.sls",
-		// 	args: fakeEventAsMap(fakeNewStateSlsJobEvent()),
-		// 	want: expectedNewStateSlsJob,
-		// },
-		// {
-		// 	name: "return state.sls",
-		// 	args: fakeEventAsMap(fakeStateSlsReturnEvent()),
-		// 	want: expectedStateSlsReturn,
-		// },
-		// {
-		// 	name: "new state.single",
-		// 	args: fakeEventAsMap(fakeNewStateSingleEvent()),
-		// 	want: expectedNewStateSingle,
-		// },
-		// {
-		// 	name: "return state.single",
-		// 	args: fakeEventAsMap(fakeStateSingleReturnEvent()),
-		// 	want: expectedStateSingleReturn,
-		// },
-		// {
-		// 	name: "new state.sls test=True mock=True",
-		// 	args: fakeEventAsMap(fakeNewTestMockStateSlsJobEvent()),
-		// 	want: expectedNewTestMockStateSlsJob,
-		// },
+		{
+			name: "new job",
+			args: fakeEventAsMap(fakeNewJobEvent()),
+			want: expectedNewJob,
+		},
+		{
+			name: "return job",
+			args: fakeEventAsMap(fakeRetJobEvent()),
+			want: expectedReturnJob,
+		},
+		{
+			name: "new schedule job",
+			args: fakeEventAsMap(fakeNewScheduleJobEvent()),
+			want: expectedNewScheduleJob,
+		},
+		{
+			name: "return ack schedule job",
+			args: fakeEventAsMap(fakeAckScheduleJobEvent()),
+			want: expectedAckScheduleJob,
+		},
+		{
+			name: "return schedule job",
+			args: fakeEventAsMap(fakeScheduleJobReturnEvent()),
+			want: expectedScheduleJobReturn,
+		},
+		{
+			name: "new state.sls",
+			args: fakeEventAsMap(fakeNewStateSlsJobEvent()),
+			want: expectedNewStateSlsJob,
+		},
+		{
+			name: "return state.sls",
+			args: fakeEventAsMap(fakeStateSlsReturnEvent()),
+			want: expectedStateSlsReturn,
+		},
+		{
+			name: "new state.single",
+			args: fakeEventAsMap(fakeNewStateSingleEvent()),
+			want: expectedNewStateSingle,
+		},
+		{
+			name: "return state.single",
+			args: fakeEventAsMap(fakeStateSingleReturnEvent()),
+			want: expectedStateSingleReturn,
+		},
+		{
+			name: "new state.sls test=True mock=True",
+			args: fakeEventAsMap(fakeNewTestMockStateSlsJobEvent()),
+			want: expectedNewTestMockStateSlsJob,
+		},
 		{
 			name: "return state.sls test=True mock=True",
 			args: fakeEventAsMap(fakeTestMockStateSlsReturnEvent()),
