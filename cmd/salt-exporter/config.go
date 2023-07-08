@@ -109,6 +109,10 @@ func getConfig(configFileName string, healthMinions bool) (Config, error) {
 	viper.SetConfigType(strings.TrimPrefix(ext, "."))
 	viper.AddConfigPath(".")
 
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "__"))
+	viper.SetEnvPrefix("SALT")
+	viper.AutomaticEnv()
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
