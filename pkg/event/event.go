@@ -30,14 +30,15 @@ type EventData struct {
 }
 
 type SaltEvent struct {
-	Tag           string
-	Type          string
-	TargetNumber  int
-	Data          EventData
-	IsScheduleJob bool
-	RawBody       []byte
-	IsTest        bool
-	IsMock        bool
+	Tag                string
+	Type               string
+	TargetNumber       int
+	Data               EventData
+	IsScheduleJob      bool
+	RawBody            []byte
+	IsTest             bool
+	IsMock             bool
+	StateModuleSuccess *bool
 }
 
 // RawToJSON converts raw body to JSON
