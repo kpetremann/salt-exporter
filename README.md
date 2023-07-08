@@ -53,10 +53,18 @@ metrics:
 
 ## Usage
 
+### Run
+
 Simply run:
 ```./salt-exporter```
 
-The exporter can be configured using flags:
+The exporter can be configured in different ways, with the following precedence order:
+* flags
+* environment variables
+* configuration file (config.yml)
+
+### Flags
+
 ```
 ./salt-exporter -help
   -health-functions-filter string
@@ -83,9 +91,41 @@ The exporter can be configured using flags:
         TLS private key
 ```
 
-It can also be configured via a `config.yml` file, which provides more customization.
+### Environment variables
 
-The default settings are:
+All settings available in the configuration file can be set as environment variables, but:
+
+* all variables must be prefixed by `SALT_`
+* uppercase only
+* `-` in the configuration file becomes a `_`
+* `__` is the level separator
+
+For example, the equivalent of this config file:
+
+```yaml
+log-level: "info"
+tls:
+  enabled: true
+metrics:
+  global:
+    filters:
+      ignore-test: true
+```
+
+is:
+
+```
+SALT_LOG_LEVEL="info"
+SALT_TLS__ENABLED=true
+SALT_METRICS__GLOBAL__FILTERS__IGNORE_TEST=true
+```
+
+### Configuration file
+
+The exporter is looking for `config.yml`.
+
+See below a full example of a configuration file:
+
 ```yaml
 listen-address: ""
 listen-port: 2112
@@ -128,8 +168,6 @@ metrics:
       states:
         - "highstate"
 ```
-
-**Note: Except for -health-minions, all flags have the priority over the configuration file.**
 
 ## Features
 
