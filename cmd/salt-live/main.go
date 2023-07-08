@@ -27,6 +27,7 @@ func main() {
 	maxItems := flag.Int("max-events", 1000, "maximum events to keep in memory")
 	bufferSize := flag.Int("buffer-size", 1000, "buffer size in number of events")
 	filter := flag.String("hard-filter", "", "filter when received (filtered out events are discarded forever)")
+	ipcFilepath := flag.String("ipc-file", listener.DefaultIPCFilepath, "file location of the salt-master event bus")
 	versionCmd := flag.Bool("version", false, "print version")
 	debug := flag.Bool("debug", false, "enable debug mode (log to debug.log)")
 	flag.Parse()
@@ -52,6 +53,7 @@ func main() {
 	eventChan := make(chan event.SaltEvent, *bufferSize)
 	parser := parser.NewEventParser(true)
 	eventListener := listener.NewEventListener(ctx, parser, eventChan)
+	eventListener.SetIPCFilepath(*ipcFilepath)
 	go eventListener.ListenEvents()
 
 	p := tea.NewProgram(tui.NewModel(eventChan, *maxItems, *filter), tea.WithMouseCellMotion())
