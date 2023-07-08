@@ -7,6 +7,9 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+var False = false
+var True = true
+
 /*
 	Fake state.sls job
 
@@ -132,9 +135,10 @@ var expectedStateSlsReturn = event.SaltEvent{
 		},
 		Success: true,
 	},
-	IsScheduleJob: false,
-	IsTest:        false,
-	IsMock:        false,
+	IsScheduleJob:      false,
+	IsTest:             false,
+	IsMock:             false,
+	StateModuleSuccess: &True,
 }
 
 func fakeStateSlsReturnEvent() []byte {
@@ -327,9 +331,10 @@ var expectedStateSingleReturn = event.SaltEvent{
 		},
 		Success: true,
 	},
-	IsScheduleJob: false,
-	IsTest:        false,
-	IsMock:        false,
+	IsScheduleJob:      false,
+	IsTest:             false,
+	IsMock:             false,
+	StateModuleSuccess: &True,
 }
 
 func fakeStateSingleReturnEvent() []byte {
@@ -474,7 +479,7 @@ func fakeNewTestMockStateSlsJobEvent() []byte {
 		"id": "node1",
 		"jid": "20220630000000000000",
 		"out": "highstate",
-		"retcode": 0,
+		"retcode": 1,
 		"return": {
 			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": {
 				"__id__": "dummy somestate",
@@ -486,7 +491,23 @@ func fakeNewTestMockStateSlsJobEvent() []byte {
 				"name": "Dummy somestate",
 				"result": true,
 				"start_time": "09:17:08.822722"
-			}
+			},
+			"somestate_|-failed_|-failed_|-fail_with_changes": {
+				"__id__": "failed",
+				"__run_num__": 2,
+				"__sls__": "test",
+				"changes": {
+					"testing": {
+						"new": "Something pretended to change",
+						"old": "Unchanged"
+					}
+				},
+				"comment": "Failure!",
+				"duration": 0.579,
+				"name": "failed",
+				"result": false,
+				"start_time": "09:17:02.812345"
+			},
 		},
 		"success": true
 	}
@@ -511,7 +532,7 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 		Id:      "node1",
 		Jid:     "20220630000000000000",
 		Out:     "highstate",
-		Retcode: 0,
+		Retcode: 1,
 		Return: map[string]interface{}{
 			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
 				"__id__":      "dummy somestate",
@@ -524,12 +545,24 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 				"result":      true,
 				"start_time":  "09:17:08.822722",
 			},
+			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]interface{}{
+				"__id__":      "dummy somestate",
+				"__run_num__": int8(2),
+				"__sls__":     "somestate",
+				"changes":     map[string]interface{}{},
+				"comment":     "Failure!",
+				"duration":    0.579,
+				"name":        "failed",
+				"result":      false,
+				"start_time":  "09:17:08.812345",
+			},
 		},
 		Success: true,
 	},
-	IsScheduleJob: false,
-	IsTest:        true,
-	IsMock:        true,
+	IsScheduleJob:      false,
+	IsTest:             true,
+	IsMock:             true,
+	StateModuleSuccess: &False,
 }
 
 func fakeTestMockStateSlsReturnEvent() []byte {
@@ -548,7 +581,7 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 		Id:      "node1",
 		Out:     "highstate",
 		Jid:     "20220630000000000000",
-		Retcode: 0,
+		Retcode: 1,
 		Return: map[string]interface{}{
 			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
 				"__id__":      "dummy somestate",
@@ -560,6 +593,17 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 				"name":        "Dummy somestate",
 				"result":      true,
 				"start_time":  "09:17:08.822722",
+			},
+			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]interface{}{
+				"__id__":      "dummy somestate",
+				"__run_num__": int8(2),
+				"__sls__":     "somestate",
+				"changes":     map[string]interface{}{},
+				"comment":     "Failure!",
+				"duration":    0.579,
+				"name":        "failed",
+				"result":      false,
+				"start_time":  "09:17:08.812345",
 			},
 		},
 		Success: true,

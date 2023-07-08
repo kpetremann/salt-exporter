@@ -62,6 +62,37 @@ func getBoolKwarg(event event.SaltEvent, field string) bool {
 	return false
 }
 
+func statemoduleResult(event event.SaltEvent) *bool {
+	substates, ok := event.Data.Return.(map[string]interface{})
+	if !ok {
+		return nil
+	}
+
+	for _, ret := range substates {
+		substate, ok := ret.(map[string]interface{})
+		if !ok {
+			return nil
+		}
+
+		result, ok := substate["result"]
+		if !ok {
+			return nil
+		}
+
+		r, ok := result.(bool)
+		if !ok {
+			return nil
+		}
+
+		if !r {
+			return &r
+		}
+	}
+
+	success := true
+	return &success
+}
+
 // ParseEvent parses a salt event
 func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 	body := string(message["body"].([]byte))
@@ -94,6 +125,7 @@ func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 	ev.IsScheduleJob = ev.Data.Schedule != ""
 	ev.IsTest = getBoolKwarg(ev, testArg)
 	ev.IsMock = getBoolKwarg(ev, mockArg)
+	ev.StateModuleSuccess = statemoduleResult(ev)
 
 	// A runner are executed on the master but they do not provide their ID in the event
 	if strings.HasPrefix(tag, "salt/run") && ev.Data.Id == "" {

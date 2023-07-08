@@ -28,9 +28,16 @@ func eventToMetrics(event event.SaltEvent, r Registry) {
 		if event.IsScheduleJob {
 			// for scheduled job, when the states in the job actually failed
 			// - the global "success" value is always true
-			// - the substate success is false, and the global retcode is > 0
-			// using retcode could be enough, but in case there are other corner cases, we combine both values
+			// - the state module success is false, but the global retcode is > 0
+			// - if defined, the "result" of a state module in event.Return covers
+			//   the corner case when retccode is not properly computed by Salt.
+			//
+			// using retcode and state module success could be enough, but we combine all values
+			// in case there are other corner cases.
 			success = event.Data.Success && (event.Data.Retcode == 0)
+			if event.StateModuleSuccess != nil {
+				success = success && *event.StateModuleSuccess
+			}
 			r.IncreaseScheduledJobReturnTotal(event.Data.Fun, state, event.Data.Id, success)
 		} else {
 			r.IncreaseResponseTotal(event.Data.Id, success) // TODO: move outside the if?
