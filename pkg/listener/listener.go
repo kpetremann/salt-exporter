@@ -39,7 +39,7 @@ type EventListener struct {
 
 // Open opens the salt-master event bus
 func (e *EventListener) Open() {
-	log.Info().Msg("connecting to salt-master event bus")
+	log.Info().Str("file", e.iPCFilepath).Msg("connecting to salt-master event bus")
 	var err error
 
 	for {
