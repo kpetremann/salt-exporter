@@ -29,6 +29,10 @@ debug.log
 /salt-live
 dist/
 
+# Build
+.venv
+
 # Configuration
 settings.yml
 settings.yaml
+
