@@ -40,10 +40,10 @@ func eventToMetrics(event event.SaltEvent, r Registry) {
 			}
 			r.IncreaseScheduledJobReturnTotal(event.Data.Fun, state, event.Data.Id, success)
 		} else {
-			r.IncreaseResponseTotal(event.Data.Id, success) // TODO: move outside the if?
 			r.IncreaseFunctionResponsesTotal(event.Data.Fun, state, event.Data.Id, success)
 		}
 
+		r.IncreaseResponseTotal(event.Data.Id, success)
 		r.SetFunctionStatus(event.Data.Id, event.Data.Fun, state, success)
 	}
 }

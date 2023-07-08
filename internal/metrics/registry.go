@@ -70,7 +70,7 @@ func NewRegistry(config Config) Registry {
 		responseTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "salt_responses_total",
-				Help: "Total number of response job processed",
+				Help: "Total number of response job processed, including scheduled job",
 			},
 			[]string{"minion", "success"},
 		),
