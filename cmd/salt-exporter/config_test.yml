@@ -1,12 +1,13 @@
 listen-address: "127.0.0.1"
 listen-port: 2113
 
+ipc-file: /dev/null
+
 log-level: "info"
 tls:
   enabled: true
   key: "/path/to/key"
   certificate: "/path/to/certificate"
-
 
 metrics:
   global:

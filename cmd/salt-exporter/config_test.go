@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/kpetremann/salt-exporter/internal/metrics"
+	"github.com/kpetremann/salt-exporter/pkg/listener"
 	"github.com/spf13/viper"
 )
 
@@ -26,6 +27,7 @@ func TestReadConfigFlagOnly(t *testing.T) {
 				LogLevel:      defaultLogLevel,
 				ListenAddress: "127.0.0.1",
 				ListenPort:    8080,
+				IPCFile:       listener.DefaultIPCFilepath,
 				TLS: struct {
 					Enabled     bool
 					Key         string
@@ -102,6 +104,7 @@ func TestReadConfigFlagOnly(t *testing.T) {
 			flags: []string{
 				"-host=127.0.0.1",
 				"-port=8080",
+				"-ipc-file=/dev/null",
 				"-health-minions=false",
 				"-health-functions-filter=test.sls",
 				"-health-states-filter=nop",
@@ -115,6 +118,7 @@ func TestReadConfigFlagOnly(t *testing.T) {
 				LogLevel:      defaultLogLevel,
 				ListenAddress: "127.0.0.1",
 				ListenPort:    8080,
+				IPCFile:       "/dev/null",
 				TLS: struct {
 					Enabled     bool
 					Key         string
@@ -223,6 +227,7 @@ func TestConfigFileOnly(t *testing.T) {
 		LogLevel:      "info",
 		ListenAddress: "127.0.0.1",
 		ListenPort:    2113,
+		IPCFile:       "/dev/null",
 		TLS: struct {
 			Enabled     bool
 			Key         string
@@ -320,6 +325,7 @@ func TestConfigFileWithFlags(t *testing.T) {
 		"-health-functions-filter=test.sls",
 		"-health-states-filter=nop",
 		"-ignore-mock",
+		"-ipc-file=/somewhere",
 	}
 
 	os.Args = append([]string{name}, flags...)
@@ -331,6 +337,7 @@ func TestConfigFileWithFlags(t *testing.T) {
 		LogLevel:      "info",
 		ListenAddress: "127.0.0.1",
 		ListenPort:    8080,
+		IPCFile:       "/somewhere",
 		TLS: struct {
 			Enabled     bool
 			Key         string
