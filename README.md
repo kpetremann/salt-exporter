@@ -7,11 +7,12 @@
 
 ## Salt Live
 
-!!! note ""
+> _`salt-run state.event pretty=True` under steroids_
 
-    _`salt-run state.event pretty=True` under steroids_
+Salt Exporter comes with `Salt Live`. This is a Terminal UI tool to watch event in real time.
 
-Salt Exporter comes with a Salt Live. This is a Terminal UI tool to watch event in real time.
+<img src="./docs/docs/demo/tui-overview.gif" alt="demo" width="500" />
+
 
 ## Salt Exporter
 

@@ -6,7 +6,7 @@ title: Quickstart
 
 ## Quickstart
 
-Salt live is a Terminal UI tool to watch event in real time.
+`Salt Live` is a Terminal UI tool to watch event in real time.
 
 You can see like a `salt-run state.event pretty=True` runner under steroids.
 
