@@ -5,6 +5,7 @@ hide:
 ---
 
 [![status](https://img.shields.io/badge/status-beta-orange)](https://github.com/kpetremann/salt-exporter)
+[![Latest](https://img.shields.io/github/v/release/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/releases)
 [![Go](https://img.shields.io/github/go-mod/go-version/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter)
 [![CI](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml/badge.svg)](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml)
 [![GitHub](https://img.shields.io/github/license/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/blob/main/LICENSE)
@@ -50,3 +51,7 @@ salt_scheduled_job_return_total{function="state.sls",minion="local",state="test"
     _`salt-run state.event pretty=True` under steroids_
 
 Salt Live is a Terminal UI tool to watch event in real time.
+
+Checkout the full [demo](./salt-live/usage.md).
+
+[![tui.gif](./demo/tui-overview.gif)](./demo/tui-overview.webm)
