@@ -305,6 +305,13 @@ func (m model) View() string {
 		Left panel
 	*/
 
+	if m.currentMode == Frozen {
+		listTitleStyle.Background(lipgloss.Color("#a02725"))
+		listTitleStyle.Foreground(lipgloss.Color("#ffffff"))
+	} else {
+		listTitleStyle.UnsetBackground()
+		listTitleStyle.UnsetForeground()
+	}
 	listTitle := listTitleStyle.Render(m.eventList.Title)
 
 	leftPanelStyle.Width(contentWidth)
