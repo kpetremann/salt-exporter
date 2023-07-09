@@ -1,7 +1,9 @@
 [![status](https://img.shields.io/badge/status-beta-orange)](https://github.com/kpetremann/salt-exporter)
+[![Latest](https://img.shields.io/github/v/release/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/releases)
 [![Go](https://img.shields.io/github/go-mod/go-version/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter)
 [![CI](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml/badge.svg)](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml)
 [![GitHub](https://img.shields.io/github/license/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/blob/main/LICENSE)
+
 
 ## Salt Live
 
@@ -12,8 +14,6 @@
 Salt Exporter comes with a Salt Live. This is a Terminal UI tool to watch event in real time.
 
 ## Salt Exporter
-
-<img align="right" width="120px" src="https://raw.githubusercontent.com/kpetremann/salt-exporter/main/img/salt-exporter.png" />
 
 `Salt Exporter` is a Prometheus exporter for [Saltstack](https://github.com/saltstack/salt) events. It exposes relevant metrics regarding jobs and results.
 
