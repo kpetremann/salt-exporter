@@ -2,11 +2,13 @@ package tui
 
 import (
 	"log"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	teaList "github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textinput"
 	teaViewport "github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -28,7 +30,8 @@ const (
 type model struct {
 	eventList      teaList.Model
 	itemsBuffer    []teaList.Item
-	sideView       teaViewport.Model
+	sideBlock      teaViewport.Model
+	demoText       textinput.Model
 	eventChan      <-chan event.SaltEvent
 	hardFilter     string
 	keys           *keyMap
@@ -40,6 +43,8 @@ type model struct {
 	outputFormat   format
 	currentMode    Mode
 	wordWrap       bool
+	demoMode       bool
+	demoEnabled    bool
 }
 
 func NewModel(eventChan <-chan event.SaltEvent, maxItems int, filter string) model {
@@ -67,21 +72,31 @@ func NewModel(eventChan <-chan event.SaltEvent, maxItems int, filter string) mod
 			listKeys.toggleJSONYAML,
 		}
 	}
+	eventList.SetShowHelp(false)
+	eventList.SetShowTitle(false)
 	eventList.Filter = WordsFilter
 	eventList.KeyMap = bubblesListKeyMap()
 
 	rawView := teaViewport.New(1, 1)
 	rawView.KeyMap = teaViewport.KeyMap{}
 
-	return model{
+	m := model{
 		eventList:   eventList,
-		sideView:    rawView,
+		sideBlock:   rawView,
 		keys:        listKeys,
 		eventChan:   eventChan,
 		hardFilter:  filter,
 		currentMode: Following,
 		maxItems:    maxItems,
 	}
+
+	if os.Getenv("SALT_DEMO") == "true" {
+		m.demoEnabled = true
+		m.demoText = textinput.New()
+		m.demoText.Focus()
+	}
+
+	return m
 }
 
 func watchEvent(m model) tea.Cmd {
@@ -104,7 +119,7 @@ func watchEvent(m model) tea.Cmd {
 			item := item{
 				title:       e.Tag,
 				description: e.Type,
-				datetime:    datetime.Format("2006-01-02 15:04"),
+				datetime:    datetime.Format("15:04"),
 				event:       e,
 				sender:      sender,
 				state:       e.ExtractState(),
@@ -130,6 +145,20 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.demoEnabled {
+		if msg, ok := msg.(tea.KeyMsg); ok && m.demoEnabled && key.Matches(msg, m.keys.demoText) {
+			m.demoMode = !m.demoMode
+			m.demoText.SetValue("")
+			return m, nil
+		}
+	}
+
+	if m.demoMode {
+		var cmd tea.Cmd
+		m.demoText, cmd = m.demoText.Update(msg)
+		return m, cmd
+	}
+
 	var cmds []tea.Cmd
 
 	// Ensure the mode is Frozen if we are currently navigating
@@ -165,6 +194,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.terminalWidth = msg.Width
 		m.terminalHeight = msg.Height
 
+		// Enforce width here to avoid filter overflow
+		m.eventList.SetWidth(m.terminalWidth/2 - leftPanelStyle.GetHorizontalFrameSize())
+		m.eventList.Help.Width = m.terminalWidth
+
 	case tea.KeyMsg:
 		// Don't match any of the keys below if we're actively filtering.
 		if m.eventList.FilterState() == teaList.Filtering {
@@ -191,7 +224,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	m.updateSideInfos()
-	m.sideView, cmd = m.sideView.Update(msg)
+	m.sideBlock, cmd = m.sideBlock.Update(msg)
 	cmds = append(cmds, cmd)
 
 	if m.eventList.Index() > 0 {
@@ -213,9 +246,9 @@ func (m *model) updateSideInfos() {
 				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
 			}
 			if info, err := Highlight(m.sideInfos, "yaml", theme); err != nil {
-				m.sideView.SetContent(m.sideInfos)
+				m.sideBlock.SetContent(m.sideInfos)
 			} else {
-				m.sideView.SetContent(info)
+				m.sideBlock.SetContent(info)
 			}
 		case JSON:
 			m.sideTitle = "Raw event (JSON)"
@@ -224,16 +257,16 @@ func (m *model) updateSideInfos() {
 				m.sideInfos = strings.ReplaceAll(m.sideInfos, "\\n", "  \\\n")
 			}
 			if info, err := Highlight(m.sideInfos, "json", theme); err != nil {
-				m.sideView.SetContent(m.sideInfos)
+				m.sideBlock.SetContent(m.sideInfos)
 			} else {
-				m.sideView.SetContent(info)
+				m.sideBlock.SetContent(info)
 			}
 		case PARSED:
 			m.sideTitle = "Parsed event (Golang)"
 			eventLite := sel.(item).event
 			eventLite.RawBody = nil
 			m.sideInfos = pp.Sprint(eventLite)
-			m.sideView.SetContent(m.sideInfos)
+			m.sideBlock.SetContent(m.sideInfos)
 		}
 	}
 }
@@ -248,29 +281,43 @@ func (m *model) updateTitle() {
 }
 
 func (m model) View() string {
+	if m.demoMode {
+		return lipgloss.Place(m.terminalWidth, m.terminalHeight, lipgloss.Center, lipgloss.Center, m.demoText.View())
+	}
+
+	/*
+		Bottom
+	*/
+	helpView := m.eventList.Help.View(m.eventList)
+
 	/*
 		Top bar
 	*/
 	topBarStyle.Width(m.terminalWidth)
-	topBar := topBarStyle.Render(appTitleStyle.Render("Salt live"))
+	topBar := topBarStyle.Render(appTitleStyle.Render("Salt Live"))
 
+	// Calculate content height for left and right panels
 	var content []string
-	contentHeight := m.terminalHeight - lipgloss.Height(topBar)
+	contentHeight := m.terminalHeight - lipgloss.Height(topBar) - lipgloss.Height(helpView)
 	contentWidth := m.terminalWidth / 2
 
 	/*
 		Left panel
 	*/
 
+	listTitle := listTitleStyle.Render(m.eventList.Title)
+
 	leftPanelStyle.Width(contentWidth)
 	leftPanelStyle.Height(contentHeight)
 
 	m.eventList.SetSize(
 		contentWidth-leftPanelStyle.GetHorizontalFrameSize(),
-		contentHeight-leftPanelStyle.GetVerticalFrameSize(),
+		contentHeight-lipgloss.Height(listTitle)-leftPanelStyle.GetVerticalFrameSize(),
 	)
 
-	content = append(content, leftPanelStyle.Render(m.eventList.View()))
+	listWithTitle := lipgloss.JoinVertical(0, listTitle, m.eventList.View())
+
+	content = append(content, leftPanelStyle.Render(listWithTitle))
 
 	/*
 		Right panel
@@ -282,15 +329,15 @@ func (m model) View() string {
 		rightPanelStyle.Width(contentWidth)
 		rightPanelStyle.Height(contentHeight)
 
-		m.sideView.Width = contentWidth - rightPanelStyle.GetHorizontalFrameSize()
-		m.sideView.Height = contentHeight - lipgloss.Height(rawTitle) - rightPanelStyle.GetVerticalFrameSize()
+		m.sideBlock.Width = contentWidth - rightPanelStyle.GetHorizontalFrameSize()
+		m.sideBlock.Height = contentHeight - lipgloss.Height(rawTitle) - rightPanelStyle.GetVerticalFrameSize()
 
-		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawTitle, m.sideView.View()))
+		sideInfos := rightPanelStyle.Render(lipgloss.JoinVertical(0, rawTitle, m.sideBlock.View()))
 		content = append(content, sideInfos)
 	}
 
 	/*
 		Final rendering
 	*/
-	return lipgloss.JoinVertical(0, topBar, lipgloss.JoinHorizontal(0, content...))
+	return lipgloss.JoinVertical(0, topBar, lipgloss.JoinHorizontal(0, content...), helpView)
 }

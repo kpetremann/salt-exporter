@@ -9,21 +9,25 @@ type keyMap struct {
 	enableFollow   key.Binding
 	toggleJSONYAML key.Binding
 	toggleWordwrap key.Binding
+	demoText       key.Binding
 }
 
 func defaultKeyMap() *keyMap {
 	return &keyMap{
 		enableFollow: key.NewBinding(
 			key.WithKeys("f"),
-			key.WithHelp("f", "follow mode"),
+			key.WithHelp("f", "follow"),
 		),
 		toggleWordwrap: key.NewBinding(
 			key.WithKeys("w"),
-			key.WithHelp("w", "toggle JSON word wrap"),
+			key.WithHelp("w", "JSON word wrap"),
 		),
 		toggleJSONYAML: key.NewBinding(
 			key.WithKeys("m"),
-			key.WithHelp("m", "toggle JSON/YAML/parsed"),
+			key.WithHelp("m", "JSON/YAML/parsed"),
+		),
+		demoText: key.NewBinding(
+			key.WithKeys("$"),
 		),
 	}
 }
