@@ -18,13 +18,13 @@ hide:
 
 This exporter is passive. It does not use the Salt API.
 
-It works out of the box: you just need to run the exporter on the same server as the Salt Master.
+It works out of the box: you just need to run the exporter on the same user as the Salt Master.
 
 ```
 $ ./salt-exporter
 ```
 
-```
+``` promql
 $ curl -s 127.0.0.1:2112/metrics
 
 salt_expected_responses_total{function="cmd.run", state=""} 6
@@ -46,12 +46,10 @@ salt_scheduled_job_return_total{function="state.sls",minion="local",state="test"
 
 ## Salt Live
 
-!!! note ""
+!!! tip "`salt-run state.event pretty=True` under steroids"
 
-    _`salt-run state.event pretty=True` under steroids_
+`Salt Live` is a Terminal UI tool to watch events in real time.
 
-Salt Live is a Terminal UI tool to watch event in real time.
-
-Checkout the full [demo](./salt-live/usage.md).
+Check out the full demo **[here](./salt-live/usage.md)**.
 
 [![tui.gif](./demo/tui-overview.gif)](./demo/tui-overview.webm)

@@ -145,21 +145,13 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	if m.demoEnabled {
-		if msg, ok := msg.(tea.KeyMsg); ok && m.demoEnabled && key.Matches(msg, m.keys.demoText) {
-			m.demoMode = !m.demoMode
-			m.demoText.SetValue("")
-			return m, nil
-		}
-	}
+	var cmds []tea.Cmd
 
 	if m.demoMode {
 		var cmd tea.Cmd
 		m.demoText, cmd = m.demoText.Update(msg)
-		return m, cmd
+		cmds = append(cmds, cmd)
 	}
-
-	var cmds []tea.Cmd
 
 	// Ensure the mode is Frozen if we are currently navigating
 	if m.eventList.Index() > 0 {
@@ -204,6 +196,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			break
 		}
 
+		if m.demoEnabled && key.Matches(msg, m.keys.demoText) {
+			m.demoMode = !m.demoMode
+			m.demoText.SetValue("")
+		}
+		if m.demoMode {
+			return m, tea.Batch(cmds...)
+		}
+
 		switch {
 		case key.Matches(msg, m.keys.enableFollow):
 			m.currentMode = Following
@@ -232,6 +232,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	m.updateTitle()
+
 	return m, tea.Batch(cmds...)
 
 }

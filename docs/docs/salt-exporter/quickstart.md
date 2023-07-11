@@ -9,15 +9,15 @@ title: Quickstart
 
 You can download the binary from the [Github releases](https://github.com/kpetremann/salt-exporter/releases) page.
 
-Or, install them from source:
+Or install from source:
 
-* latest release:
-    ``` shell
+* latest published version:
+    ``` { .sh .copy }
     go install github.com/kpetremann/salt-exporter/cmd/salt-exporter@latest
     ```
 
-* unstable:
-    ``` shell
+* latest commit (unstable):
+    ``` { .sh .copy }
     go install github.com/kpetremann/salt-exporter/cmd/salt-exporter@main
     ```
 
@@ -29,15 +29,15 @@ Or, install them from source:
     * `-health-functions-filter`
     * `-health-states-filter`
 
-    They should be replaced by configuring metrics in the `config.yml` file.
+    They should be replaced by metrics configuration in the `config.yml` file.
 
     The equivalent of:
-    ```
+    ``` shell
     ./salt-exporter -health-minions -health-functions-filter "func1,func2" -health-states-filter "state1,state2"`
     ```
 
     is:
-    ``` yaml
+    ``` { .yaml .copy }
     metrics:
       salt_responses_total:
         enabled: true
@@ -56,13 +56,16 @@ Or, install them from source:
 
 ## Usage
 
-The exporter will run out of the box:
+The exporter runs out of the box:
 ```./salt-exporter```
 
 !!! note
 
     You need to run the exporter with the user running the Salt master.
 
-The feature list can be found [here]("./features.md")
+!!! example "Examples of configuration options"
 
-If needed, you can [configure]("./configuration.md") the exporter to better match your needs.
+    * All metrics can be either enabled or disabled.
+    * You can add a minion label to some metrics (not recommended on large environment as it could lead to cardinality issues).
+    * You can filter out `test=true`/`mock=true` events, useful to ignore tests.
+    * ... more options can be found in the [configuration page](./configuration.md)

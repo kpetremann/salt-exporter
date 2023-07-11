@@ -1,7 +1,6 @@
 nav:
     - quickstart.md
-    - metrics.md
-    - features.md
     - configuration.md
+    - metrics.md
     - ...
     - performance.md

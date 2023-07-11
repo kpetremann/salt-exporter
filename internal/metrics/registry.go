@@ -38,7 +38,7 @@ func NewRegistry(config Config) Registry {
 		newJobTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "salt_new_job_total",
-				Help: "Total number of new job processed",
+				Help: "Total number of new jobs processed",
 			},
 			[]string{"function", "state", "success"},
 		),
@@ -54,7 +54,7 @@ func NewRegistry(config Config) Registry {
 		functionResponsesTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "salt_function_responses_total",
-				Help: "Total number of response per function processed",
+				Help: "Total number of responses per function processed",
 			},
 			functionResponsesTotalLabels,
 		),
@@ -62,7 +62,7 @@ func NewRegistry(config Config) Registry {
 		scheduledJobReturnTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "salt_scheduled_job_return_total",
-				Help: "Total number of scheduled job response",
+				Help: "Total number of scheduled job responses",
 			},
 			scheduledJobReturnTotalLabels,
 		),
@@ -70,7 +70,7 @@ func NewRegistry(config Config) Registry {
 		responseTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "salt_responses_total",
-				Help: "Total number of response job processed, including scheduled job",
+				Help: "Total number of responses",
 			},
 			[]string{"minion", "success"},
 		),
