@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -48,8 +49,8 @@ type Config struct {
 
 func parseFlags() bool {
 	// flags
+	versionCmd := flag.Bool("version", false, "print version")
 	flag.String("log-level", defaultLogLevel, "log level (debug, info, warn, error, fatal, panic, disabled)")
-
 	flag.String("host", "", "listen address")
 	flag.Int("port", defaultPort, "listen port")
 	flag.String("ipc-file", listener.DefaultIPCFilepath, "file location of the salt-master event bus")
@@ -67,6 +68,16 @@ func parseFlags() bool {
 	flag.String("health-states-filter", defaultHealthStatesFilter,
 		"[DEPRECATED] apply filter on states to monitor, separated by a comma")
 	flag.Parse()
+
+	if *versionCmd {
+		if version == "unknown" {
+			version = fmt.Sprintf("v%s", version)
+		}
+		fmt.Println("Version:", version)
+		fmt.Println("Build date:", date)
+		fmt.Println("Commit:", commit)
+		os.Exit(0)
+	}
 
 	return *healthMinions
 }

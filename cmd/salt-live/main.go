@@ -17,10 +17,17 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-var version = "development"
+var version = "unknown"
+var commit = "unknown"
+var date = "unknown"
 
 func printVersion() {
-	fmt.Println("Version: ", version)
+	if version == "unknown" {
+		version = fmt.Sprintf("v%s", version)
+	}
+	fmt.Println("Version:", version)
+	fmt.Println("Build date:", date)
+	fmt.Println("Commit:", commit)
 }
 
 func main() {
