@@ -18,7 +18,7 @@ func eventToMetrics(event event.SaltEvent, r Registry) {
 	switch event.Type {
 	case "new":
 		state := event.ExtractState()
-		r.IncreaseNewJobTotal(event.Data.Fun, state, true)
+		r.IncreaseNewJobTotal(event.Data.Fun, state)
 		r.IncreaseExpectedResponsesTotal(event.Data.Fun, state, float64(event.TargetNumber))
 
 	case "ret":

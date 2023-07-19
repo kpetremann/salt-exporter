@@ -40,7 +40,7 @@ func NewRegistry(config Config) Registry {
 				Name: "salt_new_job_total",
 				Help: "Total number of new jobs processed",
 			},
-			[]string{"function", "state", "success"},
+			[]string{"function", "state"},
 		),
 
 		expectedResponsesTotal: promauto.NewCounterVec(
@@ -85,9 +85,9 @@ func NewRegistry(config Config) Registry {
 	}
 }
 
-func (r Registry) IncreaseNewJobTotal(function, state string, success bool) {
+func (r Registry) IncreaseNewJobTotal(function, state string) {
 	if r.config.SaltNewJobTotal.Enabled {
-		r.newJobTotal.WithLabelValues(function, state, strconv.FormatBool(success)).Inc()
+		r.newJobTotal.WithLabelValues(function, state).Inc()
 	}
 }
 
