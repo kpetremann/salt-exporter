@@ -20,8 +20,8 @@ import (
 const configFileName = "config.yml"
 
 var (
-	version = ""
-	commit  = ""
+	version = "unknown"
+	commit  = "unknown"
 	date    = "unknown"
 )
 
