@@ -1,0 +1,6 @@
+nav:
+    - quickstart.md
+    - configuration.md
+    - metrics.md
+    - ...
+    - performance.md

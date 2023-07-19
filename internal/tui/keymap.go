@@ -9,21 +9,25 @@ type keyMap struct {
 	enableFollow   key.Binding
 	toggleJSONYAML key.Binding
 	toggleWordwrap key.Binding
+	demoText       key.Binding
 }
 
 func defaultKeyMap() *keyMap {
 	return &keyMap{
 		enableFollow: key.NewBinding(
-			key.WithKeys("f"),
-			key.WithHelp("f", "follow mode"),
+			key.WithKeys("f", "F"),
+			key.WithHelp("f", "follow"),
 		),
 		toggleWordwrap: key.NewBinding(
-			key.WithKeys("w"),
-			key.WithHelp("w", "toggle JSON word wrap"),
+			key.WithKeys("w", "W"),
+			key.WithHelp("w", "JSON word wrap"),
 		),
 		toggleJSONYAML: key.NewBinding(
-			key.WithKeys("m"),
-			key.WithHelp("m", "toggle JSON/YAML/parsed"),
+			key.WithKeys("m", "M"),
+			key.WithHelp("m", "JSON/YAML/parsed"),
+		),
+		demoText: key.NewBinding(
+			key.WithKeys("$"),
 		),
 	}
 }
@@ -86,7 +90,7 @@ func bubblesListKeyMap() teaList.KeyMap {
 
 		// Quitting.
 		Quit: key.NewBinding(
-			key.WithKeys("q", "esc"),
+			key.WithKeys("q", "Q", "esc"),
 			key.WithHelp("q", "quit"),
 		),
 		ForceQuit: key.NewBinding(key.WithKeys("ctrl+c")),
