@@ -26,6 +26,10 @@ debug.log
 
 # Artifacts
 dist/
+/salt-exporter
+/salt-live
+!/salt-exporter/
+!/salt-live/
 
 # Build
 .venv
