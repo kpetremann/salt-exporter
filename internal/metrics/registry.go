@@ -85,19 +85,19 @@ func NewRegistry(config Config) Registry {
 	}
 }
 
-func (r Registry) IncreaseNewJobTotal(function, state string) {
+func (r *Registry) IncreaseNewJobTotal(function, state string) {
 	if r.config.SaltNewJobTotal.Enabled {
 		r.newJobTotal.WithLabelValues(function, state).Inc()
 	}
 }
 
-func (r Registry) IncreaseExpectedResponsesTotal(function, state string, value float64) {
+func (r *Registry) IncreaseExpectedResponsesTotal(function, state string, value float64) {
 	if r.config.SaltExpectedResponsesTotal.Enabled {
 		r.expectedResponsesTotal.WithLabelValues(function, state).Add(value)
 	}
 }
 
-func (r Registry) IncreaseFunctionResponsesTotal(function, state, minion string, success bool) {
+func (r *Registry) IncreaseFunctionResponsesTotal(function, state, minion string, success bool) {
 	labels := []string{function, state, strconv.FormatBool(success)}
 	if r.config.SaltFunctionResponsesTotal.AddMinionLabel {
 		labels = append([]string{minion}, labels...)
@@ -108,7 +108,7 @@ func (r Registry) IncreaseFunctionResponsesTotal(function, state, minion string,
 	}
 }
 
-func (r Registry) IncreaseScheduledJobReturnTotal(function, state, minion string, success bool) {
+func (r *Registry) IncreaseScheduledJobReturnTotal(function, state, minion string, success bool) {
 	labels := []string{function, state, strconv.FormatBool(success)}
 	if r.config.SaltScheduledJobReturnTotal.AddMinionLabel {
 		labels = append([]string{minion}, labels...)
@@ -119,13 +119,13 @@ func (r Registry) IncreaseScheduledJobReturnTotal(function, state, minion string
 	}
 }
 
-func (r Registry) IncreaseResponseTotal(minion string, success bool) {
+func (r *Registry) IncreaseResponseTotal(minion string, success bool) {
 	if r.config.SaltResponsesTotal.Enabled {
 		r.responseTotal.WithLabelValues(minion, strconv.FormatBool(success)).Inc()
 	}
 }
 
-func (r Registry) SetFunctionStatus(minion, function, state string, success bool) {
+func (r *Registry) SetFunctionStatus(minion, function, state string, success bool) {
 	if !r.config.SaltFunctionStatus.Enabled {
 		return
 	}
