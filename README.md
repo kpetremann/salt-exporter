@@ -1,4 +1,3 @@
-[![status](https://img.shields.io/badge/status-beta-orange)](https://github.com/kpetremann/salt-exporter)
 [![Latest](https://img.shields.io/github/v/release/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter/releases)
 [![Go](https://img.shields.io/github/go-mod/go-version/kpetremann/salt-exporter)](https://github.com/kpetremann/salt-exporter)
 [![CI](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml/badge.svg)](https://github.com/kpetremann/salt-exporter/actions/workflows/go.yml)
