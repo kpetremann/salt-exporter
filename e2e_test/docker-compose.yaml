@@ -24,7 +24,7 @@ services:
       - e2e
 
   exporter:
-    image: golang:1.20-bullseye
+    image: golang:1.21-bullseye
     command: "go run ./cmd/salt-exporter"
     working_dir: "/app"
     environment:
