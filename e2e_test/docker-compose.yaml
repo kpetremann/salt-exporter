@@ -2,7 +2,7 @@ version: '3'
 
 services:
   salt_master:
-    image: saltstack/salt:3005.1
+    image: saltstack/salt:3006.4
     environment:
       SALT_MASTER_CONFIG: '{"interface": "0.0.0.0", "auto_accept": true}'
     volumes:
@@ -13,7 +13,7 @@ services:
       - e2e
 
   minion:
-    image: saltstack/salt:3005.1
+    image: saltstack/salt:3006.4
     environment:
       SALT_MINION_CONFIG: '{"id": "foo", "master": "salt_master"}'
     healthcheck:
