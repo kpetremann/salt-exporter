@@ -3,10 +3,32 @@ package event
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 
 	"github.com/vmihailenco/msgpack/v5"
 	"gopkg.in/yaml.v3"
 )
+
+type EventModule int
+
+type WatchOp uint32
+
+const (
+	UnknownModule EventModule = iota
+	RunnerModule
+	JobModule
+	BeaconModule
+)
+
+const (
+	Accepted WatchOp = iota
+	Removed
+)
+
+type WatchEvent struct {
+	MinionName string
+	Op         WatchOp
+}
 
 type EventData struct {
 	Arg       []interface{} `msgpack:"arg"`
@@ -32,6 +54,7 @@ type EventData struct {
 type SaltEvent struct {
 	Tag                string
 	Type               string
+	Module             EventModule
 	TargetNumber       int
 	Data               EventData
 	IsScheduleJob      bool
@@ -72,6 +95,23 @@ func (e SaltEvent) RawToYAML() ([]byte, error) {
 	}
 
 	return yaml.Marshal(data)
+}
+
+func GetEventModule(tag string) EventModule {
+	tagParts := strings.Split(tag, "/")
+	if len(tagParts) < 2 {
+		return UnknownModule
+	}
+	switch tagParts[1] {
+	case "run":
+		return RunnerModule
+	case "job":
+		return JobModule
+	case "beacon":
+		return BeaconModule
+	default:
+		return UnknownModule
+	}
 }
 
 // extractStateFromArgs extracts embedded state info

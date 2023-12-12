@@ -28,6 +28,7 @@ func TestReadConfigFlagOnly(t *testing.T) {
 				ListenAddress: "127.0.0.1",
 				ListenPort:    8080,
 				IPCFile:       listener.DefaultIPCFilepath,
+				PKIDir:        listener.DefaultPKIDirpath,
 				TLS: struct {
 					Enabled     bool
 					Key         string
@@ -119,6 +120,7 @@ func TestReadConfigFlagOnly(t *testing.T) {
 				ListenAddress: "127.0.0.1",
 				ListenPort:    8080,
 				IPCFile:       "/dev/null",
+				PKIDir:        "/etc/salt/pki",
 				TLS: struct {
 					Enabled     bool
 					Key         string
@@ -228,6 +230,7 @@ func TestConfigFileOnly(t *testing.T) {
 		ListenAddress: "127.0.0.1",
 		ListenPort:    2113,
 		IPCFile:       "/dev/null",
+		PKIDir:        "/tmp/pki",
 		TLS: struct {
 			Enabled     bool
 			Key         string
@@ -338,6 +341,7 @@ func TestConfigFileWithFlags(t *testing.T) {
 		ListenAddress: "127.0.0.1",
 		ListenPort:    8080,
 		IPCFile:       "/somewhere",
+		PKIDir:        "/tmp/pki",
 		TLS: struct {
 			Enabled     bool
 			Key         string

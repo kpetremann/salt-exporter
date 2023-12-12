@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/kpetremann/salt-exporter/internal/filters"
 	"github.com/prometheus/client_golang/prometheus"
@@ -11,6 +12,8 @@ import (
 type Registry struct {
 	config Config
 
+	observedMinions int32
+
 	newJobTotal            *prometheus.CounterVec
 	expectedResponsesTotal *prometheus.CounterVec
 
@@ -19,9 +22,12 @@ type Registry struct {
 
 	responseTotal  *prometheus.CounterVec
 	functionStatus *prometheus.GaugeVec
+
+	statusLastResponse *prometheus.GaugeVec
+	minionsTotal       *prometheus.GaugeVec
 }
 
-func NewRegistry(config Config) Registry {
+func NewRegistry(config Config) *Registry {
 	functionResponsesTotalLabels := []string{"function", "state", "success"}
 	if config.SaltFunctionResponsesTotal.AddMinionLabel {
 		functionResponsesTotalLabels = append([]string{"minion"}, functionResponsesTotalLabels...)
@@ -32,9 +38,10 @@ func NewRegistry(config Config) Registry {
 		scheduledJobReturnTotalLabels = append([]string{"minion"}, scheduledJobReturnTotalLabels...)
 	}
 
-	return Registry{
+	return &Registry{
 		config: config,
 
+		observedMinions: 0,
 		newJobTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "salt_new_job_total",
@@ -82,7 +89,37 @@ func NewRegistry(config Config) Registry {
 			},
 			[]string{"minion", "function", "state"},
 		),
+		statusLastResponse: promauto.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "salt_health_last_heartbeat",
+				Help: "Last status beacon received. Unix timestamp",
+			},
+			[]string{"minion"},
+		),
+		minionsTotal: promauto.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "salt_health_minions_total",
+				Help: "Total number of observed minions via status beacon",
+			}, []string{},
+		),
 	}
+}
+
+func (r *Registry) UpdateLastHeartbeat(minion string) {
+	timestamp := time.Now().Unix()
+	r.statusLastResponse.WithLabelValues(minion).Set(float64(timestamp))
+}
+
+func (r *Registry) AddObservableMinion(minion string) {
+	r.observedMinions += 1
+	r.UpdateLastHeartbeat(minion)
+	r.minionsTotal.WithLabelValues().Set(float64(r.observedMinions))
+}
+
+func (r *Registry) DeleteObservableMinion(minion string) {
+	r.statusLastResponse.DeleteLabelValues(minion)
+	r.observedMinions -= 1
+	r.minionsTotal.WithLabelValues().Set(float64(r.observedMinions))
 }
 
 func (r *Registry) IncreaseNewJobTotal(function, state string) {

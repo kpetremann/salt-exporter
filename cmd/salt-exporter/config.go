@@ -38,6 +38,7 @@ type Config struct {
 	ListenAddress string `mapstructure:"listen-address"`
 	ListenPort    int    `mapstructure:"listen-port"`
 	IPCFile       string `mapstructure:"ipc-file"`
+	PKIDir        string `mapstructure:"pki-dir"`
 	TLS           struct {
 		Enabled     bool
 		Key         string
@@ -86,6 +87,7 @@ func setDefaults(healthMinions bool) {
 	viper.SetDefault("log-level", defaultLogLevel)
 	viper.SetDefault("listen-port", defaultPort)
 	viper.SetDefault("ipc-file", listener.DefaultIPCFilepath)
+	viper.SetDefault("pki-dir", listener.DefaultPKIDirpath)
 	viper.SetDefault("metrics.health-minions", defaultHealthMinion)
 	viper.SetDefault("metrics.salt_new_job_total.enabled", true)
 	viper.SetDefault("metrics.salt_expected_responses_total.enabled", true)
