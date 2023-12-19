@@ -27,7 +27,7 @@ type Registry struct {
 	minionsTotal       *prometheus.GaugeVec
 }
 
-func NewRegistry(config Config) *Registry {
+func NewRegistry(config Config) Registry {
 	functionResponsesTotalLabels := []string{"function", "state", "success"}
 	if config.SaltFunctionResponsesTotal.AddMinionLabel {
 		functionResponsesTotalLabels = append([]string{"minion"}, functionResponsesTotalLabels...)
@@ -38,7 +38,7 @@ func NewRegistry(config Config) *Registry {
 		scheduledJobReturnTotalLabels = append([]string{"minion"}, scheduledJobReturnTotalLabels...)
 	}
 
-	return &Registry{
+	return Registry{
 		config: config,
 
 		observedMinions: 0,

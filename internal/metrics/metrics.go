@@ -80,7 +80,7 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, watchC
 				return
 			}
 
-			eventToMetrics(event, registry)
+			eventToMetrics(event, &registry)
 		}
 	}
 }
