@@ -55,14 +55,23 @@ func start(config Config) {
 
 	log.Info().Msg("listening for events...")
 	eventChan := make(chan event.SaltEvent)
+	watchChan := make(chan event.WatchEvent)
 
 	// listen and expose metric
 	parser := parser.NewEventParser(false)
 	eventListener := listener.NewEventListener(ctx, parser, eventChan)
 	eventListener.SetIPCFilepath(config.IPCFile)
 
+	if config.Metrics.HealthMinions {
+		pkiWatcher, err := listener.NewPKIWatcher(ctx, config.PKIDir, watchChan)
+		if err != nil {
+			log.Fatal().Msgf("unable to watch PKI for minions change: %v", err)
+		}
+
+		go pkiWatcher.StartWatching()
+	}
 	go eventListener.ListenEvents()
-	go metrics.ExposeMetrics(ctx, eventChan, config.Metrics)
+	go metrics.ExposeMetrics(ctx, eventChan, watchChan, config.Metrics)
 
 	// start http server
 	log.Info().Msg("exposing metrics on " + listenSocket + "/metrics")

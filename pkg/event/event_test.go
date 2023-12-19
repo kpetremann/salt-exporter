@@ -10,6 +10,7 @@ func getNewStateEvent() event.SaltEvent {
 	return event.SaltEvent{
 		Tag:          "salt/job/20220630000f000000000/new",
 		Type:         "new",
+		Module:       event.JobModule,
 		TargetNumber: 1,
 		Data: event.EventData{
 			Timestamp: "2022-06-30T00:00:00.000000",

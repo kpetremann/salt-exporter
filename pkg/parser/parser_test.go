@@ -69,6 +69,11 @@ func TestParseEvent(t *testing.T) {
 			args: fakeEventAsMap(fakeTestMockStateSlsReturnEvent()),
 			want: expectedTestMockStateSlsReturn,
 		},
+		{
+			name: "beacon",
+			args: fakeEventAsMap(fakeBeaconEvent()),
+			want: expectedBeacon,
+		},
 	}
 
 	p := parser.NewEventParser(false)

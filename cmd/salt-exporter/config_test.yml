@@ -2,6 +2,7 @@ listen-address: "127.0.0.1"
 listen-port: 2113
 
 ipc-file: /dev/null
+pki-dir: /tmp/pki
 
 log-level: "info"
 tls:

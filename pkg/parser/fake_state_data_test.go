@@ -33,6 +33,7 @@ var True = true
 var expectedNewStateSlsJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
+	Module:       event.JobModule,
 	TargetNumber: 1,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -110,6 +111,7 @@ func fakeNewStateSlsJobEvent() []byte {
 var expectedStateSlsReturn = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/node1",
 	Type:         "ret",
+	Module:       event.JobModule,
 	TargetNumber: 0,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -208,6 +210,7 @@ func fakeStateSlsReturnEvent() []byte {
 var expectedNewStateSingle = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
+	Module:       event.JobModule,
 	TargetNumber: 1,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -301,6 +304,7 @@ func fakeNewStateSingleEvent() []byte {
 var expectedStateSingleReturn = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/node1",
 	Type:         "ret",
+	Module:       event.JobModule,
 	TargetNumber: 0,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -408,6 +412,7 @@ func fakeStateSingleReturnEvent() []byte {
 var expectedNewTestMockStateSlsJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
+	Module:       event.JobModule,
 	TargetNumber: 1,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -517,6 +522,7 @@ func fakeNewTestMockStateSlsJobEvent() []byte {
 var expectedTestMockStateSlsReturn = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/node1",
 	Type:         "ret",
+	Module:       event.JobModule,
 	TargetNumber: 0,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/kpetremann/salt-exporter/pkg/event"
+	evt "github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/rs/zerolog/log"
 )
 
@@ -14,7 +15,15 @@ func boolToFloat64(b bool) float64 {
 	return 0.0
 }
 
-func eventToMetrics(event event.SaltEvent, r Registry) {
+func eventToMetrics(event event.SaltEvent, r *Registry) {
+	if event.Module == evt.BeaconModule {
+		if event.Type != "status" {
+			return
+		}
+		r.UpdateLastHeartbeat(event.Data.Id)
+		return
+	}
+
 	switch event.Type {
 	case "new":
 		state := event.ExtractState()
@@ -48,7 +57,7 @@ func eventToMetrics(event event.SaltEvent, r Registry) {
 	}
 }
 
-func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, config Config) {
+func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, watchChan <-chan event.WatchEvent, config Config) {
 	registry := NewRegistry(config)
 
 	for {
@@ -56,6 +65,13 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, config
 		case <-ctx.Done():
 			log.Info().Msg("stopping event listener")
 			return
+		case event := <-watchChan:
+			if event.Op == evt.Accepted {
+				registry.AddObservableMinion(event.MinionName)
+			}
+			if event.Op == evt.Removed {
+				registry.DeleteObservableMinion(event.MinionName)
+			}
 		case event := <-eventChan:
 			if config.Global.Filters.IgnoreTest && event.IsTest {
 				return
@@ -64,7 +80,7 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, config
 				return
 			}
 
-			eventToMetrics(event, registry)
+			eventToMetrics(event, &registry)
 		}
 	}
 }

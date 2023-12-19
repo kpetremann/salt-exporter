@@ -28,6 +28,7 @@ import (
 var expectedNewJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
+	Module:       event.JobModule,
 	TargetNumber: 1,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -84,6 +85,7 @@ func fakeNewJobEvent() []byte {
 var expectedReturnJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
+	Module:       event.JobModule,
 	TargetNumber: 0,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -144,6 +146,7 @@ func fakeRetJobEvent() []byte {
 var expectedNewScheduleJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/new",
 	Type:         "new",
+	Module:       event.JobModule,
 	TargetNumber: 1,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -206,6 +209,7 @@ func fakeNewScheduleJobEvent() []byte {
 var expectedAckScheduleJob = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
+	Module:       event.JobModule,
 	TargetNumber: 0,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
@@ -294,6 +298,7 @@ func fakeAckScheduleJobEvent() []byte {
 var expectedScheduleJobReturn = event.SaltEvent{
 	Tag:          "salt/job/20220630000000000000/ret/localhost",
 	Type:         "ret",
+	Module:       event.JobModule,
 	TargetNumber: 0,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",

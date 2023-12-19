@@ -99,17 +99,29 @@ func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 	lines := strings.SplitN(body, "\n\n", 2)
 
 	tag := lines[0]
-	if !(strings.HasPrefix(tag, "salt/job") || strings.HasPrefix(tag, "salt/run")) {
+	if !(strings.HasPrefix(tag, "salt/")) {
 		return event.SaltEvent{}, errors.New("tag not supported")
 	}
 	log.Debug().Str("tag", tag).Msg("new event")
+
+	parts := strings.Split(tag, "/")
+
+	if len(parts) < 3 {
+		return event.SaltEvent{}, errors.New("tag not supported")
+	}
+
+	event_module := event.GetEventModule(tag)
+
+	if event_module == event.UnknownModule {
+		return event.SaltEvent{}, errors.New("tag not supported. Module unknown")
+	}
 
 	// Extract job type from the tag
 	job_type := strings.Split(tag, "/")[3]
 
 	// Parse message body
 	byteResult := []byte(lines[1])
-	ev := event.SaltEvent{Tag: tag, Type: job_type}
+	ev := event.SaltEvent{Tag: tag, Type: job_type, Module: event_module}
 
 	if e.KeepRawBody {
 		ev.RawBody = byteResult
