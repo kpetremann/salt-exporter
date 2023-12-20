@@ -120,7 +120,7 @@ func TestReadConfigFlagOnly(t *testing.T) {
 				ListenAddress: "127.0.0.1",
 				ListenPort:    8080,
 				IPCFile:       "/dev/null",
-				PKIDir:        "/etc/salt/pki",
+				PKIDir:        "/etc/salt/pki/master",
 				TLS: struct {
 					Enabled     bool
 					Key         string
