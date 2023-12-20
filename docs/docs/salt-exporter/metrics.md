@@ -23,6 +23,8 @@ title: Metrics
 | `salt_scheduled_job_return_total` | `function`, `state`, `success`<br />(opt: `minion`) | Counter incremented each time a minion sends a scheduled job result       |
 | `salt_responses_total`            | `minion`, `success`                                 | Total number of job responses<br />_including scheduled_job responses_    |
 | `salt_function_status`            | `function`, `state`, `minion`                       | Last status of a job execution*                                           |
+| `salt_health_last_heartbeat`      | `minion` | Last heartbeat from minion in UNIX timestamp
+| `salt_health_minions_total`       |           | Total number of registered minions
 
 \* more details in the section below.
 
@@ -54,6 +56,22 @@ The value can be:
 You can find an example of Prometheus alerts that could be used [here](https://github.com/kpetremann/salt-exporter/blob/main/prometheus_alerts/highstate.yaml).
 
 See the [configuration page](./configuration.md) if you want to watch other functions/states, or if you want to disable this metric.
+
+## Minions health
+
+The exporter is supporting "hearbeat"-ing detection from minions which can be used to monitor for non-responding/dead minions. Under the hood it depends on Salt's beacons.
+To ensure that all required minions are reported (even if there is no heartbeat from them yet), exporter needs access to the PKI directory of the Salt Master (by default `/etc/salt/pki/master`) where it watches for accepted minion's public keys (located under `/etc/salt/pki/master/minions`).
+On startup, all currently accepted minions are added with last heartbeat set to current time. From this point forward, exporter is using __fsnotify__ to detect added or removed minions. This will ensure that once minion is added, it will be monitored for heartbeat and metric will be removed once minion is deleted from Salt master.
+
+To use this functionality you'll need to add [`status` beacon](https://docs.saltproject.io/en/latest/ref/beacons/all/salt.beacons.status.html#:~:text=salt.-,beacons.,presence%20to%20be%20set%20up.) to each minion. It doesn't mater what functions will returned or the period. Exporter will just detect such events (in the format `salt/beacon/<minion id>/status`) and register the timestamp as last heartbeat.
+
+### Detecting dead minions
+
+The most simple way is (e.g. no heartbeat in last hour):
+    ``` { .promql .copy }
+    (time() - salt_health_last_heartbeat) > 3600
+    ```
+> __NOTE__: Above is assuming beacon interval is set to < 3600 seconds
 
 ## How to estimate missing responses
 
@@ -125,4 +143,12 @@ More advanced:
     salt_new_job_total{function="state.single",state="test.nop",success="true"} 3
 
     salt_scheduled_job_return_total{function="state.sls",minion="local",state="test",success="true"} 3
+    ```
+??? example "Minions heartbeat"
+
+    ```promql
+    salt_health_last_heartbeat{minion="local"} 1703053536
+    salt_health_last_heartbeat{minion="node1"} 1703052536
+
+    salt_health_minions_total{} 2
     ```
