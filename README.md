@@ -43,6 +43,11 @@ salt_responses_total{minion="local",success="true"} 6
 salt_responses_total{minion="node1",success="true"} 6
 
 salt_scheduled_job_return_total{function="state.sls",minion="local",state="test",success="true"} 2
+
+salt_health_last_heartbeat{minion="local"} 1703053536
+salt_health_last_heartbeat{minion="node1"} 1703053536
+
+salt_health_minions_total{} 2
 ```
 
 ### Deprecation notice

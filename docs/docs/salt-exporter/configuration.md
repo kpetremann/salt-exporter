@@ -26,6 +26,9 @@ log-level: "info"
 listen-address: ""
 listen-port: 2112
 
+pki-dir: /etc/salt/pki/master
+ipc-file: /var/run/salt/master/master_event_pub.ipc
+
 tls:
   enabled: true
   key: "/path/to/key"
@@ -70,6 +73,7 @@ metrics:
 | log-level      | `info`    | log level can be: debug, info, warn, error, fatal, panic, disabled |
 | listen-address | `0.0.0.0` | listening address                                                  |
 | listen-port    | `2112`    | listening port                                                     |
+| pki-dir        | `/etc/salt/pki/master` | path to Salt master's PKI directory   |
 
 ### TLS settings
 
@@ -100,6 +104,19 @@ All parameters below are in the `metrics` section of the configuration.
 | `<metrics_name>`.add-minion-label<br /><br />Only for:<br /><ul><li>`salt_function_responses_total`</li><li>`salt_scheduled_job_return_total`</li></ul> | `false` | adds minion label<br />_not recommended<br />can lead to cardinality issues_ |
 | salt_function_status.filters.function | `state.highstate` | updates the metric only if the event function matches the filter |
 | salt_function_status.filters.states | `highstate` | updates the metric only if the event state matches the filter |
+
+### Minions health detection
+
+In most of the cases all that you need to configure is to enable [`status` beacon](https://docs.saltproject.io/en/latest/ref/beacons/all/salt.beacons.status.html#:~:text=salt.-,beacons.,presence%20to%20be%20set%20up.) on Salt minions.
+However, if you change the [pki directory](https://docs.saltproject.io/en/latest/ref/configuration/master.html#pki-dir) for Salt master, you'll need to make a change in the exporter side too by changing it in the configuration
+```yaml
+log-level: "info"
+
+pki-dir: /path/as/set/in/master/config
+
+tls:
+...
+```
 
 ## Alternative methods
 

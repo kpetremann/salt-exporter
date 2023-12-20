@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const DefaultPKIDirpath = "/etc/salt/pki"
+const DefaultPKIDirpath = "/etc/salt/pki/master"
 
 type PKIWatcher struct {
 	ctx context.Context
@@ -62,7 +62,7 @@ func (w *PKIWatcher) open() {
 		default:
 		}
 
-		minionsDir := path.Join(w.pkiDirPath, "master/minions")
+		minionsDir := path.Join(w.pkiDirPath, "minions")
 
 		log.Info().Msg("loading currently accepted minions")
 		entries, err := os.ReadDir(minionsDir)
