@@ -116,7 +116,7 @@ func watchEvent(m model) tea.Cmd {
 				log.Fatalln(err)
 			}
 			datetime, _ := time.Parse("2006-01-02T15:04:05.999999", e.Data.Timestamp)
-			item := item{
+			i := item{
 				title:       e.Tag,
 				description: e.Type,
 				datetime:    datetime.Format("15:04"),
@@ -129,12 +129,12 @@ func watchEvent(m model) tea.Cmd {
 
 			// No hard filter set
 			if m.hardFilter == "" {
-				return item
+				return i
 			}
 
 			// Hard filter set
-			if rank := m.eventList.Filter(m.hardFilter, []string{item.FilterValue()}); len(rank) > 0 {
-				return item
+			if rank := m.eventList.Filter(m.hardFilter, []string{i.FilterValue()}); len(rank) > 0 {
+				return i
 			}
 		}
 	}
@@ -219,6 +219,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	/*
 		Update embedded components
 	*/
+
 	var cmd tea.Cmd
 	m.eventList, cmd = m.eventList.Update(msg)
 	cmds = append(cmds, cmd)
