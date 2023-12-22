@@ -91,7 +91,7 @@ var expectedReturnJob = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "test.ping",
-		Id:        "localhost",
+		ID:        "localhost",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return:    true,
@@ -106,7 +106,7 @@ func fakeRetJobEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "test.ping",
-		Id:        "localhost",
+		ID:        "localhost",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return:    true,
@@ -216,7 +216,7 @@ var expectedAckScheduleJob = event.SaltEvent{
 		Cmd:       "_return",
 		Fun:       "schedule.run_job",
 		FunArgs:   []interface{}{"sync_all"},
-		Id:        "localhost",
+		ID:        "localhost",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return: map[string]interface{}{
@@ -235,7 +235,7 @@ func fakeAckScheduleJobEvent() []byte {
 		Cmd:       "_return",
 		Fun:       "schedule.run_job",
 		FunArgs:   []interface{}{"sync_all"},
-		Id:        "localhost",
+		ID:        "localhost",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return: map[string]interface{}{
@@ -304,7 +304,7 @@ var expectedScheduleJobReturn = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "saltutil.sync_all",
-		Id:        "localhost",
+		ID:        "localhost",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return: map[string]interface{}{
@@ -340,7 +340,7 @@ func fakeScheduleJobReturnEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "saltutil.sync_all",
-		Id:        "localhost",
+		ID:        "localhost",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return: map[string]interface{}{

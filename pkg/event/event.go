@@ -35,7 +35,7 @@ type EventData struct {
 	Cmd       string        `msgpack:"cmd"`
 	Fun       string        `msgpack:"fun"`
 	FunArgs   []interface{} `msgpack:"fun_args"`
-	Id        string        `msgpack:"id"`
+	ID        string        `msgpack:"id"`
 	Jid       string        `msgpack:"jid"`
 	JidStamp  string        `msgpack:"jid_stamp"`
 	Minions   []string      `msgpack:"minions"`
@@ -66,7 +66,7 @@ type SaltEvent struct {
 
 // RawToJSON converts raw body to JSON
 //
-// If indent is true, the JSON will be indented
+// If indent is true, the JSON will be indented.
 func (e SaltEvent) RawToJSON(indent bool) ([]byte, error) {
 	if e.RawBody == nil {
 		return nil, errors.New("raw body not registered")
@@ -83,7 +83,7 @@ func (e SaltEvent) RawToJSON(indent bool) ([]byte, error) {
 	}
 }
 
-// RawToYAML converts raw body to YAML
+// RawToYAML converts raw body to YAML.
 func (e SaltEvent) RawToYAML() ([]byte, error) {
 	if e.RawBody == nil {
 		return nil, errors.New("raw body not registered")
@@ -114,7 +114,7 @@ func GetEventModule(tag string) EventModule {
 	}
 }
 
-// extractStateFromArgs extracts embedded state info
+// extractStateFromArgs extracts embedded state info.
 func extractStateFromArgs(args interface{}, key string) string {
 	// args only
 	if v, ok := args.(string); ok {
@@ -134,15 +134,16 @@ func extractStateFromArgs(args interface{}, key string) string {
 	return ""
 }
 
-// Extract state info from event
+// Extract state info from event.
 func (e *SaltEvent) ExtractState() string {
 	switch e.Data.Fun {
 	case "state.sls", "state.apply":
-		if len(e.Data.Arg) > 0 {
+		switch {
+		case len(e.Data.Arg) > 0:
 			return extractStateFromArgs(e.Data.Arg[0], "mods")
-		} else if len(e.Data.FunArgs) > 0 {
+		case len(e.Data.FunArgs) > 0:
 			return extractStateFromArgs(e.Data.FunArgs[0], "mods")
-		} else if e.Data.Fun == "state.apply" {
+		case e.Data.Fun == "state.apply":
 			return "highstate"
 		}
 	case "state.single":

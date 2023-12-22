@@ -13,11 +13,11 @@ const testArg = "test"
 const mockArg = "mock"
 
 type Event struct {
-	KeepRawBody bool
+	KeepRewBody bool
 }
 
-func NewEventParser(KeepRawBody bool) Event {
-	return Event{KeepRawBody: KeepRawBody}
+func NewEventParser(keepRawBody bool) Event {
+	return Event{KeepRewBody: keepRawBody}
 }
 
 // isDryRun checks if an event is run with test=True
@@ -93,7 +93,7 @@ func statemoduleResult(event event.SaltEvent) *bool {
 	return &success
 }
 
-// ParseEvent parses a salt event
+// ParseEvent parses a salt event.
 func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 	body := string(message["body"].([]byte))
 	lines := strings.SplitN(body, "\n\n", 2)
@@ -110,20 +110,20 @@ func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 		return event.SaltEvent{}, errors.New("tag not supported")
 	}
 
-	event_module := event.GetEventModule(tag)
+	eventModule := event.GetEventModule(tag)
 
-	if event_module == event.UnknownModule {
+	if eventModule == event.UnknownModule {
 		return event.SaltEvent{}, errors.New("tag not supported. Module unknown")
 	}
 
 	// Extract job type from the tag
-	job_type := strings.Split(tag, "/")[3]
+	jobType := strings.Split(tag, "/")[3]
 
 	// Parse message body
 	byteResult := []byte(lines[1])
-	ev := event.SaltEvent{Tag: tag, Type: job_type, Module: event_module}
+	ev := event.SaltEvent{Tag: tag, Type: jobType, Module: eventModule}
 
-	if e.KeepRawBody {
+	if e.KeepRewBody {
 		ev.RawBody = byteResult
 	}
 
@@ -140,8 +140,8 @@ func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 	ev.StateModuleSuccess = statemoduleResult(ev)
 
 	// A runner are executed on the master but they do not provide their ID in the event
-	if strings.HasPrefix(tag, "salt/run") && ev.Data.Id == "" {
-		ev.Data.Id = "master"
+	if strings.HasPrefix(tag, "salt/run") && ev.Data.ID == "" {
+		ev.Data.ID = "master"
 	}
 
 	return ev, nil

@@ -41,7 +41,6 @@ func matchTerm(s string, pattern string) bool {
 //   - Match("foo", []string{"*o*"}) -> true
 func Match(value string, filters []string) bool {
 	for _, pattern := range filters {
-
 		if matchTerm(value, pattern) {
 			return true
 		}

@@ -96,5 +96,4 @@ func TestExtractState(t *testing.T) {
 			t.Errorf("Mismatch for '%s', wants '%s' got '%s' ", test.name, test.want, res)
 		}
 	}
-
 }

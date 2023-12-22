@@ -66,6 +66,6 @@ func main() {
 	p := tea.NewProgram(tui.NewModel(eventChan, *maxItems, *filter), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
-		os.Exit(1)
+		os.Exit(1) //nolint:gocritic // force exit
 	}
 }
