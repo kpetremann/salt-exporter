@@ -19,7 +19,6 @@ import (
 const theme = "solarized-dark"
 
 type format int
-
 type Mode int
 
 const (
@@ -29,7 +28,6 @@ const (
 
 type model struct {
 	eventList      teaList.Model
-	itemsBuffer    []teaList.Item
 	sideBlock      teaViewport.Model
 	demoText       textinput.Model
 	eventChan      <-chan event.SaltEvent
@@ -39,7 +37,6 @@ type model struct {
 	sideTitle      string
 	terminalWidth  int
 	terminalHeight int
-	maxItems       int
 	outputFormat   format
 	currentMode    Mode
 	wordWrap       bool
@@ -50,7 +47,7 @@ type model struct {
 func NewModel(eventChan <-chan event.SaltEvent, maxItems int, filter string) model {
 	var listKeys = defaultKeyMap()
 
-	list := teaList.NewDefaultDelegate()
+	list := newDelegate(maxItems)
 
 	selColor := lipgloss.Color("#fcc203")
 	list.Styles.SelectedTitle = list.Styles.SelectedTitle.Foreground(selColor).BorderLeftForeground(selColor)
@@ -87,7 +84,6 @@ func NewModel(eventChan <-chan event.SaltEvent, maxItems int, filter string) mod
 		eventChan:   eventChan,
 		hardFilter:  filter,
 		currentMode: Following,
-		maxItems:    maxItems,
 	}
 
 	if os.Getenv("SALT_DEMO") == "true" {
@@ -103,6 +99,7 @@ func watchEvent(m model) tea.Cmd {
 	return func() tea.Msg {
 		for {
 			e := <-m.eventChan
+
 			sender := "master"
 			if e.Data.ID != "" {
 				sender = e.Data.ID
@@ -163,32 +160,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	*/
 	switch msg := msg.(type) {
 	case item:
-		switch m.currentMode {
-		case Following:
-			// In follow mode (default), we update both the list and the buffer
-			currentList := m.eventList.Items()
-			if len(currentList) >= m.maxItems {
-				m.eventList.RemoveItem(len(currentList) - 1)
-			}
-			cmds = append(cmds, m.eventList.InsertItem(0, msg))
-			m.itemsBuffer = m.eventList.Items()
-		case Frozen:
-			// In Frozen mode, we only update the buffer and keep the item list as is
-			m.itemsBuffer = append([]teaList.Item{msg}, m.itemsBuffer...)
-			if len(m.itemsBuffer) > m.maxItems {
-				m.itemsBuffer = m.itemsBuffer[:len(m.itemsBuffer)-1]
-			}
-		}
-
 		cmds = append(cmds, watchEvent(m))
 
 	case tea.WindowSizeMsg:
 		m.terminalWidth = msg.Width
 		m.terminalHeight = msg.Height
-
-		// Enforce width here to avoid filter overflow
-		m.eventList.SetWidth(m.terminalWidth/2 - leftPanelStyle.GetHorizontalFrameSize())
-		m.eventList.Help.Width = m.terminalWidth
 
 	case tea.KeyMsg:
 		// Don't match any of the keys below if we're actively filtering.
@@ -206,9 +182,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch {
 		case key.Matches(msg, m.keys.enableFollow):
+			var cmd tea.Cmd
 			m.currentMode = Following
-			m.eventList.ResetSelected()
-			cmds = append(cmds, m.eventList.SetItems(m.itemsBuffer))
+			m.eventList, cmd = m.eventList.Update(Following)
+			return m, cmd
 		case key.Matches(msg, m.keys.toggleWordwrap):
 			m.wordWrap = !m.wordWrap
 		case key.Matches(msg, m.keys.toggleJSONYAML):
@@ -229,10 +206,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	if m.eventList.Index() > 0 {
+		var cmd tea.Cmd
 		m.currentMode = Frozen
+		m.eventList, cmd = m.eventList.Update(Frozen)
+		cmds = append(cmds, cmd)
 	}
-
-	m.updateTitle()
 
 	return m, tea.Batch(cmds...)
 }
@@ -269,15 +247,6 @@ func (m *model) updateSideInfos() {
 			m.sideInfos = pp.Sprint(eventLite)
 			m.sideBlock.SetContent(m.sideInfos)
 		}
-	}
-}
-
-func (m *model) updateTitle() {
-	switch m.currentMode {
-	case Following:
-		m.eventList.Title = "Events"
-	case Frozen:
-		m.eventList.Title = "Events (frozen)"
 	}
 }
 
