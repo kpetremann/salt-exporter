@@ -31,7 +31,7 @@ var expectedBeacon = event.SaltEvent{
 	TargetNumber: 0,
 	Data: event.EventData{
 		Timestamp: "2023-10-09T11:36:02.205686",
-		Id:        "host1.example.com",
+		ID:        "host1.example.com",
 		Minions:   []string{},
 	},
 	IsScheduleJob: false,
@@ -42,7 +42,7 @@ func fakeBeaconEvent() []byte {
 	fake := FakeData{
 		Timestamp: "2023-10-09T11:36:02.205686",
 		Minions:   []string{},
-		Id:        "host1.example.com",
+		ID:        "host1.example.com",
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)

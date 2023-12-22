@@ -11,7 +11,7 @@ type FakeData struct {
 	Cmd       string        `msgpack:"cmd"`
 	Fun       string        `msgpack:"fun"`
 	FunArgs   []interface{} `msgpack:"fun_args"`
-	Id        string        `msgpack:"id"`
+	ID        string        `msgpack:"id"`
 	Jid       string        `msgpack:"jid"`
 	Minions   []string      `msgpack:"minions"`
 	Missing   []string      `msgpack:"missing"`

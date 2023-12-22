@@ -17,7 +17,7 @@ type eventParser interface {
 
 const DefaultIPCFilepath = "/var/run/salt/master/master_event_pub.ipc"
 
-// EventListener listens to the salt-master event bus and sends events to the event channel
+// EventListener listens to the salt-master event bus and sends events to the event channel.
 type EventListener struct {
 	// ctx specificies the context used mainly for cancellation
 	ctx context.Context
@@ -37,7 +37,7 @@ type EventListener struct {
 	eventParser eventParser
 }
 
-// Open opens the salt-master event bus
+// Open opens the salt-master event bus.
 func (e *EventListener) Open() {
 	log.Info().Str("file", e.iPCFilepath).Msg("connecting to salt-master event bus")
 	var err error
@@ -61,7 +61,7 @@ func (e *EventListener) Open() {
 	}
 }
 
-// Close closes the salt-master event bus
+// Close closes the salt-master event bus.
 func (e *EventListener) Close() error {
 	log.Info().Msg("disconnecting from salt-master event bus")
 	if e.saltEventBus != nil {
@@ -71,7 +71,7 @@ func (e *EventListener) Close() error {
 	}
 }
 
-// Reconnect reconnects to the salt-master event bus
+// Reconnect reconnects to the salt-master event bus.
 func (e *EventListener) Reconnect() {
 	select {
 	case <-e.ctx.Done():
@@ -99,12 +99,12 @@ func NewEventListener(ctx context.Context, eventParser eventParser, eventChan ch
 //
 // The IPC file must be readable by the user running the exporter.
 //
-// Default: /var/run/salt/master/master_event_pub.ipc
+// Default: /var/run/salt/master/master_event_pub.ipc.
 func (e *EventListener) SetIPCFilepath(filepath string) {
 	e.iPCFilepath = filepath
 }
 
-// ListenEvents listens to the salt-master event bus and sends events to the event channel
+// ListenEvents listens to the salt-master event bus and sends events to the event channel.
 func (e *EventListener) ListenEvents() {
 	e.Open()
 

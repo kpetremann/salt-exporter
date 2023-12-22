@@ -15,19 +15,14 @@ import (
 const DefaultPKIDirpath = "/etc/salt/pki/master"
 
 type PKIWatcher struct {
-	ctx context.Context
-
+	ctx        context.Context
 	pkiDirPath string
-
-	watcher *fsnotify.Watcher
-
-	eventChan chan<- event.WatchEvent
-
-	lock sync.RWMutex
+	watcher    *fsnotify.Watcher
+	eventChan  chan<- event.WatchEvent
+	lock       sync.RWMutex
 }
 
 func NewPKIWatcher(ctx context.Context, pkiDirPath string, eventChan chan event.WatchEvent) (*PKIWatcher, error) {
-
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return nil, err
@@ -48,13 +43,12 @@ func NewPKIWatcher(ctx context.Context, pkiDirPath string, eventChan chan event.
 //
 // The directory must be readable by the user running the exporter (usually salt).
 //
-// Default: /etc/salt/pki
+// Default: /etc/salt/pki.
 func (w *PKIWatcher) SetPKIDirectory(filepath string) {
 	w.pkiDirPath = filepath
 }
 
 func (w *PKIWatcher) open() {
-
 	for {
 		select {
 		case <-w.ctx.Done():

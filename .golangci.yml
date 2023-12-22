@@ -1,0 +1,63 @@
+---
+run:
+linters:
+  enable:
+    - asasalint
+    - asciicheck
+    - bodyclose
+    - dupword
+    - durationcheck
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - gocheckcompilerdirectives
+    - gocritic
+    - godot
+    - gofmt
+    - goimports
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - grouper
+    - ineffassign
+    - makezero
+    - nilerr
+    - nilnil
+    - nolintlint
+    - nosprintfhostport
+    - prealloc
+    - predeclared
+    - reassign
+    - staticcheck
+    - stylecheck
+    - tenv
+    - testableexamples
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+    - zerologlint
+  fast: false
+
+# Issues configuration
+issues:
+  exclude: []
+  exclude-case-sensitive: false
+  exclude-rules:
+    - path: '(.+)_test\.go'
+      linters:
+        - goconst
+    - path: '(.+)_test\.go'
+      linters:
+        - govet
+      text: 'fieldalignment: .*'
+  fix: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

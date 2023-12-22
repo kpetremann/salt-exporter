@@ -16,7 +16,7 @@ func Configure() {
 
 // SetLogLevel configures the loglevel.
 //
-// logLevel: The log level to use, in zerolog format
+// logLevel: The log level to use, in zerolog format.
 func SetLevel(logLevel string) {
 	level, err := zerolog.ParseLevel(logLevel)
 	fmt.Println(logLevel)

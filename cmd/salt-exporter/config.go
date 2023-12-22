@@ -128,7 +128,7 @@ func getConfig(configFileName string, healthMinions bool) (Config, error) {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok { //nolint: errorlint // ConfigFileNotFoundError not implementing error
 			return Config{}, fmt.Errorf("invalid config file: %w", err)
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/kpetremann/salt-exporter/internal/logging"
 	"github.com/kpetremann/salt-exporter/internal/metrics"
@@ -65,7 +66,7 @@ func start(config Config) {
 	if config.Metrics.HealthMinions {
 		pkiWatcher, err := listener.NewPKIWatcher(ctx, config.PKIDir, watchChan)
 		if err != nil {
-			log.Fatal().Msgf("unable to watch PKI for minions change: %v", err)
+			log.Fatal().Msgf("unable to watch PKI for minions change: %v", err) //nolint:gocritic // force exit
 		}
 
 		go pkiWatcher.StartWatching()
@@ -78,7 +79,7 @@ func start(config Config) {
 
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.Handler())
-	httpServer := http.Server{Addr: listenSocket, Handler: mux}
+	httpServer := http.Server{Addr: listenSocket, Handler: mux, ReadHeaderTimeout: 2 * time.Second}
 
 	go func() {
 		var err error
@@ -108,7 +109,7 @@ func main() {
 
 	config, err := ReadConfig(configFileName)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to load settings during initialization")
+		log.Fatal().Err(err).Msg("failed to load settings during initialization") //nolint:gocritic // force exit
 	}
 
 	logging.SetLevel(config.LogLevel)

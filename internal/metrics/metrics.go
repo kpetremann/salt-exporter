@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/kpetremann/salt-exporter/pkg/event"
-	evt "github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/rs/zerolog/log"
 )
 
@@ -15,26 +14,26 @@ func boolToFloat64(b bool) float64 {
 	return 0.0
 }
 
-func eventToMetrics(event event.SaltEvent, r *Registry) {
-	if event.Module == evt.BeaconModule {
-		if event.Type != "status" {
+func eventToMetrics(e event.SaltEvent, r *Registry) {
+	if e.Module == event.BeaconModule {
+		if e.Type != "status" {
 			return
 		}
-		r.UpdateLastHeartbeat(event.Data.Id)
+		r.UpdateLastHeartbeat(e.Data.ID)
 		return
 	}
 
-	switch event.Type {
+	switch e.Type {
 	case "new":
-		state := event.ExtractState()
-		r.IncreaseNewJobTotal(event.Data.Fun, state)
-		r.IncreaseExpectedResponsesTotal(event.Data.Fun, state, float64(event.TargetNumber))
+		state := e.ExtractState()
+		r.IncreaseNewJobTotal(e.Data.Fun, state)
+		r.IncreaseExpectedResponsesTotal(e.Data.Fun, state, float64(e.TargetNumber))
 
 	case "ret":
-		state := event.ExtractState()
-		success := event.Data.Success
+		state := e.ExtractState()
+		success := e.Data.Success
 
-		if event.IsScheduleJob {
+		if e.IsScheduleJob {
 			// for scheduled job, when the states in the job actually failed
 			// - the global "success" value is always true
 			// - the state module success is false, but the global retcode is > 0
@@ -43,17 +42,17 @@ func eventToMetrics(event event.SaltEvent, r *Registry) {
 			//
 			// using retcode and state module success could be enough, but we combine all values
 			// in case there are other corner cases.
-			success = event.Data.Success && (event.Data.Retcode == 0)
-			if event.StateModuleSuccess != nil {
-				success = success && *event.StateModuleSuccess
+			success = e.Data.Success && (e.Data.Retcode == 0)
+			if e.StateModuleSuccess != nil {
+				success = success && *e.StateModuleSuccess
 			}
-			r.IncreaseScheduledJobReturnTotal(event.Data.Fun, state, event.Data.Id, success)
+			r.IncreaseScheduledJobReturnTotal(e.Data.Fun, state, e.Data.ID, success)
 		} else {
-			r.IncreaseFunctionResponsesTotal(event.Data.Fun, state, event.Data.Id, success)
+			r.IncreaseFunctionResponsesTotal(e.Data.Fun, state, e.Data.ID, success)
 		}
 
-		r.IncreaseResponseTotal(event.Data.Id, success)
-		r.SetFunctionStatus(event.Data.Id, event.Data.Fun, state, success)
+		r.IncreaseResponseTotal(e.Data.ID, success)
+		r.SetFunctionStatus(e.Data.ID, e.Data.Fun, state, success)
 	}
 }
 
@@ -65,22 +64,22 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, watchC
 		case <-ctx.Done():
 			log.Info().Msg("stopping event listener")
 			return
-		case event := <-watchChan:
-			if event.Op == evt.Accepted {
-				registry.AddObservableMinion(event.MinionName)
+		case e := <-watchChan:
+			if e.Op == event.Accepted {
+				registry.AddObservableMinion(e.MinionName)
 			}
-			if event.Op == evt.Removed {
-				registry.DeleteObservableMinion(event.MinionName)
+			if e.Op == event.Removed {
+				registry.DeleteObservableMinion(e.MinionName)
 			}
-		case event := <-eventChan:
-			if config.Global.Filters.IgnoreTest && event.IsTest {
+		case e := <-eventChan:
+			if config.Global.Filters.IgnoreTest && e.IsTest {
 				return
 			}
-			if config.Global.Filters.IgnoreMock && event.IsMock {
+			if config.Global.Filters.IgnoreMock && e.IsMock {
 				return
 			}
 
-			eventToMetrics(event, &registry)
+			eventToMetrics(e, &registry)
 		}
 	}
 }

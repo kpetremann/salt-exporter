@@ -103,9 +103,9 @@ func watchEvent(m model) tea.Cmd {
 	return func() tea.Msg {
 		for {
 			e := <-m.eventChan
-			var sender string = "master"
-			if e.Data.Id != "" {
-				sender = e.Data.Id
+			sender := "master"
+			if e.Data.ID != "" {
+				sender = e.Data.ID
 			}
 			eventJSON, err := e.RawToJSON(true)
 			if err != nil {
@@ -234,7 +234,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.updateTitle()
 
 	return m, tea.Batch(cmds...)
-
 }
 
 func (m *model) updateSideInfos() {
