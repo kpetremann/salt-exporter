@@ -10,7 +10,7 @@ env:
   COMPOSE_FILE: e2e_test/docker-compose.yaml
 
 jobs:
-  build:
+  tests:
     name: "Lint and test"
     runs-on: ubuntu-latest
     steps:

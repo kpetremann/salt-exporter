@@ -18,8 +18,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const configFileName = "config.yml"
-
 var (
 	version = "unknown"
 	commit  = "unknown"
@@ -107,7 +105,7 @@ func main() {
 	defer quit()
 	logging.Configure()
 
-	config, err := ReadConfig(configFileName)
+	config, err := ReadConfig()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to load settings during initialization") //nolint:gocritic // force exit
 	}

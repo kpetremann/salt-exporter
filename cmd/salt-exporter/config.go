@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+const defaultConfigFilename = "config.yml"
 const defaultLogLevel = "info"
 const defaultPort = 2112
 const defaultHealthMinion = true
@@ -48,9 +49,10 @@ type Config struct {
 	Metrics metrics.Config
 }
 
-func parseFlags() bool {
+func parseFlags() (string, bool) {
 	// flags
 	versionCmd := flag.Bool("version", false, "print version")
+	configFile := flag.String("config-file", defaultConfigFilename, "config filepath")
 	flag.String("log-level", defaultLogLevel, "log level (debug, info, warn, error, fatal, panic, disabled)")
 	flag.String("host", "", "listen address")
 	flag.Int("port", defaultPort, "listen port")
@@ -80,7 +82,7 @@ func parseFlags() bool {
 		os.Exit(0)
 	}
 
-	return *healthMinions
+	return *configFile, *healthMinions
 }
 
 func setDefaults(healthMinions bool) {
@@ -117,10 +119,14 @@ func getConfig(configFileName string, healthMinions bool) (Config, error) {
 	}
 
 	// bind configuration file
-	ext := filepath.Ext(configFileName)
-	viper.SetConfigName(strings.TrimSuffix(configFileName, ext))
-	viper.SetConfigType(strings.TrimPrefix(ext, "."))
-	viper.AddConfigPath(".")
+	if filepath.IsAbs(configFileName) {
+		viper.SetConfigFile(configFileName)
+	} else {
+		ext := filepath.Ext(configFileName)
+		viper.SetConfigName(strings.TrimSuffix(configFileName, ext))
+		viper.SetConfigType(strings.TrimPrefix(ext, "."))
+		viper.AddConfigPath(".")
+	}
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "__"))
 	viper.SetEnvPrefix("SALT")
@@ -155,10 +161,10 @@ func checkRequirements(cfg Config) error {
 	return nil
 }
 
-func ReadConfig(configFileName string) (Config, error) {
+func ReadConfig() (Config, error) {
 	var err error
 
-	healthMinions := parseFlags()
+	configFileName, healthMinions := parseFlags()
 
 	cfg, err := getConfig(configFileName, healthMinions)
 	if err != nil {

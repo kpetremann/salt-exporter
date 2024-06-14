@@ -18,6 +18,8 @@ The salt-exporter can be configured with flags, environments variables and confi
 
 The exporter is looking for `config.yml`.
 
+Note: You can specify a specific config filepath using `--config-file`, i.e. `--config-file="/srv/salt-exporter/config.yml"`
+
 See below a full example of a configuration file:
 
 ```  { .yaml .copy }
@@ -153,18 +155,22 @@ SALT_METRICS__GLOBAL__FILTERS__IGNORE_TEST=true
 
 ```
 ./salt-exporter -help
+  -config-file string
+        config filepath (default "config.yml")
   -health-functions-filter string
         [DEPRECATED] apply filter on functions to monitor, separated by a comma (default "highstate")
-  -health-states-filter string
-        [DEPRECATED] apply filter on states to monitor, separated by a comma (default "highstate")
   -health-minions
         [DEPRECATED] enable minion metrics (default true)
+  -health-states-filter string
+        [DEPRECATED] apply filter on states to monitor, separated by a comma (default "highstate")
   -host string
         listen address
   -ignore-mock
         ignore mock=True events
   -ignore-test
         ignore test=True events
+  -ipc-file string
+        file location of the salt-master event bus (default "/var/run/salt/master/master_event_pub.ipc")
   -log-level string
         log level (debug, info, warn, error, fatal, panic, disabled) (default "info")
   -port int
@@ -175,5 +181,7 @@ SALT_METRICS__GLOBAL__FILTERS__IGNORE_TEST=true
         TLS certificated
   -tls-key string
         TLS private key
+  -version
+        print version
 ```
 
