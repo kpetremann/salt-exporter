@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   salt_master:
     image: saltstack/salt:3006.4

@@ -209,7 +209,7 @@ func TestReadConfigFlagOnly(t *testing.T) {
 			flag.CommandLine = flag.NewFlagSet(name, flag.ContinueOnError)
 			viper.Reset()
 
-			cfg, err := ReadConfig("nofiles.yml")
+			cfg, err := ReadConfig()
 
 			if diff := cmp.Diff(cfg, test.want); diff != "" {
 				t.Errorf("Mismatch for '%s' test:\n%s", test.name, diff)
@@ -223,8 +223,25 @@ func TestReadConfigFlagOnly(t *testing.T) {
 }
 
 func TestConfigFileOnly(t *testing.T) {
-	defer viper.Reset()
-	cfg, err := ReadConfig("config_test.yml")
+	name := os.Args[0]
+	backupArgs := os.Args
+	backupCommandLine := flag.CommandLine
+	defer func() {
+		flag.CommandLine = backupCommandLine
+		os.Args = backupArgs
+		viper.Reset()
+	}()
+
+	flags := []string{
+		"-config-file=config_test.yml",
+	}
+
+	os.Args = append([]string{name}, flags...)
+	flag.CommandLine = flag.NewFlagSet(name, flag.ContinueOnError)
+	viper.Reset()
+
+	cfg, err := ReadConfig()
+
 	want := Config{
 		LogLevel:      "info",
 		ListenAddress: "127.0.0.1",
@@ -322,6 +339,7 @@ func TestConfigFileWithFlags(t *testing.T) {
 	}()
 
 	flags := []string{
+		"-config-file=config_test.yml",
 		"-host=127.0.0.1",
 		"-port=8080",
 		"-health-minions=false",
@@ -335,7 +353,7 @@ func TestConfigFileWithFlags(t *testing.T) {
 	flag.CommandLine = flag.NewFlagSet(name, flag.ContinueOnError)
 	viper.Reset()
 
-	cfg, err := ReadConfig("config_test.yml")
+	cfg, err := ReadConfig()
 	want := Config{
 		LogLevel:      "info",
 		ListenAddress: "127.0.0.1",

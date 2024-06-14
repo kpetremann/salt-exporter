@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-doc:
 
     runs-on: ubuntu-latest
 
