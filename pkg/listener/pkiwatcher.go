@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path"
+	"strings"
 	"sync"
 	"time"
 
@@ -96,6 +97,9 @@ func (w *PKIWatcher) StartWatching() {
 			return
 		case evt := <-w.watcher.Events:
 			minionName := path.Base(evt.Name)
+			if minionName == ".key_cache" || strings.HasPrefix(minionName, ".___atomic_write") {
+				continue
+			}
 			if evt.Op == fsnotify.Create {
 				w.eventChan <- event.WatchEvent{
 					MinionName: minionName,
