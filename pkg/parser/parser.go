@@ -95,7 +95,13 @@ func statemoduleResult(event event.SaltEvent) *bool {
 
 // ParseEvent parses a salt event.
 func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
-	body := string(message["body"].([]byte))
+	var body string
+
+	if raw, ok := message["body"].([]byte); ok {
+		body = string(raw)
+	} else {
+		body = message["body"].(string)
+	}
 	lines := strings.SplitN(body, "\n\n", 2)
 
 	tag := lines[0]
