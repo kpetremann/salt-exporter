@@ -22,7 +22,7 @@ services:
       - e2e
 
   exporter:
-    image: golang:1.22-bullseye
+    image: golang:bookworm
     command: "go run ./cmd/salt-exporter"
     working_dir: "/app"
     environment:
