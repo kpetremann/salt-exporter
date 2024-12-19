@@ -22,7 +22,7 @@ jobs:
         go-version-file: 'go.mod'
 
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v3.2.0
+      uses: golangci/golangci-lint-action@v6
 
     - name: Test
       run: go test -v ./...
