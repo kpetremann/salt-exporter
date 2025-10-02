@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/kpetremann/salt-exporter/pkg/event"
@@ -123,6 +124,9 @@ func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
 	}
 
 	// Extract job type from the tag
+	if len(tag) < 4 {
+		return event.SaltEvent{}, fmt.Errorf("invalid salt tag: %s", tag)
+	}
 	jobType := strings.Split(tag, "/")[3]
 
 	// Parse message body
