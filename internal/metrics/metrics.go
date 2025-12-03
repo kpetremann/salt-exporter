@@ -73,10 +73,10 @@ func ExposeMetrics(ctx context.Context, eventChan <-chan event.SaltEvent, watchC
 			}
 		case e := <-eventChan:
 			if config.Global.Filters.IgnoreTest && e.IsTest {
-				return
+				continue
 			}
 			if config.Global.Filters.IgnoreMock && e.IsMock {
-				return
+				continue
 			}
 
 			eventToMetrics(e, &registry)
