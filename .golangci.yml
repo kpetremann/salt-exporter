@@ -1,5 +1,4 @@
----
-run:
+version: "2"
 linters:
   enable:
     - asasalint
@@ -7,21 +6,15 @@ linters:
     - bodyclose
     - dupword
     - durationcheck
-    - errcheck
     - errname
     - errorlint
     - exhaustive
     - gocheckcompilerdirectives
     - gocritic
     - godot
-    - gofmt
-    - goimports
     - goprintffuncname
     - gosec
-    - gosimple
-    - govet
     - grouper
-    - ineffassign
     - makezero
     - nilerr
     - nilnil
@@ -31,33 +24,45 @@ linters:
     - predeclared
     - reassign
     - staticcheck
-    - stylecheck
-    - tenv
     - testableexamples
     - thelper
     - tparallel
-    - typecheck
     - unconvert
     - unparam
-    - unused
     - usestdlibvars
     - wastedassign
     - whitespace
     - zerologlint
-  fast: false
-
-# Issues configuration
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - goconst
+        path: (.+)_test\.go
+      - linters:
+          - govet
+        path: (.+)_test\.go
+        text: 'fieldalignment: .*'
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude: []
-  exclude-case-sensitive: false
-  exclude-rules:
-    - path: '(.+)_test\.go'
-      linters:
-        - goconst
-    - path: '(.+)_test\.go'
-      linters:
-        - govet
-      text: 'fieldalignment: .*'
-  fix: false
   max-issues-per-linter: 0
   max-same-issues: 0
+  fix: false
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
