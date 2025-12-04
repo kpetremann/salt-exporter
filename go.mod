@@ -1,6 +1,8 @@
 module github.com/kpetremann/salt-exporter
 
-go 1.23.4
+go 1.24.0
+
+toolchain go1.25.4
 
 require (
 	github.com/alecthomas/chroma v0.10.0
