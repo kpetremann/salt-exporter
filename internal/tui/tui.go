@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"
-	teaList "github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	teaViewport "github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/k0kubun/pp/v3"
+	teaList "github.com/kpetremann/salt-exporter/internal/tui/list"
 	"github.com/kpetremann/salt-exporter/pkg/event"
 )
 
