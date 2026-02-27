@@ -52,6 +52,7 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - internal/tui/list
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
@@ -66,3 +67,4 @@ formatters:
       - third_party$
       - builtin$
       - examples$
+      - internal/tui/list
