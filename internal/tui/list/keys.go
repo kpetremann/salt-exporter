@@ -1,39 +1,38 @@
-package tui
+package list
 
-import (
-	"github.com/charmbracelet/bubbles/key"
-	teaList "github.com/kpetremann/salt-exporter/internal/tui/list"
-)
+import "github.com/charmbracelet/bubbles/key"
 
-type keyMap struct {
-	enableFollow   key.Binding
-	toggleJSONYAML key.Binding
-	toggleWordwrap key.Binding
-	demoText       key.Binding
+// KeyMap defines keybindings. It satisfies to the help.KeyMap interface, which
+// is used to render the menu.
+type KeyMap struct {
+	// Keybindings used when browsing the list.
+	CursorUp    key.Binding
+	CursorDown  key.Binding
+	NextPage    key.Binding
+	PrevPage    key.Binding
+	GoToStart   key.Binding
+	GoToEnd     key.Binding
+	Filter      key.Binding
+	ClearFilter key.Binding
+
+	// Keybindings used when setting a filter.
+	CancelWhileFiltering key.Binding
+	AcceptWhileFiltering key.Binding
+
+	// Help toggle keybindings.
+	ShowFullHelp  key.Binding
+	CloseFullHelp key.Binding
+
+	// The quit keybinding. This won't be caught when filtering.
+	Quit key.Binding
+
+	// The quit-no-matter-what keybinding. This will be caught when filtering.
+	ForceQuit key.Binding
 }
 
-func defaultKeyMap() *keyMap {
-	return &keyMap{
-		enableFollow: key.NewBinding(
-			key.WithKeys("f", "F"),
-			key.WithHelp("f", "follow"),
-		),
-		toggleWordwrap: key.NewBinding(
-			key.WithKeys("w", "W"),
-			key.WithHelp("w", "JSON word wrap"),
-		),
-		toggleJSONYAML: key.NewBinding(
-			key.WithKeys("m", "M"),
-			key.WithHelp("m", "JSON/YAML/parsed"),
-		),
-		demoText: key.NewBinding(
-			key.WithKeys("$"),
-		),
-	}
-}
-
-func bubblesListKeyMap() teaList.KeyMap {
-	return teaList.KeyMap{
+// DefaultKeyMap returns a default set of keybindings.
+func DefaultKeyMap() KeyMap {
+	return KeyMap{
 		// Browsing.
 		CursorUp: key.NewBinding(
 			key.WithKeys("up", "k"),
@@ -48,7 +47,7 @@ func bubblesListKeyMap() teaList.KeyMap {
 			key.WithHelp("←/h/pgup", "prev page"),
 		),
 		NextPage: key.NewBinding(
-			key.WithKeys("right", "l", "pgdown", "d"),
+			key.WithKeys("right", "l", "pgdown", "f", "d"),
 			key.WithHelp("→/l/pgdn", "next page"),
 		),
 		GoToStart: key.NewBinding(
@@ -90,7 +89,7 @@ func bubblesListKeyMap() teaList.KeyMap {
 
 		// Quitting.
 		Quit: key.NewBinding(
-			key.WithKeys("q", "Q", "esc"),
+			key.WithKeys("q", "esc"),
 			key.WithHelp("q", "quit"),
 		),
 		ForceQuit: key.NewBinding(key.WithKeys("ctrl+c")),

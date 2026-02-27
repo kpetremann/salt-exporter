@@ -39,6 +39,7 @@ func (i item) Description() string {
 	}
 	return out
 }
+
 func (i item) FilterValue() string {
 	return i.title + " " + i.Description() + " " + i.eventJSON
 }

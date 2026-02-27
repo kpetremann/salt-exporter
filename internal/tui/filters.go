@@ -3,7 +3,7 @@ package tui
 import (
 	"strings"
 
-	"github.com/charmbracelet/bubbles/list"
+	"github.com/kpetremann/salt-exporter/internal/tui/list"
 )
 
 const negativePrefix = "!"
