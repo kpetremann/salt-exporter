@@ -293,7 +293,7 @@ func (m model) View() string {
 	/*
 		Top bar
 	*/
-	topBarStyle.Width(m.terminalWidth)
+	topBarStyle = topBarStyle.Width(m.terminalWidth)
 	topBar := topBarStyle.Render(appTitleStyle.Render("Salt Live"))
 
 	// Calculate content height for left and right panels
@@ -306,16 +306,16 @@ func (m model) View() string {
 	*/
 
 	if m.currentMode == Frozen {
-		listTitleStyle.Background(lipgloss.Color("#a02725"))
-		listTitleStyle.Foreground(lipgloss.Color("#ffffff"))
+		listTitleStyle = listTitleStyle.Background(lipgloss.Color("#a02725"))
+		listTitleStyle = listTitleStyle.Foreground(lipgloss.Color("#ffffff"))
 	} else {
-		listTitleStyle.UnsetBackground()
-		listTitleStyle.UnsetForeground()
+		listTitleStyle = listTitleStyle.UnsetBackground()
+		listTitleStyle = listTitleStyle.UnsetForeground()
 	}
 	listTitle := listTitleStyle.Render(m.eventList.Title)
 
-	leftPanelStyle.Width(contentWidth)
-	leftPanelStyle.Height(contentHeight)
+	leftPanelStyle = leftPanelStyle.Width(contentWidth)
+	leftPanelStyle = leftPanelStyle.Height(contentHeight)
 
 	m.eventList.SetSize(
 		contentWidth-leftPanelStyle.GetHorizontalFrameSize(),
@@ -333,8 +333,8 @@ func (m model) View() string {
 	if m.sideInfos != "" {
 		rawTitle := rightPanelTitleStyle.Render(m.sideTitle)
 
-		rightPanelStyle.Width(contentWidth)
-		rightPanelStyle.Height(contentHeight)
+		rightPanelStyle = rightPanelStyle.Width(contentWidth)
+		rightPanelStyle = rightPanelStyle.Height(contentHeight)
 
 		m.sideBlock.Width = contentWidth - rightPanelStyle.GetHorizontalFrameSize()
 		m.sideBlock.Height = contentHeight - lipgloss.Height(rawTitle) - rightPanelStyle.GetVerticalFrameSize()
