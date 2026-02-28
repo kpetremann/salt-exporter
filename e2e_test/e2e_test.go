@@ -10,6 +10,7 @@ import (
 	prom "github.com/prometheus/client_model/go"
 
 	"github.com/prometheus/common/expfmt"
+	"github.com/prometheus/common/model"
 )
 
 const exporterURL = "http://127.0.0.1:2112/metrics"
@@ -30,7 +31,7 @@ func scrapeMetrics(url string) (map[string]*prom.MetricFamily, error) {
 	defer resp.Body.Close()
 
 	// Read the response body and parse the metrics
-	var parser expfmt.TextParser
+	parser := expfmt.NewTextParser(model.UTF8Validation)
 	parsed, err := parser.TextToMetricFamilies(resp.Body)
 	if err != nil {
 		return nil, err

@@ -25,7 +25,7 @@ func (f viperFlag) ValueString() string { return f.original.Value.String() }
 
 func (f viperFlag) ValueType() string {
 	t := reflect.TypeOf(f.original.Value)
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		return t.Elem().Kind().String()
 	}
 	return t.Kind().String()

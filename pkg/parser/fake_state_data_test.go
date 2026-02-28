@@ -11,6 +11,119 @@ var False = false
 var True = true
 
 /*
+	Fake state.highstate ret with saltenv/pillarenv args
+
+	salt/job/20260218151902735416/ret/test-node-00	{
+		"_stamp": "2026-02-18T15:19:02.735941",
+		"arg": [
+			"saltenv=branch_name",
+			"pillarenv=branch_name"
+		],
+		"cmd": "_return",
+		"fun": "state.highstate",
+		"fun_args": [
+			"saltenv=branch_name",
+			"pillarenv=branch_name"
+		],
+		"id": "test-node-00",
+		"jid": "20260218151902735416",
+		"out": "highstate",
+		"retcode": 0,
+		"return": {
+			"file_|-hostname_file_|-/etc/hostname_|-managed": {
+				"__id__": "hostname_file",
+				"__run_num__": 0,
+				"__sls__": "defaults",
+				"changes": {},
+				"comment": "File /etc/hostname is in the correct state",
+				"duration": 14.258,
+				"name": "/etc/hostname",
+				"result": true,
+				"start_time": "15:19:02.712934"
+			}
+		},
+		"tgt": "test-node-00",
+		"tgt_type": "glob"
+	}
+*/
+
+var expectedStateHighstateWithEnvReturn = event.SaltEvent{
+	Tag:          "salt/job/20260218151902735416/ret/test-node-00",
+	Type:         "ret",
+	Module:       event.JobModule,
+	TargetNumber: 0,
+	Data: event.EventData{
+		Timestamp: "2026-02-18T15:19:02.735941",
+		Arg:       []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		Cmd:       "_return",
+		Fun:       "state.highstate",
+		FunArgs:   []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		ID:        "test-node-00",
+		Jid:       "20260218151902735416",
+		Out:       "highstate",
+		Retcode:   0,
+		Return: map[string]any{
+			"file_|-hostname_file_|-/etc/hostname_|-managed": map[string]any{
+				"__id__":      "hostname_file",
+				"__run_num__": int8(0),
+				"__sls__":     "defaults",
+				"changes":     map[string]any{},
+				"comment":     "File /etc/hostname is in the correct state",
+				"duration":    14.258,
+				"name":        "/etc/hostname",
+				"result":      true,
+				"start_time":  "15:19:02.712934",
+			},
+		},
+		Tgt:     "test-node-00",
+		TgtType: "glob",
+	},
+	IsScheduleJob:      false,
+	IsTest:             false,
+	IsMock:             false,
+	StateModuleSuccess: &True,
+}
+
+func fakeStateHighstateWithEnvReturnEvent() []byte {
+	fake := FakeData{
+		Timestamp: "2026-02-18T15:19:02.735941",
+		Arg:       []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		Cmd:       "_return",
+		Fun:       "state.highstate",
+		FunArgs:   []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		ID:        "test-node-00",
+		Jid:       "20260218151902735416",
+		Out:       "highstate",
+		Retcode:   0,
+		Return: map[string]any{
+			"file_|-hostname_file_|-/etc/hostname_|-managed": map[string]any{
+				"__id__":      "hostname_file",
+				"__run_num__": 0,
+				"__sls__":     "defaults",
+				"changes":     map[string]any{},
+				"comment":     "File /etc/hostname is in the correct state",
+				"duration":    14.258,
+				"name":        "/etc/hostname",
+				"result":      true,
+				"start_time":  "15:19:02.712934",
+			},
+		},
+		Tgt:     "test-node-00",
+		TgtType: "glob",
+	}
+
+	fakeBody, err := msgpack.Marshal(fake)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fakeMessage := []byte("salt/job/20260218151902735416/ret/test-node-00\n\n")
+	fakeMessage = append(fakeMessage, fakeBody...)
+
+	return fakeMessage
+}
+
+/*
 	Fake state.sls job
 
 	salt/job/20220630000000000000/new	{
@@ -38,7 +151,7 @@ var expectedNewStateSlsJob = event.SaltEvent{
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg:       []interface{}{"test"},
+		Arg:       []any{"test"},
 		Jid:       "20220630000000000000",
 		Minions:   []string{"node1"},
 		Missing:   []string{},
@@ -56,7 +169,7 @@ func fakeNewStateSlsJobEvent() []byte {
 	fake := FakeData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg:       []interface{}{"test"},
+		Arg:       []any{"test"},
 		Jid:       "20220630000000000000",
 		Minions:   []string{"node1"},
 		Missing:   []string{},
@@ -117,17 +230,17 @@ var expectedStateSlsReturn = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs:   []interface{}{"test"},
+		FunArgs:   []any{"test"},
 		ID:        "node1",
 		Jid:       "20220630000000000000",
 		Out:       "highstate",
 		Retcode:   0,
-		Return: map[string]interface{}{
-			"test_|-dummy test_|-Dummy test_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-dummy test_|-Dummy test_|-nop": map[string]any{
 				"__id__":      "dummy test",
 				"__run_num__": int8(0),
 				"__sls__":     "test",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy test",
@@ -135,7 +248,7 @@ var expectedStateSlsReturn = event.SaltEvent{
 				"start_time":  "09:17:08.822722",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	},
 	IsScheduleJob:      false,
 	IsTest:             false,
@@ -149,17 +262,17 @@ func fakeStateSlsReturnEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs:   []interface{}{"test"},
+		FunArgs:   []any{"test"},
 		ID:        "node1",
 		Out:       "highstate",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
-		Return: map[string]interface{}{
-			"test_|-dummy test_|-Dummy test_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-dummy test_|-Dummy test_|-nop": map[string]any{
 				"__id__":      "dummy test",
 				"__run_num__": 0,
 				"__sls__":     "test",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy test",
@@ -167,7 +280,7 @@ func fakeStateSlsReturnEvent() []byte {
 				"start_time":  "09:17:08.822722",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)
@@ -214,8 +327,8 @@ var expectedNewStateSingle = event.SaltEvent{
 	TargetNumber: 1,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
-		Arg: []interface{}{
-			map[string]interface{}{
+		Arg: []any{
+			map[string]any{
 				"__kwarg__": true,
 				"fun":       "test.nop",
 				"name":      "toto",
@@ -238,8 +351,8 @@ func fakeNewStateSingleEvent() []byte {
 	// Marshal the data using MsgPack
 	fake := FakeData{
 		Timestamp: "2022-06-30T00:00:00.000000",
-		Arg: []interface{}{
-			map[string]interface{}{
+		Arg: []any{
+			map[string]any{
 				"__kwarg__": true,
 				"fun":       "test.nop",
 				"name":      "toto",
@@ -310,8 +423,8 @@ var expectedStateSingleReturn = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.single",
-		FunArgs: []interface{}{
-			map[string]interface{}{
+		FunArgs: []any{
+			map[string]any{
 				"fun":  "test.nop",
 				"name": "toto",
 			},
@@ -320,12 +433,12 @@ var expectedStateSingleReturn = event.SaltEvent{
 		Jid:     "20220630000000000000",
 		Out:     "highstate",
 		Retcode: 0,
-		Return: map[string]interface{}{
-			"test_|-toto_|-toto_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-toto_|-toto_|-nop": map[string]any{
 				"__id__":      "toto",
 				"__run_num__": int8(0),
 				"__sls__":     nil,
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.49,
 				"name":        "toto",
@@ -333,7 +446,7 @@ var expectedStateSingleReturn = event.SaltEvent{
 				"start_time":  "09:20:38.462572",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	},
 	IsScheduleJob:      false,
 	IsTest:             false,
@@ -347,8 +460,8 @@ func fakeStateSingleReturnEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.single",
-		FunArgs: []interface{}{
-			map[string]interface{}{
+		FunArgs: []any{
+			map[string]any{
 				"fun":  "test.nop",
 				"name": "toto",
 			},
@@ -357,12 +470,12 @@ func fakeStateSingleReturnEvent() []byte {
 		Jid:     "20220630000000000000",
 		Out:     "highstate",
 		Retcode: 0,
-		Return: map[string]interface{}{
-			"test_|-toto_|-toto_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-toto_|-toto_|-nop": map[string]any{
 				"__id__":      "toto",
 				"__run_num__": 0,
 				"__sls__":     nil,
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.49,
 				"name":        "toto",
@@ -370,7 +483,7 @@ func fakeStateSingleReturnEvent() []byte {
 				"start_time":  "09:20:38.462572",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)
@@ -417,9 +530,9 @@ var expectedNewTestMockStateSlsJob = event.SaltEvent{
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg: []interface{}{
+		Arg: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -441,9 +554,9 @@ func fakeNewTestMockStateSlsJobEvent() []byte {
 	fake := FakeData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg: []interface{}{
+		Arg: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -528,9 +641,9 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs: []interface{}{
+		FunArgs: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -539,23 +652,23 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 		Jid:     "20220630000000000000",
 		Out:     "highstate",
 		Retcode: 1,
-		Return: map[string]interface{}{
-			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": int8(0),
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy somestate",
 				"result":      true,
 				"start_time":  "09:17:08.822722",
 			},
-			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]interface{}{
+			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": int8(2),
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Failure!",
 				"duration":    0.579,
 				"name":        "failed",
@@ -563,7 +676,7 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 				"start_time":  "09:17:08.812345",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	},
 	IsScheduleJob:      false,
 	IsTest:             true,
@@ -577,9 +690,9 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs: []interface{}{
+		FunArgs: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -588,23 +701,23 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 		Out:     "highstate",
 		Jid:     "20220630000000000000",
 		Retcode: 1,
-		Return: map[string]interface{}{
-			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": 0,
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy somestate",
 				"result":      true,
 				"start_time":  "09:17:08.822722",
 			},
-			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]interface{}{
+			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": int8(2),
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Failure!",
 				"duration":    0.579,
 				"name":        "failed",
@@ -612,7 +725,7 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 				"start_time":  "09:17:08.812345",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)

@@ -11,7 +11,7 @@ import (
 func TestParseEvent(t *testing.T) {
 	tests := []struct {
 		name string
-		args map[string]interface{}
+		args map[string]any
 		want event.SaltEvent
 	}{
 		{
@@ -68,6 +68,11 @@ func TestParseEvent(t *testing.T) {
 			name: "return state.sls test=True mock=True",
 			args: fakeEventAsMap(fakeTestMockStateSlsReturnEvent()),
 			want: expectedTestMockStateSlsReturn,
+		},
+		{
+			name: "return state.highstate with saltenv/pillarenv args",
+			args: fakeEventAsMap(fakeStateHighstateWithEnvReturnEvent()),
+			want: expectedStateHighstateWithEnvReturn,
 		},
 		{
 			name: "beacon",
