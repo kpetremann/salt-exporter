@@ -97,6 +97,7 @@ func setDefaults(healthMinions bool) {
 	viper.SetDefault("metrics.salt_scheduled_job_return_total.enabled", true)
 	viper.SetDefault("metrics.salt_function_status.enabled", healthMinions) // TODO: true once health-minions will be removed
 	viper.SetDefault("metrics.salt_responses_total.enabled", healthMinions) // TODO: true once health-minions will be removed
+	viper.SetDefault("metrics.salt_job_duration_seconds.enabled", true)
 	viper.SetDefault("metrics.salt_function_status.filters.functions", []string{defaultHealthFunctionsFilter})
 	viper.SetDefault("metrics.salt_function_status.filters.states", []string{defaultHealthStatesFilter})
 }

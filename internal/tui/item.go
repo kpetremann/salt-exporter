@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/kpetremann/salt-exporter/pkg/event"
 )
@@ -13,6 +14,7 @@ type item struct {
 	datetime    string
 	sender      string
 	state       string
+	duration    *time.Duration
 	eventJSON   string
 	eventYAML   string
 }
@@ -36,6 +38,9 @@ func (i item) Description() string {
 			target = "target"
 		}
 		out = fmt.Sprintf("%s - %d %s", out, i.event.TargetNumber, target)
+	}
+	if i.duration != nil {
+		out = fmt.Sprintf("%s - %.3fs", out, i.duration.Seconds())
 	}
 	return out
 }

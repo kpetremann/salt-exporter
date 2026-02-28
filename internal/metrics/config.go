@@ -48,4 +48,9 @@ type Config struct {
 			States    []string
 		}
 	} `mapstructure:"salt_function_status"`
+
+	SaltJobDurationSeconds struct {
+		Enabled        bool
+		AddMinionLabel bool `mapstructure:"add-minion-label"`
+	} `mapstructure:"salt_job_duration_seconds"`
 }

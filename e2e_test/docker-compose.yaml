@@ -23,13 +23,14 @@ services:
 
   exporter:
     image: golang:bookworm
-    command: "go run ./cmd/salt-exporter"
+    command: "go run ./cmd/salt-exporter -config-file=/etc/salt-exporter/config.yml"
     working_dir: "/app"
     environment:
       CGO_ENABLED: 0
     volumes:
       - ../:/app/:ro
       - ipc:/var/run/salt/master/:ro
+      - ./config.yml:/etc/salt-exporter/config.yml:ro
     ports:
       - 127.0.0.1:2112:2112
     healthcheck:
