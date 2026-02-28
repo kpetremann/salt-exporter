@@ -11,6 +11,119 @@ var False = false
 var True = true
 
 /*
+	Fake state.highstate ret with saltenv/pillarenv args
+
+	salt/job/20260218151902735416/ret/test-node-00	{
+		"_stamp": "2026-02-18T15:19:02.735941",
+		"arg": [
+			"saltenv=branch_name",
+			"pillarenv=branch_name"
+		],
+		"cmd": "_return",
+		"fun": "state.highstate",
+		"fun_args": [
+			"saltenv=branch_name",
+			"pillarenv=branch_name"
+		],
+		"id": "test-node-00",
+		"jid": "20260218151902735416",
+		"out": "highstate",
+		"retcode": 0,
+		"return": {
+			"file_|-hostname_file_|-/etc/hostname_|-managed": {
+				"__id__": "hostname_file",
+				"__run_num__": 0,
+				"__sls__": "defaults",
+				"changes": {},
+				"comment": "File /etc/hostname is in the correct state",
+				"duration": 14.258,
+				"name": "/etc/hostname",
+				"result": true,
+				"start_time": "15:19:02.712934"
+			}
+		},
+		"tgt": "test-node-00",
+		"tgt_type": "glob"
+	}
+*/
+
+var expectedStateHighstateWithEnvReturn = event.SaltEvent{
+	Tag:          "salt/job/20260218151902735416/ret/test-node-00",
+	Type:         "ret",
+	Module:       event.JobModule,
+	TargetNumber: 0,
+	Data: event.EventData{
+		Timestamp: "2026-02-18T15:19:02.735941",
+		Arg:       []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		Cmd:       "_return",
+		Fun:       "state.highstate",
+		FunArgs:   []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		ID:        "test-node-00",
+		Jid:       "20260218151902735416",
+		Out:       "highstate",
+		Retcode:   0,
+		Return: map[string]any{
+			"file_|-hostname_file_|-/etc/hostname_|-managed": map[string]any{
+				"__id__":      "hostname_file",
+				"__run_num__": int8(0),
+				"__sls__":     "defaults",
+				"changes":     map[string]any{},
+				"comment":     "File /etc/hostname is in the correct state",
+				"duration":    14.258,
+				"name":        "/etc/hostname",
+				"result":      true,
+				"start_time":  "15:19:02.712934",
+			},
+		},
+		Tgt:     "test-node-00",
+		TgtType: "glob",
+	},
+	IsScheduleJob:      false,
+	IsTest:             false,
+	IsMock:             false,
+	StateModuleSuccess: &True,
+}
+
+func fakeStateHighstateWithEnvReturnEvent() []byte {
+	fake := FakeData{
+		Timestamp: "2026-02-18T15:19:02.735941",
+		Arg:       []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		Cmd:       "_return",
+		Fun:       "state.highstate",
+		FunArgs:   []any{"saltenv=branch_name", "pillarenv=branch_name"},
+		ID:        "test-node-00",
+		Jid:       "20260218151902735416",
+		Out:       "highstate",
+		Retcode:   0,
+		Return: map[string]any{
+			"file_|-hostname_file_|-/etc/hostname_|-managed": map[string]any{
+				"__id__":      "hostname_file",
+				"__run_num__": 0,
+				"__sls__":     "defaults",
+				"changes":     map[string]any{},
+				"comment":     "File /etc/hostname is in the correct state",
+				"duration":    14.258,
+				"name":        "/etc/hostname",
+				"result":      true,
+				"start_time":  "15:19:02.712934",
+			},
+		},
+		Tgt:     "test-node-00",
+		TgtType: "glob",
+	}
+
+	fakeBody, err := msgpack.Marshal(fake)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fakeMessage := []byte("salt/job/20260218151902735416/ret/test-node-00\n\n")
+	fakeMessage = append(fakeMessage, fakeBody...)
+
+	return fakeMessage
+}
+
+/*
 	Fake state.sls job
 
 	salt/job/20220630000000000000/new	{

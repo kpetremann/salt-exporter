@@ -70,6 +70,11 @@ func TestParseEvent(t *testing.T) {
 			want: expectedTestMockStateSlsReturn,
 		},
 		{
+			name: "return state.highstate with saltenv/pillarenv args",
+			args: fakeEventAsMap(fakeStateHighstateWithEnvReturnEvent()),
+			want: expectedStateHighstateWithEnvReturn,
+		},
+		{
 			name: "beacon",
 			args: fakeEventAsMap(fakeBeaconEvent()),
 			want: expectedBeacon,
