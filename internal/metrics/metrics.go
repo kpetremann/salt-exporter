@@ -57,6 +57,10 @@ func eventToMetrics(e event.SaltEvent, r *Registry) {
 
 		r.IncreaseResponseTotal(e.Data.ID, success)
 		r.SetFunctionStatus(e.Data.ID, e.Data.Fun, state, success)
+
+		if e.StateDuration != nil {
+			r.SetJobDuration(e.Data.Fun, state, e.Data.ID, e.StateDuration.Seconds())
+		}
 	}
 }
 

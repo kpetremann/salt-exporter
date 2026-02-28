@@ -116,6 +116,7 @@ func watchEvent(m model) tea.Cmd {
 				log.Fatalln(err)
 			}
 			datetime, _ := time.Parse("2006-01-02T15:04:05.999999", e.Data.Timestamp)
+
 			item := item{
 				title:       e.Tag,
 				description: e.Type,
@@ -123,6 +124,7 @@ func watchEvent(m model) tea.Cmd {
 				event:       e,
 				sender:      sender,
 				state:       e.ExtractState(),
+				duration:    e.StateDuration,
 				eventJSON:   string(eventJSON),
 				eventYAML:   string(eventYAML),
 			}

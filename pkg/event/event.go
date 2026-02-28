@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/vmihailenco/msgpack/v5"
 	"gopkg.in/yaml.v3"
@@ -62,6 +63,7 @@ type SaltEvent struct {
 	IsTest             bool
 	IsMock             bool
 	StateModuleSuccess *bool
+	StateDuration      *time.Duration
 }
 
 // RawToJSON converts raw body to JSON

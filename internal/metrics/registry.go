@@ -25,6 +25,8 @@ type Registry struct {
 
 	statusLastResponse *prometheus.GaugeVec
 	minionsTotal       *prometheus.GaugeVec
+
+	jobDurationSeconds *prometheus.GaugeVec
 }
 
 func NewRegistry(config Config) Registry {
@@ -36,6 +38,11 @@ func NewRegistry(config Config) Registry {
 	scheduledJobReturnTotalLabels := []string{"function", "state", "success"}
 	if config.SaltScheduledJobReturnTotal.AddMinionLabel {
 		scheduledJobReturnTotalLabels = append([]string{"minion"}, scheduledJobReturnTotalLabels...)
+	}
+
+	jobDurationSecondsLabels := []string{"function", "state"}
+	if config.SaltJobDurationSeconds.AddMinionLabel {
+		jobDurationSecondsLabels = append([]string{"minion"}, jobDurationSecondsLabels...)
 	}
 
 	return Registry{
@@ -102,6 +109,14 @@ func NewRegistry(config Config) Registry {
 				Help: "Total number of observed minions via status beacon",
 			}, []string{},
 		),
+
+		jobDurationSeconds: promauto.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "salt_job_duration_seconds",
+				Help: "Last duration of a Salt job in seconds",
+			},
+			jobDurationSecondsLabels,
+		),
 	}
 }
 
@@ -159,6 +174,16 @@ func (r *Registry) IncreaseScheduledJobReturnTotal(function, state, minion strin
 func (r *Registry) IncreaseResponseTotal(minion string, success bool) {
 	if r.config.SaltResponsesTotal.Enabled {
 		r.responseTotal.WithLabelValues(minion, strconv.FormatBool(success)).Inc()
+	}
+}
+
+func (r *Registry) SetJobDuration(function, state, minion string, durationSeconds float64) {
+	if r.config.SaltJobDurationSeconds.Enabled {
+		labels := []string{function, state}
+		if r.config.SaltJobDurationSeconds.AddMinionLabel {
+			labels = append([]string{minion}, labels...)
+		}
+		r.jobDurationSeconds.WithLabelValues(labels...).Set(durationSeconds)
 	}
 }
 

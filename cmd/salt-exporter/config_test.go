@@ -97,6 +97,13 @@ func TestReadConfigFlagOnly(t *testing.T) {
 							},
 						},
 					},
+					SaltJobDurationSeconds: struct {
+						Enabled        bool
+						AddMinionLabel bool `mapstructure:"add-minion-label"`
+					}{
+						Enabled:        true,
+						AddMinionLabel: false,
+					},
 				},
 			},
 		},
@@ -188,6 +195,13 @@ func TestReadConfigFlagOnly(t *testing.T) {
 								"nop",
 							},
 						},
+					},
+					SaltJobDurationSeconds: struct {
+						Enabled        bool
+						AddMinionLabel bool `mapstructure:"add-minion-label"`
+					}{
+						Enabled:        true,
+						AddMinionLabel: false,
 					},
 				},
 			},
@@ -316,6 +330,13 @@ func TestConfigFileOnly(t *testing.T) {
 					},
 				},
 			},
+			SaltJobDurationSeconds: struct {
+				Enabled        bool
+				AddMinionLabel bool `mapstructure:"add-minion-label"`
+			}{
+				Enabled:        true,
+				AddMinionLabel: false,
+			},
 		},
 	}
 
@@ -427,6 +448,13 @@ func TestConfigFileWithFlags(t *testing.T) {
 						"nop",
 					},
 				},
+			},
+			SaltJobDurationSeconds: struct {
+				Enabled        bool
+				AddMinionLabel bool `mapstructure:"add-minion-label"`
+			}{
+				Enabled:        true,
+				AddMinionLabel: false,
 			},
 		},
 	}

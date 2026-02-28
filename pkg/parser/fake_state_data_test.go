@@ -2,13 +2,11 @@ package parser_test
 
 import (
 	"log"
+	"time"
 
 	"github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/vmihailenco/msgpack/v5"
 )
-
-var False = false
-var True = true
 
 /*
 	Fake state.highstate ret with saltenv/pillarenv args
@@ -81,7 +79,8 @@ var expectedStateHighstateWithEnvReturn = event.SaltEvent{
 	IsScheduleJob:      false,
 	IsTest:             false,
 	IsMock:             false,
-	StateModuleSuccess: &True,
+	StateModuleSuccess: new(true),
+	StateDuration:      new(time.Duration(14.258 * float64(time.Second))),
 }
 
 func fakeStateHighstateWithEnvReturnEvent() []byte {
@@ -253,7 +252,8 @@ var expectedStateSlsReturn = event.SaltEvent{
 	IsScheduleJob:      false,
 	IsTest:             false,
 	IsMock:             false,
-	StateModuleSuccess: &True,
+	StateModuleSuccess: new(true),
+	StateDuration:      new(time.Duration(0.481 * float64(time.Second))),
 }
 
 func fakeStateSlsReturnEvent() []byte {
@@ -451,7 +451,8 @@ var expectedStateSingleReturn = event.SaltEvent{
 	IsScheduleJob:      false,
 	IsTest:             false,
 	IsMock:             false,
-	StateModuleSuccess: &True,
+	StateModuleSuccess: new(true),
+	StateDuration:      new(time.Duration(0.49 * float64(time.Second))),
 }
 
 func fakeStateSingleReturnEvent() []byte {
@@ -681,7 +682,8 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 	IsScheduleJob:      false,
 	IsTest:             true,
 	IsMock:             true,
-	StateModuleSuccess: &False,
+	StateModuleSuccess: new(false),
+	StateDuration:      new(time.Duration((0.481 + 0.579) * float64(time.Second))),
 }
 
 func fakeTestMockStateSlsReturnEvent() []byte {

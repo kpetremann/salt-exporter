@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/kpetremann/salt-exporter/pkg/event"
 	"github.com/rs/zerolog/log"
@@ -94,6 +95,37 @@ func statemoduleResult(event event.SaltEvent) *bool {
 	return &success
 }
 
+// StateDuration sums all inner duration.
+func stateDuration(event event.SaltEvent) *time.Duration {
+	substates, ok := event.Data.Return.(map[string]any)
+	if !ok {
+		return nil
+	}
+
+	var totalDuration float64
+	found := false
+
+	for _, v := range substates {
+		substate, ok := v.(map[string]any)
+		if !ok {
+			return nil
+		}
+		s, ok := substate["duration"].(float64)
+		if !ok {
+			return nil
+		}
+		totalDuration += s
+		found = true
+	}
+
+	if !found {
+		return nil
+	}
+
+	d := time.Duration(totalDuration * float64(time.Second))
+	return &d
+}
+
 // ParseEvent parses a salt event.
 func (e Event) Parse(message map[string]any) (event.SaltEvent, error) {
 	var body string
@@ -148,6 +180,7 @@ func (e Event) Parse(message map[string]any) (event.SaltEvent, error) {
 	ev.IsTest = getBoolKwarg(ev, testArg)
 	ev.IsMock = getBoolKwarg(ev, mockArg)
 	ev.StateModuleSuccess = statemoduleResult(ev)
+	ev.StateDuration = stateDuration(ev)
 
 	// A runner are executed on the master but they do not provide their ID in the event
 	if strings.HasPrefix(tag, "salt/run") && ev.Data.ID == "" {
