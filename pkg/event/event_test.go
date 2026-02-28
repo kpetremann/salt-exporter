@@ -15,7 +15,7 @@ func getNewStateEvent() event.SaltEvent {
 		Data: event.EventData{
 			Timestamp: "2022-06-30T00:00:00.000000",
 			Fun:       "state.sls",
-			Arg:       []interface{}{"test"},
+			Arg:       []any{"test"},
 			Jid:       "20220630000000000000",
 			Minions:   []string{"node1"},
 			Missing:   []string{},
@@ -32,11 +32,11 @@ func TestExtractState(t *testing.T) {
 
 	stateSlsFunArg := getNewStateEvent()
 	stateSlsFunArg.Data.Arg = nil
-	stateSlsFunArg.Data.FunArgs = []interface{}{"test", map[string]bool{"dry_run": true}}
+	stateSlsFunArg.Data.FunArgs = []any{"test", map[string]bool{"dry_run": true}}
 
 	stateSlsFunArgMap := getNewStateEvent()
 	stateSlsFunArgMap.Data.Arg = nil
-	stateSlsFunArgMap.Data.FunArgs = []interface{}{map[string]interface{}{"mods": "test", "dry_run": true}}
+	stateSlsFunArgMap.Data.FunArgs = []any{map[string]any{"mods": "test", "dry_run": true}}
 
 	stateApplyArg := getNewStateEvent()
 	stateApplyArg.Data.Fun = "state.apply"

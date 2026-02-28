@@ -38,7 +38,7 @@ var expectedNewStateSlsJob = event.SaltEvent{
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg:       []interface{}{"test"},
+		Arg:       []any{"test"},
 		Jid:       "20220630000000000000",
 		Minions:   []string{"node1"},
 		Missing:   []string{},
@@ -56,7 +56,7 @@ func fakeNewStateSlsJobEvent() []byte {
 	fake := FakeData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg:       []interface{}{"test"},
+		Arg:       []any{"test"},
 		Jid:       "20220630000000000000",
 		Minions:   []string{"node1"},
 		Missing:   []string{},
@@ -117,17 +117,17 @@ var expectedStateSlsReturn = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs:   []interface{}{"test"},
+		FunArgs:   []any{"test"},
 		ID:        "node1",
 		Jid:       "20220630000000000000",
 		Out:       "highstate",
 		Retcode:   0,
-		Return: map[string]interface{}{
-			"test_|-dummy test_|-Dummy test_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-dummy test_|-Dummy test_|-nop": map[string]any{
 				"__id__":      "dummy test",
 				"__run_num__": int8(0),
 				"__sls__":     "test",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy test",
@@ -149,17 +149,17 @@ func fakeStateSlsReturnEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs:   []interface{}{"test"},
+		FunArgs:   []any{"test"},
 		ID:        "node1",
 		Out:       "highstate",
 		Jid:       "20220630000000000000",
 		Retcode:   0,
-		Return: map[string]interface{}{
-			"test_|-dummy test_|-Dummy test_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-dummy test_|-Dummy test_|-nop": map[string]any{
 				"__id__":      "dummy test",
 				"__run_num__": 0,
 				"__sls__":     "test",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy test",
@@ -214,8 +214,8 @@ var expectedNewStateSingle = event.SaltEvent{
 	TargetNumber: 1,
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
-		Arg: []interface{}{
-			map[string]interface{}{
+		Arg: []any{
+			map[string]any{
 				"__kwarg__": true,
 				"fun":       "test.nop",
 				"name":      "toto",
@@ -238,8 +238,8 @@ func fakeNewStateSingleEvent() []byte {
 	// Marshal the data using MsgPack
 	fake := FakeData{
 		Timestamp: "2022-06-30T00:00:00.000000",
-		Arg: []interface{}{
-			map[string]interface{}{
+		Arg: []any{
+			map[string]any{
 				"__kwarg__": true,
 				"fun":       "test.nop",
 				"name":      "toto",
@@ -310,8 +310,8 @@ var expectedStateSingleReturn = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.single",
-		FunArgs: []interface{}{
-			map[string]interface{}{
+		FunArgs: []any{
+			map[string]any{
 				"fun":  "test.nop",
 				"name": "toto",
 			},
@@ -320,12 +320,12 @@ var expectedStateSingleReturn = event.SaltEvent{
 		Jid:     "20220630000000000000",
 		Out:     "highstate",
 		Retcode: 0,
-		Return: map[string]interface{}{
-			"test_|-toto_|-toto_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-toto_|-toto_|-nop": map[string]any{
 				"__id__":      "toto",
 				"__run_num__": int8(0),
 				"__sls__":     nil,
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.49,
 				"name":        "toto",
@@ -347,8 +347,8 @@ func fakeStateSingleReturnEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.single",
-		FunArgs: []interface{}{
-			map[string]interface{}{
+		FunArgs: []any{
+			map[string]any{
 				"fun":  "test.nop",
 				"name": "toto",
 			},
@@ -357,12 +357,12 @@ func fakeStateSingleReturnEvent() []byte {
 		Jid:     "20220630000000000000",
 		Out:     "highstate",
 		Retcode: 0,
-		Return: map[string]interface{}{
-			"test_|-toto_|-toto_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"test_|-toto_|-toto_|-nop": map[string]any{
 				"__id__":      "toto",
 				"__run_num__": 0,
 				"__sls__":     nil,
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.49,
 				"name":        "toto",
@@ -417,9 +417,9 @@ var expectedNewTestMockStateSlsJob = event.SaltEvent{
 	Data: event.EventData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg: []interface{}{
+		Arg: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -441,9 +441,9 @@ func fakeNewTestMockStateSlsJobEvent() []byte {
 	fake := FakeData{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Fun:       "state.sls",
-		Arg: []interface{}{
+		Arg: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -528,9 +528,9 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs: []interface{}{
+		FunArgs: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -539,23 +539,23 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 		Jid:     "20220630000000000000",
 		Out:     "highstate",
 		Retcode: 1,
-		Return: map[string]interface{}{
-			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": int8(0),
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy somestate",
 				"result":      true,
 				"start_time":  "09:17:08.822722",
 			},
-			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]interface{}{
+			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": int8(2),
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Failure!",
 				"duration":    0.579,
 				"name":        "failed",
@@ -577,9 +577,9 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 		Timestamp: "2022-06-30T00:00:00.000000",
 		Cmd:       "_return",
 		Fun:       "state.sls",
-		FunArgs: []interface{}{
+		FunArgs: []any{
 			"somestate",
-			map[string]interface{}{
+			map[string]any{
 				"test": true,
 				"mock": true,
 			},
@@ -588,23 +588,23 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 		Out:     "highstate",
 		Jid:     "20220630000000000000",
 		Retcode: 1,
-		Return: map[string]interface{}{
-			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]interface{}{
+		Return: map[string]any{
+			"somestate_|-dummy somestate_|-Dummy somestate_|-nop": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": 0,
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Success!",
 				"duration":    0.481,
 				"name":        "Dummy somestate",
 				"result":      true,
 				"start_time":  "09:17:08.822722",
 			},
-			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]interface{}{
+			"somestate_|-failed_|-failed_|-fail_with_changes": map[string]any{
 				"__id__":      "dummy somestate",
 				"__run_num__": int8(2),
 				"__sls__":     "somestate",
-				"changes":     map[string]interface{}{},
+				"changes":     map[string]any{},
 				"comment":     "Failure!",
 				"duration":    0.579,
 				"name":        "failed",

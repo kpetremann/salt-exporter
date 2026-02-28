@@ -31,24 +31,24 @@ type WatchEvent struct {
 }
 
 type EventData struct {
-	Arg       []interface{} `msgpack:"arg"`
-	Cmd       string        `msgpack:"cmd"`
-	Fun       string        `msgpack:"fun"`
-	FunArgs   []interface{} `msgpack:"fun_args"`
-	ID        string        `msgpack:"id"`
-	Jid       string        `msgpack:"jid"`
-	JidStamp  string        `msgpack:"jid_stamp"`
-	Minions   []string      `msgpack:"minions"`
-	Missing   []string      `msgpack:"missing"`
-	Out       string        `msgpack:"out"`
-	Retcode   int           `msgpack:"retcode"`
-	Return    interface{}   `msgpack:"return"`
-	Tgt       interface{}   `msgpack:"tgt"`
-	TgtType   string        `msgpack:"tgt_type"`
-	Timestamp string        `msgpack:"_stamp"`
-	User      string        `msgpack:"user"`
-	Schedule  string        `msgpack:"schedule"`
-	Success   *bool         `msgpack:"success"`
+	Arg       []any    `msgpack:"arg"`
+	Cmd       string   `msgpack:"cmd"`
+	Fun       string   `msgpack:"fun"`
+	FunArgs   []any    `msgpack:"fun_args"`
+	ID        string   `msgpack:"id"`
+	Jid       string   `msgpack:"jid"`
+	JidStamp  string   `msgpack:"jid_stamp"`
+	Minions   []string `msgpack:"minions"`
+	Missing   []string `msgpack:"missing"`
+	Out       string   `msgpack:"out"`
+	Retcode   int      `msgpack:"retcode"`
+	Return    any      `msgpack:"return"`
+	Tgt       any      `msgpack:"tgt"`
+	TgtType   string   `msgpack:"tgt_type"`
+	Timestamp string   `msgpack:"_stamp"`
+	User      string   `msgpack:"user"`
+	Schedule  string   `msgpack:"schedule"`
+	Success   *bool    `msgpack:"success"`
 }
 
 type SaltEvent struct {
@@ -72,7 +72,7 @@ func (e SaltEvent) RawToJSON(indent bool) ([]byte, error) {
 		return nil, errors.New("raw body not registered")
 	}
 
-	var data interface{}
+	var data any
 	if err := msgpack.Unmarshal(e.RawBody, &data); err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (e SaltEvent) RawToYAML() ([]byte, error) {
 		return nil, errors.New("raw body not registered")
 	}
 
-	var data interface{}
+	var data any
 	if err := msgpack.Unmarshal(e.RawBody, &data); err != nil {
 		return nil, err
 	}
@@ -115,14 +115,14 @@ func GetEventModule(tag string) EventModule {
 }
 
 // extractStateFromArgs extracts embedded state info.
-func extractStateFromArgs(args interface{}, key string) string {
+func extractStateFromArgs(args any, key string) string {
 	// args only
 	if v, ok := args.(string); ok {
 		return v
 	}
 
 	// kwargs
-	if v, ok := args.(map[string]interface{}); ok {
+	if v, ok := args.(map[string]any); ok {
 		if _, keyExists := v[key]; !keyExists {
 			return ""
 		}

@@ -45,7 +45,7 @@ func NewEventParser(keepRawBody bool) Event {
 //	]
 func getBoolKwarg(event event.SaltEvent, field string) bool {
 	for _, arg := range event.Data.Arg {
-		if fields, ok := arg.(map[string]interface{}); ok {
+		if fields, ok := arg.(map[string]any); ok {
 			if val, ok := fields[field].(bool); ok {
 				return val
 			}
@@ -53,7 +53,7 @@ func getBoolKwarg(event event.SaltEvent, field string) bool {
 	}
 
 	for _, funArg := range event.Data.FunArgs {
-		if fields, ok := funArg.(map[string]interface{}); ok {
+		if fields, ok := funArg.(map[string]any); ok {
 			if val, ok := fields[field].(bool); ok {
 				return val
 			}
@@ -64,13 +64,13 @@ func getBoolKwarg(event event.SaltEvent, field string) bool {
 }
 
 func statemoduleResult(event event.SaltEvent) *bool {
-	substates, ok := event.Data.Return.(map[string]interface{})
+	substates, ok := event.Data.Return.(map[string]any)
 	if !ok {
 		return nil
 	}
 
 	for _, ret := range substates {
-		substate, ok := ret.(map[string]interface{})
+		substate, ok := ret.(map[string]any)
 		if !ok {
 			return nil
 		}
@@ -95,7 +95,7 @@ func statemoduleResult(event event.SaltEvent) *bool {
 }
 
 // ParseEvent parses a salt event.
-func (e Event) Parse(message map[string]interface{}) (event.SaltEvent, error) {
+func (e Event) Parse(message map[string]any) (event.SaltEvent, error) {
 	var body string
 
 	if raw, ok := message["body"].([]byte); ok {

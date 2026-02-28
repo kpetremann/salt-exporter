@@ -12,7 +12,7 @@ import (
 )
 
 type eventParser interface {
-	Parse(message map[string]interface{}) (event.SaltEvent, error)
+	Parse(message map[string]any) (event.SaltEvent, error)
 }
 
 const DefaultIPCFilepath = "/var/run/salt/master/master_event_pub.ipc"

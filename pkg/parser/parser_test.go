@@ -11,7 +11,7 @@ import (
 func TestParseEvent(t *testing.T) {
 	tests := []struct {
 		name string
-		args map[string]interface{}
+		args map[string]any
 		want event.SaltEvent
 	}{
 		{
