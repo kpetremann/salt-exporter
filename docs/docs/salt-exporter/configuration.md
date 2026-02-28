@@ -66,6 +66,10 @@ metrics:
         - "state.highstate"
       states:
         - "highstate"
+
+  salt_job_duration_seconds:
+    enabled: true
+    add-minion-label: false  # not recommended in production
 ```
 
 ### Global parameters
@@ -103,7 +107,7 @@ All parameters below are in the `metrics` section of the configuration.
 | Parameter | Default           | Description |
 |-----------|-------------------|-------------------------------------------------------------------|
 | `<metrics_name>`.enabled | `true` | enables or disables a metric |
-| `<metrics_name>`.add-minion-label<br /><br />Only for:<br /><ul><li>`salt_function_responses_total`</li><li>`salt_scheduled_job_return_total`</li></ul> | `false` | adds minion label<br />_not recommended<br />can lead to cardinality issues_ |
+| `<metrics_name>`.add-minion-label<br /><br />Only for:<br /><ul><li>`salt_function_responses_total`</li><li>`salt_scheduled_job_return_total`</li><li>`salt_job_duration_seconds`</li></ul> | `false` | adds minion label<br />_not recommended<br />can lead to cardinality issues_ |
 | salt_function_status.filters.function | `state.highstate` | updates the metric only if the event function matches the filter |
 | salt_function_status.filters.states | `highstate` | updates the metric only if the event state matches the filter |
 

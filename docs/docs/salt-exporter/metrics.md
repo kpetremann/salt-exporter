@@ -23,10 +23,13 @@ title: Metrics
 | `salt_scheduled_job_return_total` | `function`, `state`, `success`<br />(opt: `minion`) | Counter incremented each time a minion sends a scheduled job result       |
 | `salt_responses_total`            | `minion`, `success`                                 | Total number of job responses<br />_including scheduled_job responses_    |
 | `salt_function_status`            | `function`, `state`, `minion`                       | Last status of a job execution*                                           |
+| `salt_job_duration_seconds`       | `function`, `state`<br />(opt: `minion`)            | Last duration of a state job in seconds**                                 |
 | `salt_health_last_heartbeat`      | `minion` | Last heartbeat from minion in UNIX timestamp
 | `salt_health_minions_total`       |           | Total number of registered minions
 
-\* more details in the section below.
+\* more details in the [Function status](#function-status) section below.
+
+\*\* more details in the [Job duration](#job-duration) section below.
 
 
 
@@ -56,6 +59,27 @@ The value can be:
 You can find an example of Prometheus alerts that could be used [here](https://github.com/kpetremann/salt-exporter/blob/main/prometheus_alerts/highstate.yaml).
 
 See the [configuration page](./configuration.md) if you want to watch other functions/states, or if you want to disable this metric.
+
+## Job duration
+
+`salt_job_duration_seconds` tracks the last known duration of a Salt state job. It is computed by summing the `duration` field of each state step in the return event.
+
+This metric is only available for state functions (`state.sls`, `state.apply`, `state.highstate`, `state.single`) — execution modules do not report per-step durations and will not produce an observation.
+
+Example for a highstate:
+``` promql
+salt_job_duration_seconds{function="state.highstate",state="highstate"} 1.498
+```
+
+With the optional minion label enabled:
+``` promql
+salt_job_duration_seconds{function="state.highstate",minion="node1",state="highstate"} 1.498
+```
+
+!!! warning
+
+    Enabling `add-minion-label` multiplies the number of time series by the number of minions.
+    Only enable it in environments with a small and bounded number of minions.
 
 ## Minions health
 
