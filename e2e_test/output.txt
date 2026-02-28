@@ -1,0 +1,24 @@
+_stamp: 2026-02-28T11:06:46.141500
+cmd: _return
+fun: state.highstate
+fun_args: []
+id: foo
+jid: "20260228110645688669"
+out: highstate
+retcode: 0
+return:
+    test_|-succeed_|-Always a success_|-succeed_with_changes:
+        __id__: succeed
+        __run_num__: 0
+        __sls__: test.succeed
+        changes:
+            testing:
+                new: Something pretended to change
+                old: Unchanged
+        comment: Success!
+        duration: 0.557
+        name: Always a success
+        result: true
+        start_time: "11:06:46.075215"
+success: true
+user: root
