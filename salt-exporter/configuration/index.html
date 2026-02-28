@@ -935,6 +935,10 @@
 </span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;state.highstate&quot;</span>
 </span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="w">      </span><span class="nt">states</span><span class="p">:</span>
 </span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;highstate&quot;</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="w">  </span><span class="nt">salt_job_duration_seconds</span><span class="p">:</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a><span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a><span class="w">    </span><span class="nt">add-minion-label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># not recommended in production</span>
 </span></code></pre></div>
 <h3 id="global-parameters">Global parameters</h3>
 <table>
@@ -1036,7 +1040,7 @@
 <td>enables or disables a metric</td>
 </tr>
 <tr>
-<td><code>&lt;metrics_name&gt;</code>.add-minion-label<br /><br />Only for:<br /><ul><li><code>salt_function_responses_total</code></li><li><code>salt_scheduled_job_return_total</code></li></ul></td>
+<td><code>&lt;metrics_name&gt;</code>.add-minion-label<br /><br />Only for:<br /><ul><li><code>salt_function_responses_total</code></li><li><code>salt_scheduled_job_return_total</code></li><li><code>salt_job_duration_seconds</code></li></ul></td>
 <td><code>false</code></td>
 <td>adds minion label<br /><em>not recommended<br />can lead to cardinality issues</em></td>
 </tr>
