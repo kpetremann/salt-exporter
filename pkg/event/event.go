@@ -48,7 +48,7 @@ type EventData struct {
 	Timestamp string        `msgpack:"_stamp"`
 	User      string        `msgpack:"user"`
 	Schedule  string        `msgpack:"schedule"`
-	Success   bool          `msgpack:"success"`
+	Success   *bool         `msgpack:"success"`
 }
 
 type SaltEvent struct {

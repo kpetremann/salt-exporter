@@ -135,7 +135,7 @@ var expectedStateSlsReturn = event.SaltEvent{
 				"start_time":  "09:17:08.822722",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	},
 	IsScheduleJob:      false,
 	IsTest:             false,
@@ -167,7 +167,7 @@ func fakeStateSlsReturnEvent() []byte {
 				"start_time":  "09:17:08.822722",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)
@@ -333,7 +333,7 @@ var expectedStateSingleReturn = event.SaltEvent{
 				"start_time":  "09:20:38.462572",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	},
 	IsScheduleJob:      false,
 	IsTest:             false,
@@ -370,7 +370,7 @@ func fakeStateSingleReturnEvent() []byte {
 				"start_time":  "09:20:38.462572",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)
@@ -563,7 +563,7 @@ var expectedTestMockStateSlsReturn = event.SaltEvent{
 				"start_time":  "09:17:08.812345",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	},
 	IsScheduleJob:      false,
 	IsTest:             true,
@@ -612,7 +612,7 @@ func fakeTestMockStateSlsReturnEvent() []byte {
 				"start_time":  "09:17:08.812345",
 			},
 		},
-		Success: true,
+		Success: new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)

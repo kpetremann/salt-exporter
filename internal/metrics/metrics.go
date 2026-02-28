@@ -30,22 +30,26 @@ func eventToMetrics(e event.SaltEvent, r *Registry) {
 		r.IncreaseExpectedResponsesTotal(e.Data.Fun, state, float64(e.TargetNumber))
 
 	case "ret":
+		//  for normal job, success field can be missing under certain conditions.
+		//
+		//  for scheduled job, when the states in the job actually failed
+		// - the global "success" value is always true
+		// - the state module success is false, but the global retcode is > 0
+		// - if defined, the "result" of a state module in event.Return covers
+		//   the corner case when retccode is not properly computed by Salt.
+		//
+		// using retcode and state module success could be enough, but we combine all values
+		// in case there are other corner cases.
 		state := e.ExtractState()
-		success := e.Data.Success
+		success := e.Data.Retcode == 0
+		if e.Data.Success != nil {
+			success = success && *e.Data.Success
+		}
+		if e.StateModuleSuccess != nil {
+			success = success && *e.StateModuleSuccess
+		}
 
 		if e.IsScheduleJob {
-			// for scheduled job, when the states in the job actually failed
-			// - the global "success" value is always true
-			// - the state module success is false, but the global retcode is > 0
-			// - if defined, the "result" of a state module in event.Return covers
-			//   the corner case when retccode is not properly computed by Salt.
-			//
-			// using retcode and state module success could be enough, but we combine all values
-			// in case there are other corner cases.
-			success = e.Data.Success && (e.Data.Retcode == 0)
-			if e.StateModuleSuccess != nil {
-				success = success && *e.StateModuleSuccess
-			}
 			r.IncreaseScheduledJobReturnTotal(e.Data.Fun, state, e.Data.ID, success)
 		} else {
 			r.IncreaseFunctionResponsesTotal(e.Data.Fun, state, e.Data.ID, success)

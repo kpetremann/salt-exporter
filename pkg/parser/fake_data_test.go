@@ -18,7 +18,7 @@ type FakeData struct {
 	Retcode   int           `msgpack:"retcode"`
 	Return    interface{}   `msgpack:"return"`
 	Schedule  string        `msgpack:"schedule"`
-	Success   bool          `msgpack:"success"`
+	Success   *bool         `msgpack:"success"`
 	Tgt       interface{}   `msgpack:"tgt"`
 	TgtType   string        `msgpack:"tgt_type"`
 	Timestamp string        `msgpack:"_stamp"`

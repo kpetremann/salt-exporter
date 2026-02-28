@@ -95,7 +95,7 @@ var expectedReturnJob = event.SaltEvent{
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return:    true,
-		Success:   true,
+		Success:   new(true),
 	},
 	IsScheduleJob: false,
 }
@@ -110,7 +110,7 @@ func fakeRetJobEvent() []byte {
 		Jid:       "20220630000000000000",
 		Retcode:   0,
 		Return:    true,
-		Success:   true,
+		Success:   new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)
@@ -223,7 +223,7 @@ var expectedAckScheduleJob = event.SaltEvent{
 			"comment": "Scheduling Job sync_all on minion.",
 			"result":  true,
 		},
-		Success: true,
+		Success: new(true),
 	},
 	IsScheduleJob: false,
 }
@@ -242,7 +242,7 @@ func fakeAckScheduleJobEvent() []byte {
 			"comment": "Scheduling Job sync_all on minion.",
 			"result":  true,
 		},
-		Success: true,
+		Success: new(true),
 	}
 
 	fakeBody, err := msgpack.Marshal(fake)
@@ -327,7 +327,7 @@ var expectedScheduleJobReturn = event.SaltEvent{
 			"utils":        []interface{}{},
 		},
 		Schedule: "sync_all",
-		Success:  true,
+		Success:  new(true),
 		Tgt:      "localhost",
 		TgtType:  "glob",
 	},
@@ -363,7 +363,7 @@ func fakeScheduleJobReturnEvent() []byte {
 			"utils":        []interface{}{},
 		},
 		Schedule: "sync_all",
-		Success:  true,
+		Success:  new(true),
 		Tgt:      "localhost",
 		TgtType:  "glob",
 	}
