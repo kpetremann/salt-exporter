@@ -24,6 +24,7 @@ type Registry struct {
 	functionStatus *prometheus.GaugeVec
 
 	statusLastResponse *prometheus.GaugeVec
+	eventLastResponse  *prometheus.GaugeVec
 	minionsTotal       *prometheus.GaugeVec
 
 	jobDurationSeconds *prometheus.GaugeVec
@@ -103,6 +104,13 @@ func NewRegistry(config Config) Registry {
 			},
 			[]string{"minion"},
 		),
+		eventLastResponse: promauto.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "salt_responses_last_received_response",
+				Help: "Last event received from minion, Unix timestamp",
+			},
+			[]string{"minion"},
+		),
 		minionsTotal: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "salt_health_minions_total",
@@ -125,6 +133,11 @@ func (r *Registry) UpdateLastHeartbeat(minion string) {
 	r.statusLastResponse.WithLabelValues(minion).Set(float64(timestamp))
 }
 
+func (r *Registry) UpdateEventLastResponse(minion string) {
+	timestamp := time.Now().Unix()
+	r.eventLastResponse.WithLabelValues(minion).Set(float64(timestamp))
+}
+
 func (r *Registry) AddObservableMinion(minion string) {
 	r.observedMinions += 1
 	r.UpdateLastHeartbeat(minion)
@@ -133,6 +146,7 @@ func (r *Registry) AddObservableMinion(minion string) {
 
 func (r *Registry) DeleteObservableMinion(minion string) {
 	r.statusLastResponse.DeleteLabelValues(minion)
+	r.eventLastResponse.DeleteLabelValues(minion)
 	r.observedMinions -= 1
 	r.minionsTotal.WithLabelValues().Set(float64(r.observedMinions))
 }
