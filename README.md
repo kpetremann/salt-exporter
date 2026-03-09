@@ -50,8 +50,15 @@ salt_scheduled_job_return_total{function="state.sls",minion="local",state="test"
 salt_health_last_heartbeat{minion="local"} 1703053536
 salt_health_last_heartbeat{minion="node1"} 1703053536
 
+salt_responses_last_received_response{minion="local"} 1703053537
+salt_responses_last_received_response{minion="node1"} 1703053535
+
 salt_health_minions_total{} 2
 ```
+
+The exporter tracks minion health using multiple metrics:
+- `salt_health_last_heartbeat`: last heartbeat timestamp from status beacons
+- `salt_responses_last_received_response`: last received response timestamp (job results, events, etc.)
 
 ### Deprecation notice
 

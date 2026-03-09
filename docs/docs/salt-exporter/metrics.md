@@ -25,6 +25,7 @@ title: Metrics
 | `salt_function_status`            | `function`, `state`, `minion`                       | Last status of a job execution*                                           |
 | `salt_job_duration_seconds`       | `function`, `state`<br />(opt: `minion`)            | Last duration of a state job in seconds**                                 |
 | `salt_health_last_heartbeat`      | `minion` | Last heartbeat from minion in UNIX timestamp
+| `salt_responses_last_received_response` | `minion` | Last event received from minion in UNIX timestamp
 | `salt_health_minions_total`       |           | Total number of registered minions
 
 \* more details in the [Function status](#function-status) section below.
@@ -89,11 +90,18 @@ On startup, all currently accepted minions are added with last heartbeat set to 
 
 To use this functionality you'll need to add [`status` beacon](https://docs.saltproject.io/en/latest/ref/beacons/all/salt.beacons.status.html#:~:text=salt.-,beacons.,presence%20to%20be%20set%20up.) to each minion. It doesn't mater what functions will returned or the period. Exporter will just detect such events (in the format `salt/beacon/<minion id>/status`) and register the timestamp as last heartbeat.
 
+The exporter also tracks the last received response timestamp via `salt_responses_last_received_response` metric, which records when any response (job result, event, etc.) was received from each minion. This provides additional insight into minion activity beyond just heartbeat beacons.
+
 ### Detecting dead minions
 
 The most simple way is (e.g. no heartbeat in last hour):
     ``` { .promql .copy }
     (time() - salt_health_last_heartbeat) > 3600
+    ```
+
+Similarly, to detect minions with no recent responses (e.g. no response in last hour):
+    ``` { .promql .copy }
+    (time() - salt_responses_last_received_response) > 3600
     ```
 > __NOTE__: Above is assuming beacon interval is set to < 3600 seconds
 
@@ -173,6 +181,9 @@ More advanced:
     ```promql
     salt_health_last_heartbeat{minion="local"} 1703053536
     salt_health_last_heartbeat{minion="node1"} 1703052536
+
+    salt_responses_last_received_response{minion="local"} 1703053537
+    salt_responses_last_received_response{minion="node1"} 1703052535
 
     salt_health_minions_total{} 2
     ```
