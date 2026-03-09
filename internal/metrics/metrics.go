@@ -15,6 +15,11 @@ func boolToFloat64(b bool) float64 {
 }
 
 func eventToMetrics(e event.SaltEvent, r *Registry) {
+	// If we receive at least some response from the minion, we can consider it alive, regardless of its actual state
+	if e.Data.ID != "" {
+		r.UpdateEventLastResponse(e.Data.ID)
+	}
+
 	if e.Module == event.BeaconModule {
 		if e.Type != "status" {
 			return
