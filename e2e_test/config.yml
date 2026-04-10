@@ -1,4 +1,0 @@
-metrics:
-  salt_job_duration_seconds:
-    enabled: true
-    add-minion-label: true
