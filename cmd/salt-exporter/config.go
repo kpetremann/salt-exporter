@@ -41,9 +41,9 @@ type Config struct {
 	IPCFile       string `mapstructure:"ipc-file"`
 	PKIDir        string `mapstructure:"pki-dir"`
 	TLS           struct {
-		Enabled     bool
-		Key         string
-		Certificate string
+		Enabled     bool   `mapstructure:"enabled"`
+		Key         string `mapstructure:"key"`
+		Certificate string `mapstructure:"certificate"`
 	}
 
 	Metrics metrics.Config
