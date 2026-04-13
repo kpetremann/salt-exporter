@@ -44,7 +44,7 @@ type Config struct {
 		Enabled     bool   `mapstructure:"enabled"`
 		Key         string `mapstructure:"key"`
 		Certificate string `mapstructure:"certificate"`
-	}
+	} `mapstructure:"tls"`
 
 	Metrics metrics.Config
 }
