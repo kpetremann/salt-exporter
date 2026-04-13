@@ -30,9 +30,9 @@ func TestReadConfigFlagOnly(t *testing.T) {
 				IPCFile:       listener.DefaultIPCFilepath,
 				PKIDir:        listener.DefaultPKIDirpath,
 				TLS: struct {
-					Enabled     bool   `mapstructure:"enabled"`
-					Key         string `mapstructure:"key"`
-					Certificate string `mapstructure:"certificate"`
+					Enabled     bool
+					Key         string
+					Certificate string
 				}{
 					Enabled:     false,
 					Key:         "",
@@ -129,9 +129,9 @@ func TestReadConfigFlagOnly(t *testing.T) {
 				IPCFile:       "/dev/null",
 				PKIDir:        "/etc/salt/pki/master",
 				TLS: struct {
-					Enabled     bool   `mapstructure:"enabled"`
-					Key         string `mapstructure:"key"`
-					Certificate string `mapstructure:"certificate"`
+					Enabled     bool
+					Key         string
+					Certificate string
 				}{
 					Enabled:     true,
 					Key:         "./key",
@@ -263,9 +263,9 @@ func TestConfigFileOnly(t *testing.T) {
 		IPCFile:       "/dev/null",
 		PKIDir:        "/tmp/pki",
 		TLS: struct {
-			Enabled     bool   `mapstructure:"enabled"`
-			Key         string `mapstructure:"key"`
-			Certificate string `mapstructure:"certificate"`
+			Enabled     bool
+			Key         string
+			Certificate string
 		}{
 			Enabled:     true,
 			Key:         "/path/to/key",
@@ -382,9 +382,9 @@ func TestConfigFileWithFlags(t *testing.T) {
 		IPCFile:       "/somewhere",
 		PKIDir:        "/tmp/pki",
 		TLS: struct {
-			Enabled     bool   `mapstructure:"enabled"`
-			Key         string `mapstructure:"key"`
-			Certificate string `mapstructure:"certificate"`
+			Enabled     bool
+			Key         string
+			Certificate string
 		}{
 			Enabled:     true,
 			Key:         "/path/to/key",
