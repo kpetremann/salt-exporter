@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-env:
-  COMPOSE_FILE: e2e_test/docker-compose.yaml
-
 jobs:
   tests:
     name: "Lint and test"
@@ -36,6 +33,14 @@ jobs:
   e2e:
     name: "End-to-end tests"
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compose-file:
+          # - e2e_test/docker-compose.3006.yaml
+          - e2e_test/docker-compose.yaml
+    env:
+      COMPOSE_FILE: ${{ matrix.compose-file }}
     steps:
       - uses: actions/checkout@v5
 
