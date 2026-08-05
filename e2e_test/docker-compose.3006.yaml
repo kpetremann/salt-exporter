@@ -1,6 +1,6 @@
 services:
   salt_master:
-    build: ./salt
+    image: saltstack/salt:3006.4
     environment:
       SALT_MASTER_CONFIG: '{"interface": "0.0.0.0", "auto_accept": true}'
     volumes:
@@ -8,15 +8,13 @@ services:
       - ./states:/srv/salt/:ro
       - ipc:/var/run/salt/master/
       - pki:/etc/salt/pki/master/
-    command: ["salt-master", "-l", "info"]
     networks:
       - e2e
 
   minion:
-    build: ./salt
+    image: saltstack/salt:3006.4
     environment:
       SALT_MINION_CONFIG: '{"id": "foo", "master": "salt_master"}'
-    command: ["salt-minion", "-l", "info"]
     healthcheck:
       test: ["CMD-SHELL", "salt-call status.ping_master salt_master"]
       interval: 1s

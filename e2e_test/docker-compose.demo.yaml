@@ -4,11 +4,13 @@ services:
       - ../e2e_test/:/test/:ro
       - ./states:/srv/salt/:ro
       - ./ipc.ignore:/var/run/salt/master/
+      - ./pki.ignore:/etc/salt/pki/master/
 
   exporter:
     volumes:
       - ../:/app/:ro
       - ./ipc.ignore:/var/run/salt/master/:ro
+      - ./pki.ignore:/etc/salt/pki/master/:ro
 
   # recorder:
   #   image: ghcr.io/charmbracelet/vhs:v0.5.1-devel
