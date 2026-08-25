@@ -2,7 +2,10 @@ package listener
 
 import (
 	"context"
+	"encoding/binary"
 	"errors"
+	"fmt"
+	"io"
 	"net"
 	"time"
 
@@ -31,9 +34,6 @@ type EventListener struct {
 	// saltEventBus keeps the connection to the salt-master event bus
 	saltEventBus net.Conn
 
-	// decoder is msgpack decoder for parsing the event bus messages
-	decoder *msgpack.Decoder
-
 	eventParser eventParser
 }
 
@@ -55,7 +55,6 @@ func (e *EventListener) Open() {
 			time.Sleep(time.Second * 5)
 		} else {
 			log.Info().Msg("successfully connected to event bus")
-			e.decoder = msgpack.NewDecoder(e.saltEventBus)
 			return
 		}
 	}
@@ -104,7 +103,36 @@ func (e *EventListener) SetIPCFilepath(filepath string) {
 	e.iPCFilepath = filepath
 }
 
-// ListenEvents listens to the salt-master event bus and sends events to the event channel.
+// readFramedEvent reads one length-prefixed msgpack frame from the salt
+// event bus and unpacks it into a map with "head" and "body" keys, per
+// salt's frame_msg_ipc wire format: 4-byte big-endian length + msgpack payload.
+func (e *EventListener) readFramedEvent() (map[string]interface{}, error) {
+	lenBuf := make([]byte, 4)
+	n, err := io.ReadFull(e.saltEventBus, lenBuf)
+	if err != nil {
+		return nil, fmt.Errorf("read length prefix: %w", err)
+	}
+
+	msgLen := binary.BigEndian.Uint32(lenBuf)
+	if msgLen == 0 {
+		log.Info().Msg("frame length is zero, skipping read of payload")
+		return nil, fmt.Errorf("frame length is zero")
+	}
+
+	payload := make([]byte, msgLen)
+	n, err = io.ReadFull(e.saltEventBus, payload)
+	if err != nil {
+		return nil, fmt.Errorf("read payload: %w", err)
+	}
+
+	var framed map[string]interface{}
+	if err := msgpack.Unmarshal(payload, &framed); err != nil {
+		return nil, fmt.Errorf("unmarshal payload: %w", err)
+	}
+
+	return framed, nil
+}
+
 func (e *EventListener) ListenEvents() {
 	e.Open()
 
@@ -115,7 +143,7 @@ func (e *EventListener) ListenEvents() {
 			e.Close()
 			return
 		default:
-			message, err := e.decoder.DecodeMap()
+			framed, err := e.readFramedEvent()
 			if err != nil {
 				log.Error().Str("error", err.Error()).Msg("unable to read event")
 				log.Error().Msg("event bus may be closed, trying to reconnect")
@@ -124,9 +152,17 @@ func (e *EventListener) ListenEvents() {
 
 				continue
 			}
-			if event, err := e.eventParser.Parse(message); err == nil {
-				e.eventChan <- event
+
+			evt, err := e.eventParser.Parse(framed)
+			if err != nil {
+				log.Debug().
+					Str("error", err.Error()).
+					Interface("framed", framed).
+					Msg("event parser failed")
+				continue
 			}
+
+			e.eventChan <- evt
 		}
 	}
 }
