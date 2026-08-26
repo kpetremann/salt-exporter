@@ -1,3 +1,4 @@
+log-level: "debug"
 metrics:
   salt_job_duration_seconds:
     enabled: true

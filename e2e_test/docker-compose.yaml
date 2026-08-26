@@ -1,6 +1,10 @@
 services:
   salt_master:
-    build: ./salt
+    build:
+      context: ./salt
+      args:
+        SALT_VERSION: ${SALT_VERSION:-3008.2}
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.13}
     environment:
       SALT_MASTER_CONFIG: '{"interface": "0.0.0.0", "auto_accept": true}'
     volumes:
@@ -13,7 +17,11 @@ services:
       - e2e
 
   minion:
-    build: ./salt
+    build:
+      context: ./salt
+      args:
+        SALT_VERSION: ${SALT_VERSION:-3008.2}
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.13}
     environment:
       SALT_MINION_CONFIG: '{"id": "foo", "master": "salt_master"}'
     command: ["salt-minion", "-l", "info"]
