@@ -37,6 +37,7 @@ func main() {
 	ipcFilepath := flag.String("ipc-file", listener.DefaultIPCFilepath, "file location of the salt-master event bus")
 	versionCmd := flag.Bool("version", false, "print version")
 	debug := flag.Bool("debug", false, "enable debug mode (log to debug.log)")
+	raw := flag.Bool("raw", false, "print parsed events or parsing errors to stdout/stderr instead of showing the TUI")
 	flag.Parse()
 
 	if *debug {
@@ -61,7 +62,21 @@ func main() {
 	parser := parser.NewEventParser(true)
 	eventListener := listener.NewEventListener(ctx, parser, eventChan)
 	eventListener.SetIPCFilepath(*ipcFilepath)
+
 	go eventListener.ListenEvents()
+
+	if *raw {
+		fmt.Println("starting raw mode")
+		for {
+			select {
+			case ev := <-eventChan:
+				fmt.Println(ev.Tag, string(ev.RawBody))
+			case <-ctx.Done():
+				fmt.Println("exiting")
+				return
+			}
+		}
+	}
 
 	p := tea.NewProgram(tui.NewModel(eventChan, *maxItems, *filter), tea.WithMouseCellMotion())
 	if _, err := p.Run(); err != nil {
